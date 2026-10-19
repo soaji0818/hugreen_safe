@@ -164,7 +164,7 @@ export default function DataTable({
                 onDoubleClick={() => onRowDoubleClick?.(row.id)}
               >
                 {selectable && (
-                  <td>
+                  <td className="selection-cell">
                     <input
                       type="checkbox"
                       aria-label={`${row.id} 선택`}

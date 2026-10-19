@@ -329,7 +329,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
   };
 
   return (
-    <section className="work-panel screen-format-list-detail" aria-label="AI CCTV 기준정보 관리 업무 영역">
+    <section className="work-panel screen-format-list-detail cctv-master-page" aria-label="AI CCTV 기준정보 관리 업무 영역">
       <SearchFilterPanel
         className="standard-filter-panel"
         ariaLabel="AI CCTV 기준정보 관리 조회 조건"

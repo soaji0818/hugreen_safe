@@ -268,7 +268,7 @@ textarea { min-height: 76px; resize: vertical; line-height: 1.55; }
 .table-scroll { overflow: auto; }
 .cctv-master-table { position: relative; }
 .cctv-master-table::after { position: absolute; top: 0; right: 0; z-index: 4; width: 8px; height: 34px; border-bottom: 1px solid var(--line); background: #f2f4f6; content: ""; }
-.cctv-master-table .table-scroll { height: 394px; min-height: 394px; overflow: auto; scrollbar-gutter: stable; overscroll-behavior: contain; background: linear-gradient(to bottom,#f2f4f6 0 34px,var(--surface-base) 34px); scrollbar-color: #b8c0c8 transparent; }
+.cctv-master-table .table-scroll { width: 100%; height: 100%; min-height: 0; overflow: auto; scrollbar-gutter: stable; overscroll-behavior: contain; background: linear-gradient(to bottom,#f2f4f6 0 34px,var(--surface-base) 34px); scrollbar-color: #b8c0c8 transparent; }
 .cctv-master-table .table-scroll::-webkit-scrollbar { width: 8px; height: 8px; background: transparent; }
 .cctv-master-table .table-scroll::-webkit-scrollbar-track:vertical { margin-top: 34px; background: transparent; }
 .cctv-master-table .table-scroll::-webkit-scrollbar-thumb { border: 2px solid transparent; border-radius: 999px; background: #b8c0c8; background-clip: padding-box; }
@@ -281,7 +281,7 @@ td { height: 36px; padding: 3px 10px; border-right: 1px solid #edf0f2; border-bo
 tbody tr { background: white; }
 tbody tr:hover { background: #f7faf9; }
 tr.selected { background: var(--green-pale); }
-.selection-col, td:first-child { width: 42px; text-align: center; }
+.selection-col, .selection-cell { width: 42px; padding-inline: 0; text-align: center; vertical-align: middle; }
 .selection-column-width { width: 42px; }
 .resizable-table.columns-resized { min-width: 0; table-layout: fixed; }
 .resizable-table th { position: relative; }
@@ -316,6 +316,8 @@ tr.selected { background: var(--green-pale); }
   border-radius: 5px;
   background-repeat: no-repeat;
 }
+.table-panel .selection-cell input[type="checkbox"] { display: block; margin: 0 auto; }
+.table-panel .selection-cell input[type="checkbox"]:checked { background-position: center; background-size: 100% 100%; }
 .identifier { color: inherit; font-size: inherit; line-height: inherit; font-weight: inherit; font-variant-numeric: tabular-nums; }
 .date-line { display: inline-block; color: inherit; font-size: inherit; font-weight: inherit; line-height: inherit; white-space: nowrap; font-variant-numeric: tabular-nums; }
 td small { display: block; margin-top: 0; color: #8b95a1; font-size: var(--type-caption-size); line-height: var(--type-caption-line); font-variant-numeric: tabular-nums; }
@@ -639,6 +641,8 @@ dialog.cctv-detail-dialog::backdrop { backdrop-filter: none; }
   main { min-height: calc(var(--scaled-viewport-height) - 145px); display: block; overflow: hidden; padding-bottom: 0; }
   main.has-inline-detail { overflow: hidden; }
   .work-panel { flex: none; }
+  .cctv-master-page { height: calc(var(--scaled-viewport-height) - 145px); }
+  .cctv-master-page .cctv-master-table { min-height: 180px; display: flex; flex: 1; }
   .has-inline-detail .work-panel { flex: none; }
   .page-heading, .filter-panel, .list-actions { flex: none; }
   .table-panel { min-height: 0; display: block; margin-bottom: 0; }

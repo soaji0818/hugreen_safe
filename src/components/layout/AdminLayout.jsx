@@ -3,6 +3,10 @@ import Icon from "../ui/Icon";
 
 const favoriteMenus = ["MES-TD3-007", "MES-TD3-017", "MES-TD3-008"];
 
+function releaseMouseFocus(event) {
+  if (event.pointerType === "mouse") event.currentTarget.blur();
+}
+
 export default function AdminLayout({
   groups,
   items,
@@ -87,6 +91,7 @@ export default function AdminLayout({
                 key={id}
                 className={id === current ? "active" : ""}
                 aria-current={id === current ? "page" : undefined}
+                onPointerUp={releaseMouseFocus}
                 onClick={() => navigate(id, false)}
               >
                 {itemMap.get(id)}
@@ -101,6 +106,7 @@ export default function AdminLayout({
                 className="group"
                 aria-label={group.name}
                 aria-expanded={openGroups.includes(group.name) || Boolean(menuQuery)}
+                onPointerUp={releaseMouseFocus}
                 onClick={() => setOpenGroups((currentGroups) =>
                   currentGroups.includes(group.name)
                     ? currentGroups.filter((name) => name !== group.name)
@@ -120,6 +126,7 @@ export default function AdminLayout({
                         key={id}
                         className={id === current ? "active" : ""}
                         aria-current={id === current ? "page" : undefined}
+                        onPointerUp={releaseMouseFocus}
                         onClick={() => navigate(id)}
                       >
                         <span>{label}</span>
