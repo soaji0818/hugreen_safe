@@ -12,6 +12,7 @@ dist
 dist-ssr
 output
 *.local
+tmp/pdfs/
 
 # Environment variables and local secrets
 .env

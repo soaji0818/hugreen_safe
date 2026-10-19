@@ -246,7 +246,7 @@ textarea { min-height: 76px; resize: vertical; line-height: 1.55; }
 .cctv-master-filter-grid { grid-template-columns: minmax(0,.8fr) repeat(2,minmax(0,1.1fr)); }
 .filter-grid.cctv-master-filter-grid > label { grid-template-columns: 140px minmax(0,1fr); }
 .cctv-master-filter-grid > label > span:first-child { white-space: nowrap; }
-.cctv-master-filter-grid .ui-select { width: 100%; justify-self: stretch; }
+.cctv-master-filter-grid .ui-select { width: 100%; justify-self: stretch; padding-right: 10px; }
 .cctv-master-page .filter-actions.no-keyword .text-btn svg { transform: scaleX(-1); }
 .cctv-master-page .standard-filter-panel { padding-top: 0; }
 .cctv-master-page .filter-actions.no-keyword { margin-bottom: 0; }
