@@ -8,6 +8,7 @@ export default function SearchFilterPanel({
   onKeywordChange,
   onReset,
   showKeyword = true,
+  showReset = true,
   endAction,
   children,
 }) {
@@ -29,10 +30,12 @@ export default function SearchFilterPanel({
             />
           </label>
         )}
-        <button type="button" className="text-btn" onClick={onReset}>
-          <Icon name="reset" size={15} />
-          초기화
-        </button>
+        {showReset && (
+          <button type="button" className="text-btn" onClick={onReset}>
+            <Icon name="reset" size={15} />
+            초기화
+          </button>
+        )}
         {endAction && <div className="filter-actions-end">{endAction}</div>}
       </div>
       {children}

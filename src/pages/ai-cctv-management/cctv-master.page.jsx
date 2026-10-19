@@ -494,6 +494,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
         ariaLabel="AI CCTV 기준정보 관리 조회 조건"
         onReset={resetFilters}
         showKeyword={false}
+        showReset={false}
         endAction={(
           <>
             <Button
@@ -561,6 +562,10 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
 
       <div className="list-actions" aria-label="목록 작업">
         <span className="table-result-count" role="status">총 {filteredRows.length}건</span>
+        <button type="button" className="text-btn" onClick={resetFilters}>
+          <Icon name="reset" size={15} />
+          조건 초기화
+        </button>
       </div>
 
       <section className="table-panel screen-format-list-detail cctv-master-table" aria-label="조회 결과">
