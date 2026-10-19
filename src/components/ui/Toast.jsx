@@ -1,4 +1,11 @@
+/* oxlint-disable react/only-export-components -- Toast messages intentionally live with the Toast component. */
 import { useEffect, useRef } from "react";
+
+export const TOAST_MESSAGES = Object.freeze({
+  save: "저장되었습니다.",
+  update: "수정되었습니다.",
+  delete: "삭제되었습니다.",
+});
 
 export default function Toast({
   open,
