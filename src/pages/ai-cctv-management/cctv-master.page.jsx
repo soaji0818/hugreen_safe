@@ -51,6 +51,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
   const [deletePending, setDeletePending] = useState(false);
   const [notice, setNotice] = useState(null);
   const [invalidField, setInvalidField] = useState("");
+  const [validationMessage, setValidationMessage] = useState("");
   const detailDialog = useRef(null);
   const saveController = useRef(null);
 
@@ -147,6 +148,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
   };
   const openDetail = (id) => {
     setInvalidField("");
+    setValidationMessage("");
     setEditBaseline(null);
     setSelectedId(id);
     setCreateMode(false);
@@ -167,6 +169,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
       useYn: "Y",
     };
     setInvalidField("");
+    setValidationMessage("");
     setEditBaseline(initialValues);
     setCreateMode(true);
     setEditValues(initialValues);
@@ -183,6 +186,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     setEditValues(null);
     setEditBaseline(null);
     setInvalidField("");
+    setValidationMessage("");
     setDetailOpen(false);
   };
   const closeDetail = () => {
@@ -207,6 +211,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
       useYn: selectedRow.useYn || "Y",
     };
     setInvalidField("");
+    setValidationMessage("");
     setEditBaseline(initialValues);
     setCreateMode(false);
     setEditValues(initialValues);
@@ -216,12 +221,16 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     setEditValues((current) => ({ ...current, [key]: value }));
   };
   const handleEditValueChange = (key, event) => {
-    if (invalidField === key) setInvalidField("");
+    if (invalidField === key) {
+      setInvalidField("");
+      setValidationMessage("");
+    }
     updateEditValue(key, event.target.value);
   };
   const saveChanges = async (event) => {
     event.preventDefault();
     if (!editValues || (!createMode && !selectedRow)) return;
+    const form = event.currentTarget;
 
     const missingField = detailFields.find(({ key, required, readOnly }) =>
       required
@@ -229,8 +238,9 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
       && String(editValues[key] ?? "").trim() === "",
     );
     if (missingField) {
-      const missingControl = event.currentTarget.elements.namedItem(missingField.key);
+      const missingControl = form.elements.namedItem(missingField.key);
       setInvalidField(missingField.key);
+      setValidationMessage("* 표시는 필숫값입니다.");
       window.requestAnimationFrame(() => missingControl?.focus());
       return;
     }
@@ -239,6 +249,17 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
       ? editValues.cameraId.trim()
       : selectedRow.cameraId || selectedRow.id;
     if (!cameraId) return;
+    const duplicateCameraId = createMode && rows.some((row) =>
+      String(row.cameraId || row.id).trim().toLocaleUpperCase()
+      === cameraId.toLocaleUpperCase(),
+    );
+    if (duplicateCameraId) {
+      const cameraIdControl = form.elements.namedItem("cameraId");
+      setInvalidField("cameraId");
+      setValidationMessage("중복된 ID입니다.");
+      window.requestAnimationFrame(() => cameraIdControl?.focus());
+      return;
+    }
     const wasCreating = createMode;
 
     const controller = new AbortController();
@@ -265,6 +286,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
       setEditValues(null);
       setEditBaseline(null);
       setInvalidField("");
+      setValidationMessage("");
       setDetailOpen(false);
       setNotice({
         title: wasCreating ? TOAST_MESSAGES.save : TOAST_MESSAGES.update,
@@ -279,7 +301,16 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
         onUnauthorized?.();
       } else {
         const errorMessage = requestError.message || "카메라 정보를 다시 확인해 주세요.";
-        if (!errorMessage.includes("입력값을 확인하세요")) {
+        const isDuplicateError = wasCreating && (
+          requestError.status === 409
+          || /중복|duplicate|already exists|이미.*(?:존재|사용)/i.test(errorMessage)
+        );
+        if (isDuplicateError) {
+          const cameraIdControl = form.elements.namedItem("cameraId");
+          setInvalidField("cameraId");
+          setValidationMessage("중복된 ID입니다.");
+          window.requestAnimationFrame(() => cameraIdControl?.focus());
+        } else if (!errorMessage.includes("입력값을 확인하세요")) {
           setNotice({
             title: "저장하지 못했습니다.",
             description: errorMessage,
@@ -558,7 +589,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
               ))}
             </dl>
             {invalidField && (
-              <p className="cctv-required-message" role="alert">* 표시는 필숫값입니다.</p>
+              <p className="cctv-required-message" role="alert">{validationMessage}</p>
             )}
             {!editMode && (
               <section className="cctv-zone-section" aria-labelledby="cctv-zone-title">

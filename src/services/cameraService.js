@@ -34,9 +34,30 @@ export function toCameraRow(camera) {
   };
 }
 
+function compareByInsertTime(left, right) {
+  const leftValue = left.insertTime;
+  const rightValue = right.insertTime;
+
+  if (!leftValue && !rightValue) return 0;
+  if (!leftValue) return -1;
+  if (!rightValue) return 1;
+
+  const leftTime = typeof leftValue === "number"
+    ? leftValue
+    : Date.parse(String(leftValue).replace(" ", "T"));
+  const rightTime = typeof rightValue === "number"
+    ? rightValue
+    : Date.parse(String(rightValue).replace(" ", "T"));
+
+  if (!Number.isNaN(leftTime) && !Number.isNaN(rightTime)) return leftTime - rightTime;
+  return String(leftValue).localeCompare(String(rightValue));
+}
+
 export async function getCameras(params) {
   const payload = await fetchCameras(params);
-  return (payload?.data || []).map(toCameraRow);
+  return [...(payload?.data || [])]
+    .sort(compareByInsertTime)
+    .map(toCameraRow);
 }
 
 export async function removeCamera(params) {
