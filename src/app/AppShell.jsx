@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useBlocker, useLocation, useNavigate } from "react-router-dom";
-import AdminLayout from "../components/layout/AdminLayout";
+import Content from "../components/layout/Content";
+import Header from "../components/layout/Header";
+import Sidebar from "../components/layout/Sidebar";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
 
 const MAX_OPEN_TABS = 7;
@@ -13,8 +15,13 @@ export default function AppShell({ groups, pages, initialRows, user, onLogout })
   const [openTabs, setOpenTabs] = useState(() => currentPageId ? [currentPageId] : []);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [pendingLeaveAction, setPendingLeaveAction] = useState(null);
+  const [openGroups, setOpenGroups] = useState([]);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [menuQuery, setMenuQuery] = useState("");
   const allowNextNavigation = useRef(false);
   const items = groups.flatMap((group) => group.items);
+  const itemMap = new Map(items.map(([id, label]) => [id, label]));
   const PageComponent = page?.Component;
   const hasInlineDetail = Boolean(
     page?.config.detail
@@ -70,6 +77,20 @@ export default function AppShell({ groups, pages, initialRows, user, onLogout })
     if (pageId === currentPageId) return;
     requestLeave(() => performNavigate(pageId));
   };
+  const navigateFromLayout = (pageId, expandMenu = true) => {
+    navigateToPage(pageId);
+    if (expandMenu) {
+      const owner = groups.find((group) =>
+        group.items.some(([itemId]) => itemId === pageId),
+      );
+      if (owner) {
+        setOpenGroups((currentGroups) => [
+          ...new Set([...currentGroups, owner.name]),
+        ]);
+      }
+    }
+    setMobileOpen(false);
+  };
   const navigateHome = () => {
     if (currentPageId === null) return;
     requestLeave(() => {
@@ -109,46 +130,91 @@ export default function AppShell({ groups, pages, initialRows, user, onLogout })
     setPendingLeaveAction(null);
     if (blocker.state === "blocked") blocker.reset();
   };
+  const toggleGroup = (groupName) => {
+    setOpenGroups((currentGroups) =>
+      currentGroups.includes(groupName)
+        ? currentGroups.filter((name) => name !== groupName)
+        : [...currentGroups, groupName],
+    );
+  };
+  const toggleSidebar = () => {
+    if (window.matchMedia("(max-width: 800px)").matches) {
+      setMobileOpen(true);
+    } else {
+      setSidebarCollapsed((value) => !value);
+    }
+  };
+  const navigateHomeFromLayout = () => {
+    navigateHome();
+    setMobileOpen(false);
+  };
 
   return (
-    <AdminLayout
-      groups={groups}
-      items={items}
-      current={currentPageId}
-      tabs={openTabs}
-      title={page?.title || "스마트 안전관리 시스템"}
-      user={user}
-      mainClassName={hasInlineDetail ? "has-inline-detail" : ""}
-      onNavigate={navigateToPage}
-      onHome={navigateHome}
-      onCloseTab={closeTab}
-      onLogout={() => requestLeave(onLogout)}
-    >
-      {PageComponent ? (
-        <PageComponent
-          key={currentPageId}
-          pageDefinition={page}
-          initialRows={initialRows}
-          user={user}
-          onUnauthorized={onLogout}
-          onUnsavedChange={setHasUnsavedChanges}
-        />
-      ) : (
-        <section className="home-welcome" aria-label="휴그린 스마트 안전관리 시스템">
-          <div className="home-welcome-content">
-            <img src={`${import.meta.env.BASE_URL}hugreen-logo.png`} alt="휴그린 주식회사" />
-            <p>좌측 사이드바에서 메뉴를 선택해 주세요.</p>
-          </div>
-        </section>
-      )}
-      <ConfirmDialog
-        open={Boolean(pendingLeaveAction) || blocker.state === "blocked"}
-        title="저장되지 않은 내용이 있습니다."
-        description="저장하지 않고 나가시겠습니까?"
-        confirmLabel="나가기"
-        onCancel={cancelLeave}
-        onConfirm={confirmLeave}
+    <div className={`app ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
+      <a className="skip" href="#main">본문으로 이동</a>
+      <Sidebar
+        groups={groups}
+        current={currentPageId}
+        itemMap={itemMap}
+        mobileOpen={mobileOpen}
+        menuQuery={menuQuery}
+        openGroups={openGroups}
+        onMenuQueryChange={setMenuQuery}
+        onToggleGroup={toggleGroup}
+        onNavigate={navigateFromLayout}
       />
-    </AdminLayout>
+      {mobileOpen && (
+        <button
+          className="scrim"
+          onClick={() => setMobileOpen(false)}
+          aria-label="메뉴 닫기"
+        />
+      )}
+      <div className="workspace">
+        <Header
+          current={currentPageId}
+          tabs={openTabs}
+          itemMap={itemMap}
+          user={user}
+          sidebarCollapsed={sidebarCollapsed}
+          mobileOpen={mobileOpen}
+          onToggleSidebar={toggleSidebar}
+          onNavigate={navigateFromLayout}
+          onHome={navigateHomeFromLayout}
+          onCloseTab={closeTab}
+          onLogout={() => requestLeave(onLogout)}
+        />
+        <Content
+          title={page?.title || "스마트 안전관리 시스템"}
+          mainClassName={hasInlineDetail ? "has-inline-detail" : ""}
+        >
+          {PageComponent ? (
+            <PageComponent
+              key={currentPageId}
+              pageDefinition={page}
+              initialRows={initialRows}
+              user={user}
+              onUnauthorized={onLogout}
+              onUnsavedChange={setHasUnsavedChanges}
+            />
+          ) : (
+            <section className="home-welcome" aria-label="휴그린 스마트 안전관리 시스템">
+              <div className="home-welcome-content">
+                <img src={`${import.meta.env.BASE_URL}hugreen-logo.png`} alt="휴그린 주식회사" />
+                <p>좌측 사이드바에서 메뉴를 선택해 주세요.</p>
+              </div>
+            </section>
+          )}
+          <ConfirmDialog
+            open={Boolean(pendingLeaveAction) || blocker.state === "blocked"}
+            title="저장되지 않은 내용이 있습니다."
+            description="저장하지 않고 나가시겠습니까?"
+            confirmLabel="나가기"
+            onCancel={cancelLeave}
+            onConfirm={confirmLeave}
+          />
+        </Content>
+      </div>
+    </div>
   );
 }
