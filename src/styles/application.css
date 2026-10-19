@@ -352,12 +352,19 @@ tr.selected { background: var(--green-pale); }
 .identifier { color: inherit; font-size: inherit; line-height: inherit; font-weight: inherit; font-variant-numeric: tabular-nums; }
 .date-line { display: inline-block; color: inherit; font-size: inherit; font-weight: inherit; line-height: inherit; white-space: nowrap; font-variant-numeric: tabular-nums; }
 td small { display: block; margin-top: 0; color: #8b95a1; font-size: var(--type-caption-size); line-height: var(--type-caption-line); font-variant-numeric: tabular-nums; }
-.badge { display: inline; padding: 0; background: transparent; font-size: inherit; line-height: inherit; font-weight: 650; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; white-space: nowrap; }
-.badge:before { content: none; }
-.badge.red { background: transparent; color: var(--status-danger-text); }
-.badge.amber { background: transparent; color: var(--status-warning-text); }
-.badge.green { background: transparent; color: var(--status-success-text); }
-.badge.neutral { background: transparent; color: var(--status-neutral-text); }
+.badge { display: inline-flex; align-items: center; border: 1px solid transparent; border-radius: 999px; font-weight: 700; line-height: 1; white-space: nowrap; }
+.badge--xsmall { min-height: 18px; padding: 1px 5px; font-size: 10px; }
+.badge--small { min-height: 22px; padding: 2px 8px; font-size: 11px; }
+.badge--medium { min-height: 26px; padding: 4px 10px; font-size: 12px; }
+.badge--large { min-height: 30px; padding: 5px 12px; font-size: 14px; }
+.badge--weak.badge--gray { background: #f2f4f6; color: #667085; }
+.badge--weak.badge--green { background: #dcfce7; color: #16803c; }
+.badge--weak.badge--amber { background: #fef0c7; color: #b54708; }
+.badge--weak.badge--red { background: #fee4e2; color: #b42318; }
+.badge--fill.badge--gray { background: #667085; color: #fff; }
+.badge--fill.badge--green { background: #16803c; color: #fff; }
+.badge--fill.badge--amber { background: #b54708; color: #fff; }
+.badge--fill.badge--red { background: #b42318; color: #fff; }
 .sort-button { min-height: 24px; padding: 0; border: 0; background: transparent; color: inherit; font-size: inherit; }
 .pagination { min-height: 38px; display: flex; align-items: center; justify-content: center; padding: 5px 14px; color: #8b95a1; font-size: var(--type-caption-size); line-height: var(--type-caption-line); }
 .pagination > div { display: grid; grid-template-columns: repeat(5, 26px); gap: 4px; }
@@ -671,9 +678,6 @@ dialog.cctv-detail-dialog::backdrop { backdrop-filter: none; }
 .cctv-detail-table dd.status-off { align-self: center; justify-self: start; min-height: 22px; margin-left: 10px; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
 .cctv-detail-table dd.status-on { background: #dcfce7; color: #16803c; }
 .cctv-detail-table dd.status-off { background: #f2f4f6; color: #667085; }
-.cctv-status-badge { display: inline-flex; align-items: center; min-height: 22px; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
-.cctv-status-badge.is-on { background: #dcfce7; color: #16803c; }
-.cctv-status-badge.is-off { background: #f2f4f6; color: #667085; }
 .cctv-zone-section { margin-top: 16px; }
 .cctv-zone-heading { min-height: 32px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .cctv-zone-heading h3 { margin: 0; color: #273548; font-size: 14px; line-height: 20px; font-weight: 750; }
@@ -685,9 +689,7 @@ dialog.cctv-detail-dialog::backdrop { backdrop-filter: none; }
 .cctv-zone-list > li.is-inactive { background: #f8f9fa; }
 .cctv-zone-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .cctv-zone-summary strong { min-width: 0; overflow: hidden; color: #273548; font-size: 13px; line-height: 20px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
-.cctv-zone-status { flex: none; padding: 1px 7px; border-radius: 999px; font-size: 11px; line-height: 18px; font-weight: 700; }
-.cctv-zone-status.is-on { background: #dcfce7; color: #16803c; }
-.cctv-zone-status.is-off { background: #f2f4f6; color: #667085; }
+.cctv-zone-status { flex: none; }
 .cctv-zone-events { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 8px; }
 .cctv-zone-events-label { width: 100%; color: #8b95a1; font-size: 11px; line-height: 16px; }
 .cctv-zone-event-tag { padding: 2px 7px; border-radius: 5px; background: #f2f4f6; color: #4e5968; font-size: 11px; line-height: 17px; font-weight: 650; }

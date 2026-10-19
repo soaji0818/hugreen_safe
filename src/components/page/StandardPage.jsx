@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import DataTable from "../data-table/DataTable";
 import Pagination from "../data-table/Pagination";
 import SearchFilterPanel from "../filters/SearchFilterPanel";
+import Badge from "../ui/Badge";
 import Button from "../ui/Button";
 import Icon from "../ui/Icon";
 import RadioOption from "../ui/RadioOption";
@@ -23,7 +24,7 @@ const rowSelectionHiddenScreens = [
   "MES-TD3-014",
   "MES-TD3-017",
 ];
-function Badge({ value }) {
+function StatusBadge({ value }) {
   const tone = ["위험", "미확인", "장애", "취소", "부분취소"].includes(value)
     ? "red"
     : ["주의", "조치중", "승인 대기", "실패", "결제실패", "취소실패"].includes(value)
@@ -31,7 +32,7 @@ function Badge({ value }) {
       : ["조치완료", "정상", "승인", "적합"].includes(value)
         ? "green"
         : "neutral";
-  return <span className={`badge ${tone}`}>{value}</span>;
+  return <Badge size="small" variant="weak" tone={tone === "neutral" ? "gray" : tone}>{value}</Badge>;
 }
 function raw(col, r, i) {
   if (
@@ -1121,7 +1122,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
               onToggleAll={toggleAllRowSelection}
               renderCell={(item, column, index) =>
                 /상태|단계|결과/.test(column) ? (
-                  <Badge value={raw(column, item, index)} />
+                  <StatusBadge value={raw(column, item, index)} />
                 ) : /일시$/.test(column) ? (
                   <span className="date-line">
                     {formatDateTime(raw(column, item, index))}
@@ -1204,8 +1205,8 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                           <td>{item.id}</td>
                           <td><span className="date-line">{formatDateTime(item.time)}</span></td>
                           <td>{item.type}</td>
-                          <td><Badge value={item.level} /></td>
-                          <td><Badge value={item.status} /></td>
+                          <td><StatusBadge value={item.level} /></td>
+                          <td><StatusBadge value={item.status} /></td>
                         </tr>
                       ))}
                     </tbody>
@@ -1289,7 +1290,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                       </>
                     )
                   ) : !inlineDetail ? (
-                    <Badge value={row.status} />
+                    <StatusBadge value={row.status} />
                   ) : null}
                   {!inlineDetail && (
                     <button

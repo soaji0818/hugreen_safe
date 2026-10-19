@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import DataTable from "../../components/data-table/DataTable";
 import SearchFilterPanel from "../../components/filters/SearchFilterPanel";
+import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import Icon from "../../components/ui/Icon";
@@ -579,9 +580,9 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
           onToggleRow={toggleRow}
           onToggleAll={toggleAllRows}
           renderCell={(row, column) => column === "사용 여부" ? (
-            <span className={`cctv-status-badge ${row.useYn === "N" ? "is-off" : "is-on"}`}>
+            <Badge size="small" variant="weak" tone={row.useYn === "N" ? "gray" : "green"}>
               {row[column]}
-            </span>
+            </Badge>
           ) : row[column]}
           stateRow={(loading || error || filteredRows.length === 0) ? (
             <tr className="api-state-row">
@@ -755,9 +756,9 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
                           <li key={zone.zoneId} className={zone.useYn === "N" ? "is-inactive" : undefined}>
                             <div className="cctv-zone-summary">
                               <strong>{zone.zoneNm || zone.zoneId}</strong>
-                              <span className={`cctv-zone-status ${zone.useYn === "N" ? "is-off" : "is-on"}`}>
+                              <Badge className="cctv-zone-status" size="small" variant="weak" tone={zone.useYn === "N" ? "gray" : "green"}>
                                 {zone.useYn === "N" ? "미사용" : "사용"}
-                              </span>
+                              </Badge>
                             </div>
                             <div className="cctv-zone-events" aria-label={`${zone.zoneNm || zone.zoneId} 감지 이벤트 유형`}>
                               <span className="cctv-zone-events-label">감지 이벤트 유형</span>
