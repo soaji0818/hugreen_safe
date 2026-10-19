@@ -401,7 +401,7 @@ function DetailPanel({ nodes, selectedId, activeTab, mode, draft, onTab, onEdit,
             return (
               <label key={field} className={wide ? "wide" : ""}>
                 <span>{field}</span>
-                {mode === "view" || locked ? <span className="tree-record-value">{valueOf(field) || "-"}</span> : field === "입력 방식" ? (
+                {mode === "view" || locked ? <span className={`tree-record-value${locked ? " is-locked" : ""}`}>{valueOf(field) || "-"}</span> : field === "입력 방식" ? (
                   <select value={valueOf(field)} onChange={(event) => onDraft(field, event.target.value)}><option value="">선택</option><option>적합·부적합</option><option>수치</option><option>텍스트</option></select>
                 ) : field === "점검 기준" ? <textarea value={valueOf(field)} onChange={(event) => onDraft(field, event.target.value)} /> : <input type={field === "순서" ? "number" : "text"} value={valueOf(field)} onChange={(event) => onDraft(field, event.target.value)} />}
               </label>
@@ -993,9 +993,9 @@ export default function StandardPage({ pageDefinition, initialRows }) {
               <span className="filter-empty empty-one" aria-hidden="true" />
             </div>
           </SearchFilterPanel>}
-          {conf.layout !== "tree" &&
-            (canExport || conf.download || supportsDelete || canCreate) && (
+          {conf.layout !== "tree" && (
             <div className="list-actions" aria-label="목록 작업">
+              <span className="table-result-count" role="status">총 {sorted.length}건</span>
               {canExport && (
                 <Button variant="secondary" className="export-button" icon="download" onClick={exportCsv}>
                   엑셀 내보내기
@@ -1328,7 +1328,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                           >
                             <span>{field}</span>
                             {!editing || locked ? (
-                              <span className="sensor-detail-value">
+                              <span className={`sensor-detail-value${locked ? " is-locked" : ""}`}>
                                 {fieldValue(field) || "-"}
                               </span>
                             ) : choices ? (

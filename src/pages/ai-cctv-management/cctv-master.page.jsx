@@ -442,6 +442,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
       </SearchFilterPanel>
 
       <div className="list-actions" aria-label="목록 작업">
+        <span className="table-result-count" role="status">총 {filteredRows.length}건</span>
         {selectedIds.length > 0 && (
           <Button variant="danger-button" icon="trash" onClick={() => openDeleteConfirm(selectedIds)}>삭제</Button>
         )}

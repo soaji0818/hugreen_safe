@@ -157,7 +157,8 @@ h2 { color: var(--ink); font-size: var(--type-title-size); line-height: var(--ty
 .toggle-control { display: flex; align-items: center; gap: 7px; padding: 0 11px; background: white; color: #4e5968; font-weight: 500; }
 .toggle-control input { width: 15px; height: 15px; margin: 0; accent-color: var(--green); }
 .filter-grid label > select { height: 34px; min-height: 34px; padding-top: 5px; padding-bottom: 5px; border: 0; border-radius: 0; }
-.list-actions { min-height: 38px; display: flex; flex: none; align-items: center; justify-content: flex-end; gap: 8px; margin: 0 8px 8px; }
+.list-actions { min-height: 38px; display: flex; flex: none; align-items: center; justify-content: flex-end; gap: 8px; margin: 0 8px 4px; }
+.table-result-count { align-self: flex-end; margin-right: auto; color: #8b95a1; font-size: var(--type-caption-size); line-height: var(--type-caption-line); }
 .list-actions .secondary, .list-actions .primary, .list-actions .danger-button { min-height: 34px; padding: 6px 11px; font-size: 12px; }
 .list-actions .primary, .list-actions .danger-button { min-width: 72px; }
 .export-button { border-color: transparent; background: var(--neutral-button); }
@@ -269,7 +270,7 @@ textarea { min-height: 76px; resize: vertical; line-height: 1.55; }
 .table-scroll { overflow: auto; }
 .cctv-master-table { position: relative; }
 .cctv-master-table::after { position: absolute; top: 0; right: 0; z-index: 4; width: 8px; height: 34px; border-bottom: 1px solid var(--line); background: #f2f4f6; content: ""; }
-.cctv-master-table .table-scroll { width: 100%; height: 100%; min-height: 0; overflow: auto; scrollbar-gutter: stable; overscroll-behavior: contain; background: linear-gradient(to bottom,#f2f4f6 0 34px,var(--surface-base) 34px); scrollbar-color: #b8c0c8 transparent; }
+.cctv-master-table .table-scroll { width: 100%; height: 100%; min-height: 0; overflow: auto; scrollbar-gutter: stable; overscroll-behavior: contain; background: linear-gradient(to bottom,#f2f4f6 0 34px,transparent 34px); scrollbar-color: #b8c0c8 transparent; }
 .cctv-master-table .table-scroll::-webkit-scrollbar { width: 8px; height: 8px; background: transparent; }
 .cctv-master-table .table-scroll::-webkit-scrollbar-track:vertical { margin-top: 34px; background: transparent; }
 .cctv-master-table .table-scroll::-webkit-scrollbar-thumb { border: 2px solid transparent; border-radius: 999px; background: #b8c0c8; background-clip: padding-box; }
@@ -426,6 +427,7 @@ td small { display: block; margin-top: 0; color: #8b95a1; font-size: var(--type-
 .tree-record-grid label.wide { grid-column: 1/-1; }
 .tree-record-grid label > span { display: flex; align-items: center; padding: 0 10px; background: var(--neutral-button); color: #6b7684; font-size: 13px; font-weight: 500; }
 .tree-record-grid label > .tree-record-value { min-width: 0; overflow: hidden; background: var(--white); color: #191f28; font-size: 14px; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
+.tree-record-grid label > .tree-record-value.is-locked { background: #f2f4f6; color: #6b7684; }
 .tree-record-grid input:not([type="radio"]), .tree-record-grid select, .tree-record-grid textarea { min-height: 39px; padding: 7px 10px; border: 0; border-radius: 0; color: #191f28; font-size: 14px; font-weight: 400; }
 .tree-record-grid textarea { height: 64px; resize: vertical; }
 .tree-child-section { margin-top: 24px; }
@@ -483,6 +485,7 @@ td small { display: block; margin-top: 0; color: #8b95a1; font-size: var(--type-
 .sensor-detail-field.full-row { grid-column: 1/-1; }
 .sensor-detail-field > span:first-child { display: flex; align-items: center; padding: 0 10px; background: #f2f4f6; color: #4e5968; font-size: 12px; font-weight: 650; }
 .sensor-detail-value { min-width: 0; display: flex; align-items: center; padding: 0 10px; overflow: hidden; color: #8b95a1; font-size: 12px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.sensor-detail-value.is-locked { background: #f2f4f6; color: #6b7684; }
 .sensor-detail-grid input:not([type="radio"]),
 .sensor-detail-grid select { height: 37px; min-height: 37px; padding: 6px 10px; border: 0; border-radius: 0; color: #8b95a1; font-size: 12px; font-weight: 500; }
 .detail-dialog.screen-format-list-detail:not(.sensor-detail-panel) .field-section + .field-section { margin-top: 16px; padding-top: 0; border-top: 0; }
@@ -503,7 +506,8 @@ td small { display: block; margin-top: 0; color: #8b95a1; font-size: var(--type-
 .page-footer { display: flex; justify-content: space-between; padding: 3px 2px 10px; color: #a2aab3; font-size: 10px; }
 .empty { padding: 46px 20px; color: #8b95a1; text-align: center; }
 .api-state-row td { height: 160px; color: var(--text-muted); text-align: center; vertical-align: middle; }
-.cctv-master-table .api-state-row td { height: 360px; }
+.cctv-master-table .api-state-row { background: transparent; }
+.cctv-master-table .api-state-row td { height: 360px; border-right: 0; border-bottom: 0; background: transparent; }
 .cctv-empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; }
 .cctv-empty-icon { width: 58px; height: 58px; display: grid; place-items: center; margin-bottom: 15px; color: #c8cdd3; }
 .cctv-empty-state h3 { margin: 0; color: #333d4b; font-size: 20px; line-height: 29px; font-weight: 700; }
@@ -593,7 +597,7 @@ dialog.cctv-detail-dialog::backdrop { backdrop-filter: none; }
 .cctv-required-mark { margin-left: 3px; color: var(--danger); font-weight: 800; }
 .cctv-detail-table dd { overflow: hidden; background: var(--white); color: #273548; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
 .cctv-detail-table dd.is-editing { padding: 0; overflow: visible; }
-.cctv-detail-table dd.is-editing.is-readonly { padding: 7px 10px; }
+.cctv-detail-table dd.is-editing.is-readonly { padding: 7px 10px; background: #f2f4f6; color: #6b7684; }
 .cctv-detail-table dd.is-editing input,
 .cctv-detail-table dd.is-editing select { width: 100%; max-width: none; height: 35px; min-height: 35px; padding: 6px 10px; border: 0; border-radius: 0; background: #fff; color: #273548; font-size: 13px; font-weight: 600; }
 .cctv-detail-table dd.is-editing input:focus,
