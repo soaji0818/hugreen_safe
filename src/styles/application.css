@@ -287,10 +287,10 @@ table { width: 100%; border-collapse: collapse; color: var(--text); font-size: v
 th { height: 34px; padding: 5px 10px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: #f2f4f6; color: #4e5968; font-size: var(--type-label-size); line-height: var(--type-label-line); font-weight: 650; text-align: left; }
 td { height: 36px; padding: 3px 10px; border-right: 1px solid #edf0f2; border-bottom: 1px solid #edf0f2; color: #333d4b; line-height: var(--type-label-line); }
 .table-cell-text { width: 100%; min-width: 0; display: block; padding: 0; overflow: hidden; border: 0; border-radius: 0; background: transparent; color: inherit; font: inherit; line-height: inherit; text-align: inherit; text-overflow: ellipsis; white-space: nowrap; cursor: default; }
-.table-cell-text.is-truncated { cursor: pointer; }
+.table-cell-text.is-truncated { cursor: help; }
 .table-cell-text.is-truncated:hover { color: var(--green); }
 .table-cell-text.is-truncated:focus-visible { outline: 2px solid rgba(0,128,102,.24); outline-offset: 1px; }
-.table-cell-popover { position: fixed; z-index: 1300; width: max-content; padding: 9px 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--white); color: #333d4b; box-shadow: 0 10px 28px rgba(25,31,40,.18); font-size: var(--type-label-size); line-height: 1.5; overflow-wrap: anywhere; white-space: normal; }
+.table-cell-popover { position: fixed; z-index: 1300; width: max-content; padding: 9px 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--white); color: #333d4b; box-shadow: 0 10px 28px rgba(25,31,40,.18); font-size: var(--type-label-size); line-height: 1.5; overflow-wrap: anywhere; pointer-events: none; white-space: normal; }
 tbody tr { background: white; }
 tbody tr:hover { background: #f7faf9; }
 tr.selected { background: var(--green-pale); }

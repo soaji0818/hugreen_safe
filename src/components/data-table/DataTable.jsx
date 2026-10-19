@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 
 const MIN_COLUMN_WIDTH = 72;
 
-function TruncatedCellText({ value, onReveal }) {
+function TruncatedCellText({ value, onReveal, onHide }) {
   const textRef = useRef(null);
   const [truncated, setTruncated] = useState(false);
 
@@ -21,20 +21,25 @@ function TruncatedCellText({ value, onReveal }) {
   }, [value]);
 
   return (
-    <button
+    <span
       ref={textRef}
-      type="button"
       className={`table-cell-text${truncated ? " is-truncated" : ""}`}
       tabIndex={truncated ? 0 : -1}
-      aria-haspopup={truncated ? "true" : undefined}
-      onClick={(event) => {
-        event.stopPropagation();
+      onMouseEnter={(event) => {
         if (truncated) onReveal(value, event.currentTarget);
       }}
-      onDoubleClick={(event) => event.stopPropagation()}
+      onMouseLeave={() => {
+        if (document.activeElement !== textRef.current) onHide();
+      }}
+      onFocus={(event) => {
+        if (truncated) onReveal(value, event.currentTarget);
+      }}
+      onBlur={() => {
+        if (!textRef.current?.matches(":hover")) onHide();
+      }}
     >
       {value}
-    </button>
+    </span>
   );
 }
 
@@ -67,12 +72,10 @@ export default function DataTable({
     const closeOnEscape = (event) => {
       if (event.key === "Escape") close();
     };
-    document.addEventListener("pointerdown", close);
     window.addEventListener("scroll", close, true);
     window.addEventListener("resize", close);
     window.addEventListener("keydown", closeOnEscape);
     return () => {
-      document.removeEventListener("pointerdown", close);
       window.removeEventListener("scroll", close, true);
       window.removeEventListener("resize", close);
       window.removeEventListener("keydown", closeOnEscape);
@@ -251,7 +254,11 @@ export default function DataTable({
                       className={columnIndex === 0 && /ID|번호/.test(column) ? "identifier" : ""}
                     >
                       {isText ? (
-                        <TruncatedCellText value={String(content)} onReveal={revealCellText} />
+                        <TruncatedCellText
+                          value={String(content)}
+                          onReveal={revealCellText}
+                          onHide={() => setRevealedText(null)}
+                        />
                       ) : content}
                     </td>
                   );
@@ -272,7 +279,6 @@ export default function DataTable({
             maxWidth: `${revealedText.maxWidth}px`,
             transform: revealedText.openAbove ? "translateY(-100%)" : undefined,
           }}
-          onPointerDown={(event) => event.stopPropagation()}
         >
           {revealedText.text}
         </div>,
