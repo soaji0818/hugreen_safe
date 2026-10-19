@@ -14,7 +14,22 @@ import useZoneList from "../../hooks/useZoneList";
 import { removeCamera, updateCamera } from "../../services/cameraService";
 
 const EMPTY_ROWS = [];
-const columns = ["카메라ID", "카메라명", "공장", "설치 위치", "대상 설비", "사용 여부"];
+const dialogResizeHandles = [
+  { key: "n-left", direction: "n" },
+  { key: "n-right", direction: "n" },
+  ...["e", "s", "w", "ne", "se", "sw", "nw"].map((direction) => ({ key: direction, direction })),
+];
+const columns = [
+  "카메라ID",
+  "카메라명",
+  "공장",
+  "설치 위치",
+  "대상 설비",
+  "모델",
+  "IP 주소",
+  "수신 유예시간(초)",
+  "사용 여부",
+];
 const detailFields = [
   { label: "카메라ID", key: "cameraId", readOnly: true, required: true, maxLength: 20 },
   { label: "카메라명", key: "cameraNm", required: true, maxLength: 50 },
@@ -52,7 +67,9 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
   const [notice, setNotice] = useState(null);
   const [invalidField, setInvalidField] = useState("");
   const [validationMessage, setValidationMessage] = useState("");
+  const [dialogGeometry, setDialogGeometry] = useState(null);
   const detailDialog = useRef(null);
+  const dialogInteraction = useRef(null);
   const saveController = useRef(null);
   const detailCameraAfterRefetch = useRef("");
 
@@ -146,6 +163,80 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
   const resetFilters = () => {
     setFilters({ factoryCd: "", focusYn: "", useYn: "", keyword: "" });
   };
+  const startDialogInteraction = (event, mode) => {
+    if (event.button !== 0) return;
+    const dialog = detailDialog.current;
+    if (!dialog) return;
+
+    const rect = dialog.getBoundingClientRect();
+    const scale = rect.width / dialog.offsetWidth || 1;
+    const geometry = {
+      left: rect.left / scale,
+      top: rect.top / scale,
+      width: rect.width / scale,
+      height: rect.height / scale,
+    };
+    dialogInteraction.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      scale,
+      mode,
+      ...geometry,
+    };
+    setDialogGeometry(geometry);
+    event.currentTarget.setPointerCapture(event.pointerId);
+    event.preventDefault();
+    event.stopPropagation();
+  };
+  const moveDialogInteraction = (event) => {
+    const interaction = dialogInteraction.current;
+    if (!interaction || interaction.pointerId !== event.pointerId) return;
+
+    const dx = (event.clientX - interaction.startX) / interaction.scale;
+    const dy = (event.clientY - interaction.startY) / interaction.scale;
+    const viewportWidth = window.innerWidth / interaction.scale;
+    const viewportHeight = window.innerHeight / interaction.scale;
+    const minWidth = Math.min(360, viewportWidth - 16);
+    const minHeight = Math.min(280, viewportHeight - 16);
+    let { left, top, width, height } = interaction;
+
+    if (interaction.mode === "drag") {
+      left = Math.min(Math.max(0, interaction.left + dx), Math.max(0, viewportWidth - width));
+      top = Math.min(Math.max(0, interaction.top + dy), Math.max(0, viewportHeight - height));
+    } else {
+      if (interaction.mode.includes("e")) {
+        width = Math.min(Math.max(minWidth, interaction.width + dx), viewportWidth - interaction.left);
+      }
+      if (interaction.mode.includes("s")) {
+        height = Math.min(Math.max(minHeight, interaction.height + dy), viewportHeight - interaction.top);
+      }
+      if (interaction.mode.includes("w")) {
+        const right = interaction.left + interaction.width;
+        left = Math.min(Math.max(0, interaction.left + dx), right - minWidth);
+        width = right - left;
+      }
+      if (interaction.mode.includes("n")) {
+        const bottom = interaction.top + interaction.height;
+        top = Math.min(Math.max(0, interaction.top + dy), bottom - minHeight);
+        height = bottom - top;
+      }
+    }
+
+    setDialogGeometry({
+      left: Math.round(left),
+      top: Math.round(top),
+      width: Math.round(width),
+      height: Math.round(height),
+    });
+  };
+  const stopDialogInteraction = (event) => {
+    if (dialogInteraction.current?.pointerId !== event.pointerId) return;
+    dialogInteraction.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
   const toggleRow = (id) => {
     setSelectedId(id);
     setSelectedIds((current) =>
@@ -153,6 +244,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     );
   };
   const openDetail = (id) => {
+    setDialogGeometry(null);
     setInvalidField("");
     setValidationMessage("");
     setEditBaseline(null);
@@ -176,6 +268,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     };
     setInvalidField("");
     setValidationMessage("");
+    setDialogGeometry(null);
     setEditBaseline(initialValues);
     setCreateMode(true);
     setEditValues(initialValues);
@@ -193,6 +286,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     setEditBaseline(null);
     setInvalidField("");
     setValidationMessage("");
+    setDialogGeometry(null);
     setDetailOpen(false);
   };
   const closeDetail = () => {
@@ -294,6 +388,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
       setInvalidField("");
       setValidationMessage("");
       if (!wasCreating) detailCameraAfterRefetch.current = cameraId;
+      if (wasCreating) setDialogGeometry(null);
       setDetailOpen(!wasCreating);
       setNotice({
         title: wasCreating ? TOAST_MESSAGES.save : TOAST_MESSAGES.update,
@@ -350,6 +445,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     setDeletePending(false);
     setDeleteOpen(false);
     setDeleteTargetIds([]);
+    setDialogGeometry(null);
     setDetailOpen(false);
     setSelectedIds([]);
     setSelectedId(null);
@@ -508,6 +604,17 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
         <dialog
           className="detail-dialog cctv-detail-dialog"
           ref={detailDialog}
+          style={dialogGeometry ? {
+            position: "fixed",
+            inset: "auto",
+            left: `${dialogGeometry.left}px`,
+            top: `${dialogGeometry.top}px`,
+            width: `${dialogGeometry.width}px`,
+            height: `${dialogGeometry.height}px`,
+            maxWidth: "none",
+            maxHeight: "none",
+            margin: 0,
+          } : undefined}
           onCancel={(event) => {
             event.preventDefault();
             closeDetail();
@@ -523,6 +630,15 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
                 {createMode ? "카메라 추가" : editMode ? "카메라 정보 수정" : "카메라 상세 정보"}
               </h2>
             </div>
+            <button
+              type="button"
+              className="cctv-dialog-drag-handle"
+              aria-label="팝업 이동"
+              onPointerDown={(event) => startDialogInteraction(event, "drag")}
+              onPointerMove={moveDialogInteraction}
+              onPointerUp={stopDialogInteraction}
+              onPointerCancel={stopDialogInteraction}
+            />
             <button type="button" className="cctv-detail-close" aria-label="상세 정보 닫기" onClick={closeDetail}>
               <Icon name="close" size={20} />
             </button>
@@ -669,6 +785,17 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
               )}
             </div>
           </div>
+          {dialogResizeHandles.map(({ key, direction }) => (
+            <span
+              key={key}
+              className={`cctv-dialog-resize-handle is-${key}`}
+              aria-hidden="true"
+              onPointerDown={(event) => startDialogInteraction(event, direction)}
+              onPointerMove={moveDialogInteraction}
+              onPointerUp={stopDialogInteraction}
+              onPointerCancel={stopDialogInteraction}
+            />
+          ))}
         </dialog>
       )}
 

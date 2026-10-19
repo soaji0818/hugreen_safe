@@ -1,6 +1,42 @@
-import { useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 const MIN_COLUMN_WIDTH = 72;
+
+function TruncatedCellText({ value, onReveal }) {
+  const textRef = useRef(null);
+  const [truncated, setTruncated] = useState(false);
+
+  useLayoutEffect(() => {
+    const text = textRef.current;
+    if (!text) return undefined;
+
+    const updateTruncation = () => {
+      setTruncated(text.scrollWidth > text.clientWidth + 1);
+    };
+    updateTruncation();
+    const resizeObserver = new ResizeObserver(updateTruncation);
+    resizeObserver.observe(text);
+    return () => resizeObserver.disconnect();
+  }, [value]);
+
+  return (
+    <button
+      ref={textRef}
+      type="button"
+      className={`table-cell-text${truncated ? " is-truncated" : ""}`}
+      tabIndex={truncated ? 0 : -1}
+      aria-haspopup={truncated ? "true" : undefined}
+      onClick={(event) => {
+        event.stopPropagation();
+        if (truncated) onReveal(value, event.currentTarget);
+      }}
+      onDoubleClick={(event) => event.stopPropagation()}
+    >
+      {value}
+    </button>
+  );
+}
 
 export default function DataTable({
   columns,
@@ -22,7 +58,39 @@ export default function DataTable({
 }) {
   const [columnWidths, setColumnWidths] = useState([]);
   const [tableWidth, setTableWidth] = useState(null);
+  const [revealedText, setRevealedText] = useState(null);
   const resizeState = useRef(null);
+
+  useEffect(() => {
+    if (!revealedText) return undefined;
+    const close = () => setRevealedText(null);
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") close();
+    };
+    document.addEventListener("pointerdown", close);
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", close);
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [revealedText]);
+
+  const revealCellText = (text, target) => {
+    const rect = target.getBoundingClientRect();
+    const maxWidth = Math.min(420, window.innerWidth - 24);
+    const openAbove = rect.bottom + 140 > window.innerHeight && rect.top > 140;
+    setRevealedText({
+      text,
+      left: Math.max(12, Math.min(rect.left, window.innerWidth - maxWidth - 12)),
+      top: openAbove ? rect.top - 8 : rect.bottom + 6,
+      maxWidth,
+      openAbove,
+    });
+  };
 
   const measureColumns = (table) => columns.map((_, index) =>
     table.querySelector(`th[data-column-index="${index}"]`)?.offsetWidth || MIN_COLUMN_WIDTH,
@@ -174,20 +242,42 @@ export default function DataTable({
                     />
                   </td>
                 )}
-                {columns.map((column, columnIndex) => (
-                  <td
-                    key={column}
-                    className={columnIndex === 0 && /ID|번호/.test(column) ? "identifier" : ""}
-                  >
-                    {renderCell(row, column, rowIndex)}
-                  </td>
-                ))}
+                {columns.map((column, columnIndex) => {
+                  const content = renderCell(row, column, rowIndex);
+                  const isText = typeof content === "string" || typeof content === "number";
+                  return (
+                    <td
+                      key={column}
+                      className={columnIndex === 0 && /ID|번호/.test(column) ? "identifier" : ""}
+                    >
+                      {isText ? (
+                        <TruncatedCellText value={String(content)} onReveal={revealCellText} />
+                      ) : content}
+                    </td>
+                  );
+                })}
               </tr>
             );
           })}
         </tbody>
       </table>
       {!rows.length && !stateRow && emptyState}
+      {revealedText && createPortal(
+        <div
+          className="table-cell-popover"
+          role="tooltip"
+          style={{
+            left: `${revealedText.left}px`,
+            top: `${revealedText.top}px`,
+            maxWidth: `${revealedText.maxWidth}px`,
+            transform: revealedText.openAbove ? "translateY(-100%)" : undefined,
+          }}
+          onPointerDown={(event) => event.stopPropagation()}
+        >
+          {revealedText.text}
+        </div>,
+        document.body,
+      )}
     </div>
   );
 }
