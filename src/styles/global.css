@@ -15,8 +15,8 @@ body {
   min-width: 320px;
 }
 #root {
-  --scaled-viewport-height: 111.111vh;
-  zoom: 0.9;
+  --scaled-viewport-height: 88.889vh;
+  zoom: 1.125;
 }
 button,
 input,

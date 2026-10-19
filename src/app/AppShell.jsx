@@ -1,22 +1,40 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useBlocker, useLocation, useNavigate } from "react-router-dom";
 import AdminLayout from "../components/layout/AdminLayout";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
 
 const MAX_OPEN_TABS = 7;
 
 export default function AppShell({ groups, pages, initialRows, user, onLogout }) {
-  const [currentPageId, setCurrentPageId] = useState(null);
-  const [openTabs, setOpenTabs] = useState([]);
+  const location = useLocation();
+  const routerNavigate = useNavigate();
+  const page = Object.values(pages).find((item) => item.path === location.pathname) || null;
+  const currentPageId = page?.id || null;
+  const [openTabs, setOpenTabs] = useState(() => currentPageId ? [currentPageId] : []);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [pendingLeaveAction, setPendingLeaveAction] = useState(null);
+  const allowNextNavigation = useRef(false);
   const items = groups.flatMap((group) => group.items);
-  const page = currentPageId ? pages[currentPageId] : null;
   const PageComponent = page?.Component;
   const hasInlineDetail = Boolean(
     page?.config.detail
       && page.config.detailPresentation !== "modal"
       && !["log", "snap", "tree"].includes(page.config.detail),
   );
+  const blocker = useBlocker(({ currentLocation, nextLocation }) =>
+    hasUnsavedChanges
+      && !allowNextNavigation.current
+      && currentLocation.pathname !== nextLocation.pathname,
+  );
+
+  useEffect(() => {
+    allowNextNavigation.current = false;
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (location.pathname === "/" || currentPageId) return;
+    routerNavigate("/", { replace: true });
+  }, [currentPageId, location.pathname, routerNavigate]);
 
   useEffect(() => {
     const preventUnsavedUnload = (event) => {
@@ -39,30 +57,35 @@ export default function AppShell({ groups, pages, initialRows, user, onLogout })
 
   const performNavigate = (pageId) => {
     if (!pages[pageId]) return;
-    setCurrentPageId(pageId);
     setOpenTabs((tabs) => {
       if (tabs.includes(pageId)) return tabs;
       if (tabs.length < MAX_OPEN_TABS) return [...tabs, pageId];
       const removableIndex = tabs.findIndex((tabId) => tabId !== currentPageId);
       return [...tabs.filter((_, index) => index !== removableIndex), pageId];
     });
+    allowNextNavigation.current = true;
+    routerNavigate(pages[pageId].path);
   };
-  const navigate = (pageId) => {
+  const navigateToPage = (pageId) => {
     if (pageId === currentPageId) return;
     requestLeave(() => performNavigate(pageId));
   };
   const navigateHome = () => {
     if (currentPageId === null) return;
-    requestLeave(() => setCurrentPageId(null));
+    requestLeave(() => {
+      allowNextNavigation.current = true;
+      routerNavigate("/");
+    });
   };
 
   const performCloseTab = (pageId) => {
-    setOpenTabs((tabs) => {
-      if (tabs.length === 1) return tabs;
-      const nextTabs = tabs.filter((tabId) => tabId !== pageId);
-      if (currentPageId === pageId) setCurrentPageId(nextTabs.at(-1));
-      return nextTabs;
-    });
+    if (openTabs.length === 1) return;
+    const nextTabs = openTabs.filter((tabId) => tabId !== pageId);
+    setOpenTabs(nextTabs);
+    if (currentPageId === pageId) {
+      allowNextNavigation.current = true;
+      routerNavigate(pages[nextTabs.at(-1)].path);
+    }
   };
   const closeTab = (pageId) => {
     if (pageId === currentPageId) {
@@ -76,7 +99,15 @@ export default function AppShell({ groups, pages, initialRows, user, onLogout })
     const action = pendingLeaveAction;
     setPendingLeaveAction(null);
     setHasUnsavedChanges(false);
-    action?.();
+    if (action) {
+      action();
+    } else if (blocker.state === "blocked") {
+      blocker.proceed();
+    }
+  };
+  const cancelLeave = () => {
+    setPendingLeaveAction(null);
+    if (blocker.state === "blocked") blocker.reset();
   };
 
   return (
@@ -88,7 +119,7 @@ export default function AppShell({ groups, pages, initialRows, user, onLogout })
       title={page?.title || "스마트 안전관리 시스템"}
       user={user}
       mainClassName={hasInlineDetail ? "has-inline-detail" : ""}
-      onNavigate={navigate}
+      onNavigate={navigateToPage}
       onHome={navigateHome}
       onCloseTab={closeTab}
       onLogout={() => requestLeave(onLogout)}
@@ -111,11 +142,11 @@ export default function AppShell({ groups, pages, initialRows, user, onLogout })
         </section>
       )}
       <ConfirmDialog
-        open={Boolean(pendingLeaveAction)}
+        open={Boolean(pendingLeaveAction) || blocker.state === "blocked"}
         title="저장되지 않은 내용이 있습니다."
         description="저장하지 않고 나가시겠습니까?"
         confirmLabel="나가기"
-        onCancel={() => setPendingLeaveAction(null)}
+        onCancel={cancelLeave}
         onConfirm={confirmLeave}
       />
     </AdminLayout>

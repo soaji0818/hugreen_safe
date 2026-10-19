@@ -266,8 +266,15 @@ textarea { min-height: 76px; resize: vertical; line-height: 1.55; }
 .status-tabs button.active { border-bottom-color: var(--green); color: #06735d; font-weight: 700; }
 .status-tabs button > span { padding: 2px 5px; border-radius: 6px; background: #f1f3f5; color: #8b95a1; font-size: var(--type-caption-size); line-height: var(--type-caption-line); }
 .table-scroll { overflow: auto; }
-.cctv-master-table .table-scroll { height: 394px; min-height: 394px; overflow-x: auto; overflow-y: hidden; background: var(--surface-base); }
+.cctv-master-table { position: relative; }
+.cctv-master-table::after { position: absolute; top: 0; right: 0; z-index: 4; width: 8px; height: 34px; border-bottom: 1px solid var(--line); background: #f2f4f6; content: ""; }
+.cctv-master-table .table-scroll { height: 394px; min-height: 394px; overflow: auto; scrollbar-gutter: stable; overscroll-behavior: contain; background: linear-gradient(to bottom,#f2f4f6 0 34px,var(--surface-base) 34px); scrollbar-color: #b8c0c8 transparent; }
+.cctv-master-table .table-scroll::-webkit-scrollbar { width: 8px; height: 8px; background: transparent; }
+.cctv-master-table .table-scroll::-webkit-scrollbar-track:vertical { margin-top: 34px; background: transparent; }
+.cctv-master-table .table-scroll::-webkit-scrollbar-thumb { border: 2px solid transparent; border-radius: 999px; background: #b8c0c8; background-clip: padding-box; }
+.cctv-master-table .table-scroll::-webkit-scrollbar-corner { background: transparent; }
 .cctv-master-table .resizable-table-scroll:not(.columns-resized-scroll) { overflow-x: hidden; }
+.cctv-master-table .resizable-table th { position: sticky; top: 0; z-index: 3; }
 table { width: 100%; border-collapse: collapse; color: var(--text); font-size: var(--type-label-size); line-height: var(--type-label-line); white-space: nowrap; }
 th { height: 34px; padding: 5px 10px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: #f2f4f6; color: #4e5968; font-size: var(--type-label-size); line-height: var(--type-label-line); font-weight: 650; text-align: left; }
 td { height: 36px; padding: 3px 10px; border-right: 1px solid #edf0f2; border-bottom: 1px solid #edf0f2; color: #333d4b; line-height: var(--type-label-line); }
@@ -287,6 +294,7 @@ tr.selected { background: var(--green-pale); }
 .column-resize-handle:focus-visible::after { background: var(--green); }
 .column-resize-handle:focus-visible { outline: 0; }
 .resizable-table th:last-child .column-resize-handle { right: 0; width: 6px; }
+.cctv-master-table .resizable-table th:last-child .column-resize-handle { display: none; }
 .no-row-selection td:first-child { width: auto; text-align: left; }
 .no-row-selection tbody tr.selected td:first-child { position: relative; }
 .no-row-selection tbody tr.selected td:first-child::before {
@@ -601,13 +609,10 @@ dialog.cctv-detail-dialog::backdrop { backdrop-filter: none; }
 .cctv-zone-section { margin-top: 16px; }
 .cctv-zone-heading { min-height: 32px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .cctv-zone-heading h3 { margin: 0; color: #273548; font-size: 14px; line-height: 20px; font-weight: 750; }
-.cctv-zone-heading-actions { display: flex; align-items: center; gap: 8px; }
-.cctv-zone-heading-actions > span { color: #8b95a1; font-size: 12px; line-height: 18px; }
-.cctv-zone-toggle { min-height: 28px; padding: 3px 8px; border: 0; border-radius: 6px; background: transparent; color: #4e5968; font-size: 12px; line-height: 18px; font-weight: 700; }
-.cctv-zone-toggle:hover { background: #f2f4f6; color: #273548; }
-.cctv-zone-toggle:focus-visible { outline: 2px solid rgba(0,128,102,.24); outline-offset: 1px; }
+.cctv-zone-count { color: #8b95a1; font-size: 12px; line-height: 18px; }
 .cctv-zone-heading + #cctv-zone-content { margin-top: 6px; }
 .cctv-zone-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.cctv-zone-list.is-scrollable { max-height: 116px; padding-right: 4px; overflow-y: auto; overscroll-behavior: contain; }
 .cctv-zone-list > li { padding: 11px 12px; border: 1px solid #e5e8eb; border-radius: 8px; background: #fff; }
 .cctv-zone-list > li.is-inactive { background: #f8f9fa; }
 .cctv-zone-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -625,6 +630,7 @@ dialog.cctv-detail-dialog::backdrop { backdrop-filter: none; }
 .cctv-detail-dialog .detail-footer { position: static; min-height: 60px; padding: 10px 20px 14px; border-top: 0; background: var(--white); }
 .cctv-detail-dialog .detail-footer > div { display: flex; gap: 8px; }
 .cctv-detail-dialog .detail-footer button { min-width: 58px; }
+.cctv-detail-dialog .detail-footer .primary { min-height: 34px; padding: 6px 12px; }
 .cctv-detail-dialog .detail-footer .danger-button { background: var(--surface-danger-subtle); color: var(--text-danger); }
 .cctv-detail-dialog .detail-footer .danger-button:hover:enabled { background: #fbdde2; color: #c91f30; }
 

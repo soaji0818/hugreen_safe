@@ -1,7 +1,6 @@
 /* oxlint-disable react/only-export-components -- Page metadata and its dedicated component intentionally share this module. */
 import { useEffect, useMemo, useRef, useState } from "react";
 import DataTable from "../../components/data-table/DataTable";
-import Pagination from "../../components/data-table/Pagination";
 import SearchFilterPanel from "../../components/filters/SearchFilterPanel";
 import Button from "../../components/ui/Button";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
@@ -13,7 +12,6 @@ import useCommonCodes from "../../hooks/useCommonCodes";
 import useZoneList from "../../hooks/useZoneList";
 import { removeCamera, updateCamera } from "../../services/cameraService";
 
-const PAGE_SIZE = 10;
 const EMPTY_ROWS = [];
 const columns = ["카메라ID", "카메라명", "공장", "설치 위치", "대상 설비", "사용 여부"];
 const detailFields = [
@@ -40,10 +38,8 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
   const [localRows, setLocalRows] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
-  const [page, setPage] = useState(1);
   const [detailOpen, setDetailOpen] = useState(false);
   const [createMode, setCreateMode] = useState(false);
-  const [zonesExpanded, setZonesExpanded] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editValues, setEditValues] = useState(null);
   const [editBaseline, setEditBaseline] = useState(null);
@@ -79,7 +75,6 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     setSelectedId(serverRows[0]?.id || null);
     setCreateMode(false);
     setDetailOpen(false);
-    setPage(1);
   }, [serverRows]);
 
   const rows = localRows || EMPTY_ROWS;
@@ -90,8 +85,6 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
       String(value ?? "").toLowerCase().includes(keyword),
     );
   }), [rows, filters.keyword]);
-  const pageCount = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
-  const visibleRows = filteredRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const selectedRow = rows.find((row) => row.id === selectedId) || null;
   const selectedCameraId = selectedRow?.cameraId || selectedRow?.id || "";
   const {
@@ -100,7 +93,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     error: zonesError,
     refetch: refetchZones,
   } = useZoneList({
-    enabled: detailOpen && zonesExpanded,
+    enabled: detailOpen && !editMode && Boolean(selectedCameraId),
     token: user?.token,
     cameraId: selectedCameraId,
     onUnauthorized,
@@ -110,7 +103,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     loading: eventTypesLoading,
     error: eventTypesError,
   } = useCommonCodes({
-    enabled: detailOpen && zonesExpanded,
+    enabled: detailOpen && !editMode && Boolean(selectedCameraId),
     token: user?.token,
     codeDiv: "EVT_TYPE",
     onUnauthorized,
@@ -140,11 +133,9 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
 
   const updateFilters = (changes) => {
     setFilters((current) => ({ ...current, ...changes }));
-    setPage(1);
   };
   const resetFilters = () => {
     setFilters({ factoryCd: "", focusYn: "", useYn: "", keyword: "" });
-    setPage(1);
   };
   const toggleRow = (id) => {
     setSelectedId(id);
@@ -156,7 +147,6 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     setEditBaseline(null);
     setSelectedId(id);
     setCreateMode(false);
-    setZonesExpanded(false);
     setEditMode(false);
     setEditValues(null);
     setDetailOpen(true);
@@ -175,7 +165,6 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     };
     setEditBaseline(initialValues);
     setCreateMode(true);
-    setZonesExpanded(false);
     setEditValues(initialValues);
     setEditMode(true);
     setDetailOpen(true);
@@ -186,7 +175,6 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     setSavePending(false);
     setLeaveConfirmOpen(false);
     setCreateMode(false);
-    setZonesExpanded(false);
     setEditMode(false);
     setEditValues(null);
     setEditBaseline(null);
@@ -214,7 +202,6 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     };
     setEditBaseline(initialValues);
     setCreateMode(false);
-    setZonesExpanded(false);
     setEditValues(initialValues);
     setEditMode(true);
   };
@@ -415,7 +402,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
       <section className="table-panel screen-format-list-detail cctv-master-table" aria-label="조회 결과">
         <DataTable
           columns={columns}
-          rows={visibleRows}
+          rows={filteredRows}
           selectedId={selectedId}
           selectedIds={selectedIds}
           resizableColumns
@@ -427,7 +414,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
               {row[column]}
             </span>
           ) : row[column]}
-          stateRow={(loading || error || visibleRows.length === 0) ? (
+          stateRow={(loading || error || filteredRows.length === 0) ? (
             <tr className="api-state-row">
               <td colSpan={columns.length + 1}>
                 {loading ? "카메라 목록을 불러오는 중입니다." : error ? (
@@ -463,7 +450,6 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
             </tr>
           ) : null}
         />
-        <Pagination page={page} pageCount={pageCount} onChange={setPage} />
       </section>
 
       {(selectedRow || createMode) && (
@@ -551,21 +537,11 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
               <section className="cctv-zone-section" aria-labelledby="cctv-zone-title">
                 <div className="cctv-zone-heading">
                   <h3 id="cctv-zone-title">감지구역</h3>
-                  <div className="cctv-zone-heading-actions">
-                    <span>{zonesExpanded && !zonesLoading && !zonesError ? zones.length : (selectedRow.zoneCnt ?? 0)}개</span>
-                    <button
-                      type="button"
-                      className="cctv-zone-toggle"
-                      aria-expanded={zonesExpanded}
-                      aria-controls="cctv-zone-content"
-                      onClick={() => setZonesExpanded((expanded) => !expanded)}
-                    >
-                      {zonesExpanded ? "접기" : "더보기"}
-                    </button>
-                  </div>
+                  <span className="cctv-zone-count">
+                    {!zonesLoading && !zonesError ? zones.length : (selectedRow.zoneCnt ?? 0)}개
+                  </span>
                 </div>
-                {zonesExpanded && (
-                  <div id="cctv-zone-content">
+                <div id="cctv-zone-content">
                     {zonesLoading ? (
                       <p className="cctv-zone-state">감지구역을 불러오는 중입니다.</p>
                     ) : zonesError ? (
@@ -576,7 +552,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
                     ) : zones.length === 0 ? (
                       <p className="cctv-zone-state">등록된 감지구역이 없습니다.</p>
                     ) : (
-                      <ul className="cctv-zone-list">
+                      <ul className={`cctv-zone-list${zones.length >= 2 ? " is-scrollable" : ""}`}>
                         {zones.map((zone) => (
                           <li key={zone.zoneId} className={zone.useYn === "N" ? "is-inactive" : undefined}>
                             <div className="cctv-zone-summary">
@@ -604,8 +580,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
                     {eventTypesError && zones.length > 0 && (
                       <p className="cctv-zone-code-error">이벤트 유형 이름을 불러오지 못해 코드로 표시합니다.</p>
                     )}
-                  </div>
-                )}
+                </div>
               </section>
             )}
           </form>

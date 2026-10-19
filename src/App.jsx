@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AppShell from "./app/AppShell";
 import { eventRows } from "./data/demoRows";
 import LoginPage from "./features/auth/LoginPage";
@@ -8,6 +9,7 @@ import "./styles/application.css";
 
 export default function App() {
   const [auth, setAuth] = useState(getStoredAuth);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!auth?.expiresAt) return undefined;
@@ -16,10 +18,11 @@ export default function App() {
     const timeout = window.setTimeout(() => {
       clearAuth();
       setAuth(null);
+      navigate("/", { replace: true });
     }, Math.max(0, remainingTime));
 
     return () => window.clearTimeout(timeout);
-  }, [auth]);
+  }, [auth, navigate]);
 
   function handleLogin(nextAuth) {
     saveAuth(nextAuth);
@@ -29,6 +32,7 @@ export default function App() {
   function handleLogout() {
     clearAuth();
     setAuth(null);
+    navigate("/", { replace: true });
   }
 
   if (!auth) {
