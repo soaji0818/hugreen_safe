@@ -685,7 +685,9 @@ dialog.cctv-detail-dialog::backdrop { backdrop-filter: none; }
 .cctv-zone-list > li.is-inactive { background: #f8f9fa; }
 .cctv-zone-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .cctv-zone-summary strong { min-width: 0; overflow: hidden; color: #273548; font-size: 13px; line-height: 20px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
-.cctv-zone-status { flex: none; padding: 1px 7px; border-radius: 999px; background: #f2f4f6; color: #667085; font-size: 11px; line-height: 18px; font-weight: 700; }
+.cctv-zone-status { flex: none; padding: 1px 7px; border-radius: 999px; font-size: 11px; line-height: 18px; font-weight: 700; }
+.cctv-zone-status.is-on { background: #dcfce7; color: #16803c; }
+.cctv-zone-status.is-off { background: #f2f4f6; color: #667085; }
 .cctv-zone-events { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 8px; }
 .cctv-zone-events-label { width: 100%; color: #8b95a1; font-size: 11px; line-height: 16px; }
 .cctv-zone-event-tag { padding: 2px 7px; border-radius: 5px; background: #f2f4f6; color: #4e5968; font-size: 11px; line-height: 17px; font-weight: 650; }

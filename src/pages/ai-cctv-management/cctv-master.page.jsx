@@ -755,7 +755,9 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
                           <li key={zone.zoneId} className={zone.useYn === "N" ? "is-inactive" : undefined}>
                             <div className="cctv-zone-summary">
                               <strong>{zone.zoneNm || zone.zoneId}</strong>
-                              {zone.useYn === "N" && <span className="cctv-zone-status">미사용</span>}
+                              <span className={`cctv-zone-status ${zone.useYn === "N" ? "is-off" : "is-on"}`}>
+                                {zone.useYn === "N" ? "미사용" : "사용"}
+                              </span>
                             </div>
                             <div className="cctv-zone-events" aria-label={`${zone.zoneNm || zone.zoneId} 감지 이벤트 유형`}>
                               <span className="cctv-zone-events-label">감지 이벤트 유형</span>
