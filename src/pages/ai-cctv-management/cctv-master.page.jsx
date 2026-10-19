@@ -496,18 +496,10 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
         showKeyword={false}
         showReset={false}
         endAction={(
-          <>
-            <Button
-              variant="danger-button"
-              className="cctv-toolbar-delete"
-              icon="trash"
-              disabled={selectedIds.length === 0}
-              onClick={() => openDeleteConfirm(selectedIds)}
-            >
-              삭제
-            </Button>
-            <Button variant="primary" icon="plus" onClick={openCreate}>추가</Button>
-          </>
+          <button type="button" className="text-btn" onClick={resetFilters}>
+            <Icon name="reset" size={15} />
+            초기화
+          </button>
         )}
       >
         <div className="filter-grid standard-filter-grid cctv-master-filter-grid" data-count="3" style={{ "--filter-columns": 3 }}>
@@ -562,10 +554,16 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
 
       <div className="list-actions" aria-label="목록 작업">
         <span className="table-result-count" role="status">총 {filteredRows.length}건</span>
-        <button type="button" className="text-btn" onClick={resetFilters}>
-          <Icon name="reset" size={15} />
-          조건 초기화
-        </button>
+        <Button
+          variant="danger-button"
+          className="cctv-toolbar-delete"
+          icon="trash"
+          disabled={selectedIds.length === 0}
+          onClick={() => openDeleteConfirm(selectedIds)}
+        >
+          삭제
+        </Button>
+        <Button variant="primary" icon="plus" onClick={openCreate}>추가</Button>
       </div>
 
       <section className="table-panel screen-format-list-detail cctv-master-table" aria-label="조회 결과">
