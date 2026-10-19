@@ -6,6 +6,7 @@ import Button from "../../components/ui/Button";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import Icon from "../../components/ui/Icon";
 import RadioOption from "../../components/ui/RadioOption";
+import Select from "../../components/ui/Select";
 import Toast from "../../components/ui/Toast";
 import TOAST_MESSAGES from "../../components/ui/toastMessages";
 import useCameraList from "../../hooks/useCameraList";
@@ -54,6 +55,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
   const [validationMessage, setValidationMessage] = useState("");
   const detailDialog = useRef(null);
   const saveController = useRef(null);
+  const detailCameraAfterRefetch = useRef("");
 
   const { data: serverRows, loading, error, refetch } = useCameraList({
     enabled: true,
@@ -75,9 +77,14 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     // eslint-disable-next-line react/set-state-in-effect
     setLocalRows(serverRows);
     setSelectedIds([]);
-    setSelectedId(serverRows[0]?.id || null);
+    const detailCameraId = detailCameraAfterRefetch.current;
+    const detailRow = detailCameraId
+      ? serverRows.find((row) => (row.cameraId || row.id) === detailCameraId)
+      : null;
+    setSelectedId(detailRow?.id || serverRows[0]?.id || null);
     setCreateMode(false);
-    setDetailOpen(false);
+    setDetailOpen(Boolean(detailRow));
+    detailCameraAfterRefetch.current = "";
   }, [serverRows]);
 
   const rows = localRows || EMPTY_ROWS;
@@ -287,7 +294,8 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
       setEditBaseline(null);
       setInvalidField("");
       setValidationMessage("");
-      setDetailOpen(false);
+      if (!wasCreating) detailCameraAfterRefetch.current = cameraId;
+      setDetailOpen(!wasCreating);
       setNotice({
         title: wasCreating ? TOAST_MESSAGES.save : TOAST_MESSAGES.update,
         description: wasCreating ? TOAST_MESSAGES.save : TOAST_MESSAGES.update,
@@ -389,22 +397,17 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
         <div className="filter-grid standard-filter-grid cctv-master-filter-grid" data-count="3" style={{ "--filter-columns": 3 }}>
           <label>
             <span>공장</span>
-            <span className="factory-radio-options" role="radiogroup" aria-label="공장">
-              {factoryLoading ? <span className="factory-codes-message">공장 코드를 불러오는 중입니다.</span> : (
-                [{ value: "", label: "전체" }, ...factoryCodes].map((code) => (
-                  <RadioOption
-                    className="factory-radio-option"
-                    key={code.value || "all"}
-                    name="cctv-factory"
-                    value={code.value}
-                    checked={filters.factoryCd === code.value}
-                    onChange={() => updateFilters({ factoryCd: code.value })}
-                  >
-                    {code.label}
-                  </RadioOption>
-                ))
-              )}
-            </span>
+            <Select
+              aria-label="공장"
+              value={filters.factoryCd}
+              disabled={factoryLoading}
+              onChange={(event) => updateFilters({ factoryCd: event.target.value })}
+            >
+              <option value="">{factoryLoading ? "공장 코드를 불러오는 중입니다." : "전체"}</option>
+              {factoryCodes.map((code) => (
+                <option key={code.value} value={code.value}>{code.label}</option>
+              ))}
+            </Select>
           </label>
           <label>
             <span>집중감시구역 여부</span>
@@ -545,7 +548,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
                     : field.key === "useYn" ? `status-${selectedRow.useYn === "N" ? "off" : "on"}` : undefined}
                   >
                     {!editMode || (field.readOnly && !createMode) ? (selectedRow?.[field.label] ?? "-") : field.type === "factory" ? (
-                      <select
+                      <Select
                         name={field.key}
                         aria-label={field.label}
                         aria-invalid={invalidField === field.key}
@@ -556,9 +559,9 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
                       >
                         <option value="">공장을 선택하세요</option>
                         {factoryCodes.map((code) => <option key={code.value} value={code.value}>{code.label}</option>)}
-                      </select>
+                      </Select>
                     ) : field.type === "use" ? (
-                      <select
+                      <Select
                         name={field.key}
                         aria-label={field.label}
                         aria-invalid={invalidField === field.key}
@@ -569,7 +572,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
                       >
                         <option value="Y">사용</option>
                         <option value="N">미사용</option>
-                      </select>
+                      </Select>
                     ) : (
                       <input
                         name={field.key}
