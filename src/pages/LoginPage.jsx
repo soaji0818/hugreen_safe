@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { login } from "../../services/authService";
-import "./login.css";
+import { login } from "../services/authService";
+import "../styles/login.css";
 
 function EyeIcon({ open }) {
   return open ? (

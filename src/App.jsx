@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppShell from "./app/AppShell";
 import { eventRows } from "./data/demoRows";
-import LoginPage from "./features/auth/LoginPage";
+import LoginPage from "./pages/LoginPage";
 import { clearAuth, getStoredAuth, saveAuth } from "./services/authService";
 import { groups, pages } from "./pages";
 import "./styles/application.css";
