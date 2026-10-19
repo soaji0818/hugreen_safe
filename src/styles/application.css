@@ -522,11 +522,16 @@ td small { display: block; margin-top: 0; color: #8b95a1; font-size: var(--type-
 .evidence-note { color: #8b95a1; font-size: 13px; line-height: 1.65; }
 .icon-btn { width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 8px; background: white; }
 .mobile-menu, .scrim { display: none; }
-.top-toast { position: fixed; inset: 24px auto auto 50%; z-index: 1200; min-width: 160px; max-width: min(420px,calc(100vw - 32px)); display: none; align-items: center; justify-content: center; margin: 0; padding: 9px 16px; border: 0; border-radius: 999px; background: #fff; color: #333d4b; box-shadow: 0 8px 24px rgba(25,31,40,.12); font-size: 13px; line-height: 20px; font-weight: 650; text-align: center; white-space: nowrap; }
+.top-toast { position: fixed; inset: 24px auto auto 50%; z-index: 1200; min-width: 160px; max-width: min(420px,calc(100vw - 32px)); display: none; align-items: center; justify-content: center; gap: 8px; margin: 0; padding: 9px 16px; border: 0; border-radius: 999px; background: #fff; color: #333d4b; box-shadow: 0 12px 32px rgba(25,31,40,.22), 0 3px 10px rgba(25,31,40,.10); font-size: 13px; line-height: 20px; font-weight: 650; text-align: center; white-space: nowrap; }
 .top-toast.is-open { display: flex; animation: top-toast-drop-in .32s cubic-bezier(.2,.8,.2,1) both; }
+.top-toast.is-closing { display: flex; animation: top-toast-return-up .16s cubic-bezier(.4,0,1,1) both; }
 @keyframes top-toast-drop-in {
   from { opacity: 0; transform: translate(-50%,-18px); }
   to { opacity: 1; transform: translate(-50%,0); }
+}
+@keyframes top-toast-return-up {
+  from { opacity: 1; transform: translate(-50%,0); }
+  to { opacity: 0; transform: translate(-50%,-14px); }
 }
 dialog { width: 560px; max-width: min(840px,94vw); padding: 22px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); box-shadow: 0 20px 64px rgba(25,31,40,.2); }
 dialog::backdrop { background: rgba(25,31,40,.48); backdrop-filter: blur(2px); }
@@ -593,6 +598,11 @@ dialog.cctv-detail-dialog::backdrop { backdrop-filter: none; }
 .cctv-detail-table dd.is-editing select { width: 100%; max-width: none; height: 35px; min-height: 35px; padding: 6px 10px; border: 0; border-radius: 0; background: #fff; color: #273548; font-size: 13px; font-weight: 600; }
 .cctv-detail-table dd.is-editing input:focus,
 .cctv-detail-table dd.is-editing select:focus { position: relative; z-index: 1; outline: 2px solid rgba(0,128,102,.24); outline-offset: -2px; }
+.cctv-detail-table dd.is-editing.is-invalid input,
+.cctv-detail-table dd.is-editing.is-invalid select,
+.cctv-detail-table dd.is-editing.is-invalid input:focus,
+.cctv-detail-table dd.is-editing.is-invalid select:focus { position: relative; z-index: 1; background: #fff8f7; outline: 2px solid #f04438; outline-offset: -2px; }
+.cctv-required-message { margin: 6px 0 0; padding: 0 2px; color: #d92d20; font-size: 12px; line-height: 20px; font-weight: 650; }
 .cctv-detail-table dd.is-editing input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
 .cctv-detail-table dd.is-editing input[type="number"]::-webkit-inner-spin-button,
 .cctv-detail-table dd.is-editing input[type="number"]::-webkit-outer-spin-button { margin: 0; appearance: none; -webkit-appearance: none; }
@@ -763,5 +773,5 @@ dialog.cctv-detail-dialog::backdrop { backdrop-filter: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .top-toast.is-open { animation: none; transform: translateX(-50%); }
+  .top-toast.is-open, .top-toast.is-closing { animation: none; transform: translateX(-50%); }
 }

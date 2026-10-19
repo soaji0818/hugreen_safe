@@ -17,8 +17,27 @@ export default function Toast({
     const toast = toastRef.current;
     if (!toast || typeof toast.showPopover !== "function") return;
 
-    if (open && !toast.matches(":popover-open")) toast.showPopover();
-    if (!open && toast.matches(":popover-open")) toast.hidePopover();
+    if (open) {
+      if (!toast.matches(":popover-open")) toast.showPopover();
+      toast.classList.remove("is-closing");
+      toast.classList.add("is-open");
+      return undefined;
+    }
+
+    if (!toast.matches(":popover-open")) {
+      toast.classList.remove("is-open", "is-closing");
+      return undefined;
+    }
+
+    toast.classList.remove("is-open");
+    toast.classList.add("is-closing");
+    const closeDelay = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 160;
+    const closeTimer = window.setTimeout(() => {
+      if (toast.matches(":popover-open")) toast.hidePopover();
+      toast.classList.remove("is-closing");
+    }, closeDelay);
+
+    return () => window.clearTimeout(closeTimer);
   }, [open]);
 
   useEffect(() => {
@@ -30,7 +49,7 @@ export default function Toast({
   return (
     <div
       ref={toastRef}
-      className={`top-toast${open ? " is-open" : ""}`}
+      className="top-toast"
       popover="manual"
       role="status"
       aria-live="polite"

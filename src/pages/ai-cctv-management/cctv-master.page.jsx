@@ -7,6 +7,7 @@ import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import Icon from "../../components/ui/Icon";
 import RadioOption from "../../components/ui/RadioOption";
 import Toast from "../../components/ui/Toast";
+import TOAST_MESSAGES from "../../components/ui/toastMessages";
 import useCameraList from "../../hooks/useCameraList";
 import useCommonCodes from "../../hooks/useCommonCodes";
 import useZoneList from "../../hooks/useZoneList";
@@ -49,6 +50,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
   const [deleteTargetIds, setDeleteTargetIds] = useState([]);
   const [deletePending, setDeletePending] = useState(false);
   const [notice, setNotice] = useState(null);
+  const [invalidField, setInvalidField] = useState("");
   const detailDialog = useRef(null);
   const saveController = useRef(null);
 
@@ -144,6 +146,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     );
   };
   const openDetail = (id) => {
+    setInvalidField("");
     setEditBaseline(null);
     setSelectedId(id);
     setCreateMode(false);
@@ -163,6 +166,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
       recvGraceSec: 300,
       useYn: "Y",
     };
+    setInvalidField("");
     setEditBaseline(initialValues);
     setCreateMode(true);
     setEditValues(initialValues);
@@ -178,6 +182,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     setEditMode(false);
     setEditValues(null);
     setEditBaseline(null);
+    setInvalidField("");
     setDetailOpen(false);
   };
   const closeDetail = () => {
@@ -187,7 +192,8 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     }
     discardAndCloseDetail();
   };
-  const startEditing = () => {
+  const startEditing = (event) => {
+    event.preventDefault();
     if (!selectedRow) return;
     const initialValues = {
       cameraId: selectedRow.cameraId || selectedRow.id,
@@ -200,6 +206,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
       recvGraceSec: selectedRow.recvGraceSec ?? 1,
       useYn: selectedRow.useYn || "Y",
     };
+    setInvalidField("");
     setEditBaseline(initialValues);
     setCreateMode(false);
     setEditValues(initialValues);
@@ -208,9 +215,25 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
   const updateEditValue = (key, value) => {
     setEditValues((current) => ({ ...current, [key]: value }));
   };
+  const handleEditValueChange = (key, event) => {
+    if (invalidField === key) setInvalidField("");
+    updateEditValue(key, event.target.value);
+  };
   const saveChanges = async (event) => {
     event.preventDefault();
     if (!editValues || (!createMode && !selectedRow)) return;
+
+    const missingField = detailFields.find(({ key, required, readOnly }) =>
+      required
+      && (!readOnly || createMode)
+      && String(editValues[key] ?? "").trim() === "",
+    );
+    if (missingField) {
+      const missingControl = event.currentTarget.elements.namedItem(missingField.key);
+      setInvalidField(missingField.key);
+      window.requestAnimationFrame(() => missingControl?.focus());
+      return;
+    }
 
     const cameraId = createMode
       ? editValues.cameraId.trim()
@@ -241,10 +264,11 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
       setEditMode(false);
       setEditValues(null);
       setEditBaseline(null);
+      setInvalidField("");
       setDetailOpen(false);
       setNotice({
-        title: "저장이 완료되었습니다.",
-        description: wasCreating ? "카메라가 추가되었습니다." : "수정 내용이 저장되었습니다.",
+        title: wasCreating ? TOAST_MESSAGES.save : TOAST_MESSAGES.update,
+        description: wasCreating ? TOAST_MESSAGES.save : TOAST_MESSAGES.update,
       });
       refetch();
     } catch (requestError) {
@@ -283,8 +307,6 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     );
     const completed = results.filter((result) => result.status === "fulfilled");
     const failed = results.filter((result) => result.status === "rejected");
-    const deactivatedCount = completed.filter((result) => result.value.deactivated).length;
-    const deletedCount = completed.length - deactivatedCount;
     const unauthorized = failed.some((result) => result.reason?.status === 401);
 
     setDeletePending(false);
@@ -312,19 +334,15 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
 
     if (targetIds.length === 1) {
       setNotice({
-        title: "처리가 완료되었습니다.",
-        description: deactivatedCount === 1
-          ? "이벤트 이력이 있어 삭제하지 않고 미사용으로 변경했습니다."
-          : "작업이 완료되었습니다.",
+        title: TOAST_MESSAGES.delete,
+        description: TOAST_MESSAGES.delete,
       });
       return;
     }
 
     setNotice({
-      title: "처리가 완료되었습니다.",
-      description: deactivatedCount > 0
-        ? `${deletedCount}건을 삭제하고 ${deactivatedCount}건은 미사용으로 변경했습니다.`
-        : `${deletedCount}건을 삭제했습니다.`,
+      title: TOAST_MESSAGES.delete,
+      description: TOAST_MESSAGES.delete,
     });
   };
 
@@ -478,7 +496,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
           <form
             id="cctv-detail-form"
             className="detail-body"
-            noValidate={!createMode}
+            noValidate
             onSubmit={saveChanges}
           >
             <dl className="cctv-detail-table">
@@ -491,34 +509,40 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
                     )}
                   </dt>
                   <dd className={editMode
-                    ? `is-editing${field.readOnly && !createMode ? " is-readonly" : ""}`
+                    ? `is-editing${field.readOnly && !createMode ? " is-readonly" : ""}${invalidField === field.key ? " is-invalid" : ""}`
                     : field.key === "useYn" ? `status-${selectedRow.useYn === "N" ? "off" : "on"}` : undefined}
                   >
                     {!editMode || (field.readOnly && !createMode) ? (selectedRow?.[field.label] ?? "-") : field.type === "factory" ? (
                       <select
+                        name={field.key}
                         aria-label={field.label}
+                        aria-invalid={invalidField === field.key}
                         value={editValues?.[field.key] ?? ""}
                         required={field.required}
                         disabled={savePending}
-                        onChange={(event) => updateEditValue(field.key, event.target.value)}
+                        onChange={(event) => handleEditValueChange(field.key, event)}
                       >
                         <option value="">공장을 선택하세요</option>
                         {factoryCodes.map((code) => <option key={code.value} value={code.value}>{code.label}</option>)}
                       </select>
                     ) : field.type === "use" ? (
                       <select
+                        name={field.key}
                         aria-label={field.label}
+                        aria-invalid={invalidField === field.key}
                         value={editValues?.[field.key] ?? "Y"}
                         required={field.required}
                         disabled={savePending}
-                        onChange={(event) => updateEditValue(field.key, event.target.value)}
+                        onChange={(event) => handleEditValueChange(field.key, event)}
                       >
                         <option value="Y">사용</option>
                         <option value="N">미사용</option>
                       </select>
                     ) : (
                       <input
+                        name={field.key}
                         aria-label={field.label}
+                        aria-invalid={invalidField === field.key}
                         type={field.type === "number" ? "number" : "text"}
                         value={editValues?.[field.key] ?? ""}
                         required={field.required}
@@ -526,13 +550,16 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
                         max={field.type === "number" ? 86400 : undefined}
                         maxLength={field.maxLength}
                         disabled={savePending}
-                        onChange={(event) => updateEditValue(field.key, event.target.value)}
+                        onChange={(event) => handleEditValueChange(field.key, event)}
                       />
                     )}
                   </dd>
                 </div>
               ))}
             </dl>
+            {invalidField && (
+              <p className="cctv-required-message" role="alert">* 표시는 필숫값입니다.</p>
+            )}
             {!editMode && (
               <section className="cctv-zone-section" aria-labelledby="cctv-zone-title">
                 <div className="cctv-zone-heading">
@@ -591,15 +618,21 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
               </Button>
             ) : <span />}
             <div>
-              <Button
-                variant="primary"
-                type={editMode ? "submit" : "button"}
-                form={editMode ? "cctv-detail-form" : undefined}
-                disabled={savePending}
-                onClick={editMode ? undefined : startEditing}
-              >
-                {savePending ? "저장 중..." : editMode ? "저장" : "수정"}
-              </Button>
+              {editMode ? (
+                <Button
+                  key="save-camera"
+                  variant="primary"
+                  type="submit"
+                  form="cctv-detail-form"
+                  disabled={savePending}
+                >
+                  {savePending ? "저장 중..." : "저장"}
+                </Button>
+              ) : (
+                <Button key="edit-camera" variant="primary" type="button" onClick={startEditing}>
+                  수정
+                </Button>
+              )}
             </div>
           </div>
         </dialog>
