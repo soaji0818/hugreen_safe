@@ -243,6 +243,13 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
       current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
     );
   };
+  const toggleAllRows = (ids, checked) => {
+    const visibleIds = new Set(ids);
+    setSelectedIds((current) => checked
+      ? [...new Set([...current, ...ids])]
+      : current.filter((id) => !visibleIds.has(id)));
+    if (!checked && visibleIds.has(selectedId)) setSelectedId(null);
+  };
   const openDetail = (id) => {
     setDialogGeometry(null);
     setInvalidField("");
@@ -485,9 +492,22 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
       <SearchFilterPanel
         className="standard-filter-panel"
         ariaLabel="AI CCTV 기준정보 관리 조회 조건"
-        keyword={filters.keyword}
-        onKeywordChange={(keyword) => updateFilters({ keyword })}
         onReset={resetFilters}
+        showKeyword={false}
+        endAction={(
+          <>
+            <Button
+              variant="danger-button"
+              className="cctv-toolbar-delete"
+              icon="trash"
+              disabled={selectedIds.length === 0}
+              onClick={() => openDeleteConfirm(selectedIds)}
+            >
+              삭제
+            </Button>
+            <Button variant="primary" icon="plus" onClick={openCreate}>추가</Button>
+          </>
+        )}
       >
         <div className="filter-grid standard-filter-grid cctv-master-filter-grid" data-count="3" style={{ "--filter-columns": 3 }}>
           <label>
@@ -541,10 +561,6 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
 
       <div className="list-actions" aria-label="목록 작업">
         <span className="table-result-count" role="status">총 {filteredRows.length}건</span>
-        {selectedIds.length > 0 && (
-          <Button variant="danger-button" icon="trash" onClick={() => openDeleteConfirm(selectedIds)}>삭제</Button>
-        )}
-        {selectedIds.length === 0 && <Button variant="primary" icon="plus" onClick={openCreate}>추가</Button>}
       </div>
 
       <section className="table-panel screen-format-list-detail cctv-master-table" aria-label="조회 결과">
@@ -557,6 +573,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
           onRowClick={setSelectedId}
           onRowDoubleClick={openDetail}
           onToggleRow={toggleRow}
+          onToggleAll={toggleAllRows}
           renderCell={(row, column) => column === "사용 여부" ? (
             <span className={`cctv-status-badge ${row.useYn === "N" ? "is-off" : "is-on"}`}>
               {row[column]}

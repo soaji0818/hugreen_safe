@@ -600,6 +600,26 @@ export default function StandardPage({ pageDefinition, initialRows }) {
       setSensorMode("view");
     }
   };
+  const toggleAllRowSelection = (ids, checked) => {
+    const visibleIds = new Set(ids);
+    if (
+      !checked &&
+      selected &&
+      visibleIds.has(selected) &&
+      dirty &&
+      !window.confirm("저장하지 않은 변경 내용을 버리고 전체 선택을 해제할까요?")
+    ) return;
+
+    const nextSelectedRows = checked
+      ? [...new Set([...selectedRows, ...ids])]
+      : selectedRows.filter((id) => !visibleIds.has(id));
+    setSelectedRows(nextSelectedRows);
+    if (!checked && selected && visibleIds.has(selected)) {
+      setSelected(nextSelectedRows.at(-1) || null);
+      setDraft({});
+      setSensorMode("view");
+    }
+  };
   const update = (changes) => {
     setRecords({
       ...records,
@@ -1098,6 +1118,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                 if (conf.detail) setDetailOpen(true);
               }}
               onToggleRow={toggleRowSelection}
+              onToggleAll={toggleAllRowSelection}
               renderCell={(item, column, index) =>
                 /상태|단계|결과/.test(column) ? (
                   <Badge value={raw(column, item, index)} />

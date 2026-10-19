@@ -144,6 +144,7 @@ h2 { color: var(--ink); font-size: var(--type-title-size); line-height: var(--ty
 .text-btn { min-height: 28px; display: inline-flex; align-items: center; gap: 5px; margin-left: auto; border: 0; background: transparent; color: #8b95a1; font-size: var(--type-caption-size); line-height: var(--type-caption-line); }
 .text-btn:hover { color: #4e5968; }
 .filter-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 10px; }
+.filter-actions.no-keyword { margin-bottom: 4px; }
 .filter-actions .text-btn { flex: none; white-space: nowrap; }
 .filter-keyword { width: min(360px, 100%); height: 34px; display: flex; align-items: center; gap: 8px; margin: 0; padding: 0 10px; border-radius: 7px; background: #e9edef; color: #8b95a1; }
 .filter-keyword:focus-within { box-shadow: inset 0 0 0 1px #78b9ac, 0 0 0 3px rgba(0,128,102,.06); background: white; }
@@ -214,6 +215,11 @@ textarea { min-height: 76px; resize: vertical; line-height: 1.55; }
 .access-filter-panel .filter-actions .text-btn { transform: translateY(8px); }
 .filter-panel.standard-filter-panel { padding-inline: 12px; }
 .standard-filter-panel .filter-actions .text-btn { transform: translateY(8px); }
+.standard-filter-panel .filter-actions.no-keyword .text-btn { margin-left: 0; padding-left: 0; transform: none; }
+.filter-actions-end { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.filter-actions-end .ui-button { min-width: 72px; min-height: 34px; padding: 6px 11px; font-size: 12px; }
+.filter-actions-end .cctv-toolbar-delete { border: 0; background: var(--surface-danger-subtle); color: var(--text-danger); }
+.filter-actions-end .cctv-toolbar-delete:hover:enabled { background: #fbdde2; color: #c91f30; }
 .standard-filter-grid { border-right: 0; border-bottom: 0; border-left: 0; border-radius: 0; }
 .standard-filter-grid > label > span:first-child { background: #f2f4f6; color: #4e5968; font-size: var(--type-label-size); line-height: var(--type-label-line); font-weight: 650; }
 .standard-filter-grid select,
@@ -241,6 +247,10 @@ textarea { min-height: 76px; resize: vertical; line-height: 1.55; }
 .filter-grid.cctv-master-filter-grid > label { grid-template-columns: 140px minmax(0,1fr); }
 .cctv-master-filter-grid > label > span:first-child { white-space: nowrap; }
 .cctv-master-filter-grid .ui-select { width: 100%; justify-self: stretch; }
+.cctv-master-page .filter-actions.no-keyword .text-btn svg { transform: scaleX(-1); }
+.cctv-master-page .standard-filter-panel { margin-bottom: 0; padding-bottom: 8px; }
+.cctv-master-page .list-actions { min-height: 32px; margin-bottom: 2px; }
+.cctv-master-page .table-result-count { align-self: center; }
 .radio-options { min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; padding: 6px 12px; background: var(--white); }
 .filter-grid .radio-option { width: auto; min-height: 22px; display: inline-flex; grid-template-columns: none; align-items: center; gap: 7px; overflow: visible; border: 0; background: transparent; color: #6b7684; font-size: 12px; font-weight: 500; white-space: nowrap; cursor: pointer; }
 .radio-option input { width: 18px; height: 18px; }
@@ -273,13 +283,16 @@ textarea { min-height: 76px; resize: vertical; line-height: 1.55; }
 .cctv-master-table .table-scroll::-webkit-scrollbar-track:vertical { margin-top: 34px; background: transparent; }
 .cctv-master-table .table-scroll::-webkit-scrollbar-thumb { border: 2px solid transparent; border-radius: 999px; background: #b8c0c8; background-clip: padding-box; }
 .cctv-master-table .table-scroll::-webkit-scrollbar-corner { background: transparent; }
-.cctv-master-table .resizable-table-scroll:not(.columns-resized-scroll) { overflow-x: auto; }
-.cctv-master-table .resizable-table:not(.columns-resized) { width: max-content; min-width: 100%; }
+.cctv-master-table .resizable-table-scroll:not(.columns-resized-scroll) { overflow-x: hidden; }
+.cctv-master-table .resizable-table:not(.columns-resized) { width: calc(100% - 8px); min-width: 0; table-layout: fixed; }
 .cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(2) { width: 110px; }
-.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(5) { width: 240px; }
-.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(7) { width: 200px; }
+.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(3) { width: 150px; }
+.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(4) { width: 90px; }
+.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(5),
+.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(6) { width: 175px; }
+.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(7) { width: 160px; }
 .cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(8) { width: 200px; }
-.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(9) { width: 140px; }
+.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(9) { width: 110px; }
 .cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(10) { width: 90px; }
 .cctv-master-table .resizable-table td:nth-child(9) { text-align: right; font-variant-numeric: tabular-nums; }
 .cctv-master-table .resizable-table th { position: sticky; top: 0; z-index: 3; }
@@ -329,7 +342,9 @@ tr.selected { background: var(--green-pale); }
   border-radius: 5px;
   background-repeat: no-repeat;
 }
+.table-panel .selection-col input[type="checkbox"],
 .table-panel .selection-cell input[type="checkbox"] { display: block; margin: 0 auto; }
+.table-panel .selection-col input[type="checkbox"]:indeterminate { border-color: var(--surface-brand); background-color: var(--surface-brand); background-image: linear-gradient(#fff,#fff); background-position: center; background-size: 9px 2px; }
 .table-panel .selection-cell input[type="checkbox"]:checked { background-position: center; background-size: 100% 100%; }
 .identifier { color: inherit; font-size: inherit; line-height: inherit; font-weight: inherit; font-variant-numeric: tabular-nums; }
 .date-line { display: inline-block; color: inherit; font-size: inherit; font-weight: inherit; line-height: inherit; white-space: nowrap; font-variant-numeric: tabular-nums; }

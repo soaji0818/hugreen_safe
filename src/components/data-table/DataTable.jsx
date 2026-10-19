@@ -55,6 +55,7 @@ export default function DataTable({
   onRowClick,
   onRowDoubleClick,
   onToggleRow,
+  onToggleAll,
   renderCell,
   stateRow,
   emptyState,
@@ -65,6 +66,17 @@ export default function DataTable({
   const [tableWidth, setTableWidth] = useState(null);
   const [revealedText, setRevealedText] = useState(null);
   const resizeState = useRef(null);
+  const selectAllRef = useRef(null);
+  const visibleRowIds = rows.map((row) => row.id);
+  const selectedVisibleCount = visibleRowIds.filter((id) => selectedIds.includes(id)).length;
+  const allVisibleRowsSelected = visibleRowIds.length > 0 && selectedVisibleCount === visibleRowIds.length;
+  const someVisibleRowsSelected = selectedVisibleCount > 0 && !allVisibleRowsSelected;
+
+  useEffect(() => {
+    if (selectAllRef.current) {
+      selectAllRef.current.indeterminate = someVisibleRowsSelected;
+    }
+  }, [someVisibleRowsSelected]);
 
   useEffect(() => {
     if (!revealedText) return undefined;
@@ -157,6 +169,17 @@ export default function DataTable({
     setTableWidth((current) => (current || table.offsetWidth) + result.appliedDelta);
   };
 
+  const toggleAllRows = (checked) => {
+    if (onToggleAll) {
+      onToggleAll(visibleRowIds, checked);
+      return;
+    }
+
+    visibleRowIds
+      .filter((id) => checked ? !selectedIds.includes(id) : selectedIds.includes(id))
+      .forEach((id) => onToggleRow?.(id));
+  };
+
   const tableClassName = [
     selectable ? "" : "no-row-selection",
     resizableColumns ? "resizable-table" : "",
@@ -184,7 +207,18 @@ export default function DataTable({
         </colgroup>
         <thead>
           <tr>
-            {selectable && <th className="selection-col">선택</th>}
+            {selectable && (
+              <th className="selection-col" scope="col">
+                <input
+                  ref={selectAllRef}
+                  type="checkbox"
+                  aria-label={allVisibleRowsSelected ? "전체 선택 해제" : "전체 선택"}
+                  checked={allVisibleRowsSelected}
+                  disabled={visibleRowIds.length === 0}
+                  onChange={(event) => toggleAllRows(event.target.checked)}
+                />
+              </th>
+            )}
             {columns.map((column, columnIndex) => (
               <th
                 key={column}
