@@ -495,6 +495,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
         onReset={resetFilters}
         showKeyword={false}
         showReset={false}
+        startAction={<span className="cctv-filter-heading">조회조건</span>}
         endAction={(
           <button type="button" className="text-btn" onClick={resetFilters}>
             <Icon name="reset" size={15} />

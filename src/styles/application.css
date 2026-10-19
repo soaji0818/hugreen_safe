@@ -248,6 +248,9 @@ textarea { min-height: 76px; resize: vertical; line-height: 1.55; }
 .cctv-master-filter-grid > label > span:first-child { white-space: nowrap; }
 .cctv-master-filter-grid .ui-select { width: 100%; justify-self: stretch; }
 .cctv-master-page .filter-actions.no-keyword .text-btn svg { transform: scaleX(-1); }
+.cctv-master-page .standard-filter-panel { padding-top: 0; }
+.cctv-master-page .filter-actions.no-keyword { margin-bottom: 0; }
+.cctv-filter-heading { min-width: 140px; min-height: 34px; display: flex; flex: none; align-items: center; padding: 0 10px 0 0; background: transparent; color: #4a4f55; font-size: 16px; line-height: var(--type-label-line); font-weight: 700; white-space: nowrap; }
 .radio-options { min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; padding: 6px 12px; background: var(--white); }
 .filter-grid .radio-option { width: auto; min-height: 22px; display: inline-flex; grid-template-columns: none; align-items: center; gap: 7px; overflow: visible; border: 0; background: transparent; color: #6b7684; font-size: 12px; font-weight: 500; white-space: nowrap; cursor: pointer; }
 .radio-option input { width: 18px; height: 18px; }

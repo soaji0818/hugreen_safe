@@ -9,6 +9,7 @@ export default function SearchFilterPanel({
   onReset,
   showKeyword = true,
   showReset = true,
+  startAction,
   endAction,
   children,
 }) {
@@ -19,6 +20,7 @@ export default function SearchFilterPanel({
       onSubmit={(event) => event.preventDefault()}
     >
       <div className={`filter-actions${showKeyword ? "" : " no-keyword"}`}>
+        {startAction}
         {showKeyword && (
           <label className="filter-keyword">
             <Icon name="search" size={15} />
