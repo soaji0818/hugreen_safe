@@ -12,7 +12,7 @@ export default function Button({
   return (
     <button
       type={type}
-      className={`${variant} ${className}`.trim()}
+      className={`ui-button ${variant} ${className}`.trim()}
       {...props}
     >
       {icon && <Icon name={icon} size={iconSize} />}

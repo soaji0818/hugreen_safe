@@ -126,6 +126,7 @@ h1 { color: var(--ink); font-size: var(--type-title-lg-size); line-height: var(-
 h2 { color: var(--ink); font-size: var(--type-title-size); line-height: var(--type-title-line); font-weight: 700; letter-spacing: -.15px; }
 .page-heading p { max-width: 720px; margin-top: 5px; color: #6b7684; font-size: var(--type-body-size); line-height: var(--type-body-line); }
 .primary, .secondary, .danger-button { min-height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 8px 13px; border-radius: 8px; font-size: var(--type-label-size); line-height: var(--type-label-line); font-weight: 650; white-space: nowrap; }
+.ui-button { font-size: var(--type-label-size); line-height: var(--type-label-line); font-weight: 650; }
 .primary { border: 1px solid var(--green); background: var(--green); color: white; }
 .primary:hover:enabled { border-color: var(--green-hover); background: var(--green-hover); }
 .secondary { border: 1px solid var(--line-strong); background: white; color: #4e5968; }
@@ -365,9 +366,10 @@ td small { display: block; margin-top: 0; color: #8b95a1; font-size: var(--type-
 .tree-editor-panel .pane-heading { min-height: 56px; padding: 0 16px; border-bottom: 1px solid var(--line); }
 .tree-editor-panel .pane-heading h2 { font-size: 15px; }
 .tree-editor-panel .pane-heading .primary,
+.tree-editor-panel .pane-heading .danger-button,
 .tree-detail-actions .secondary,
 .tree-detail-actions .primary,
-.danger-button,
+.tree-detail-actions .danger-button,
 .tree-save-bar button { min-height: 34px; padding: 6px 12px; border: 0; border-radius: 8px; font-size: 12px; font-weight: 600; }
 .tree-editor-panel .pane-heading .primary,
 .tree-detail-actions .primary,
@@ -631,8 +633,7 @@ dialog.cctv-detail-dialog::backdrop { backdrop-filter: none; }
 .cctv-zone-code-error { margin: 7px 0 0; color: #8b95a1; font-size: 11px; line-height: 17px; }
 .cctv-detail-dialog .detail-footer { position: static; min-height: 60px; padding: 10px 20px 14px; border-top: 0; background: var(--white); }
 .cctv-detail-dialog .detail-footer > div { display: flex; gap: 8px; }
-.cctv-detail-dialog .detail-footer button { min-width: 58px; }
-.cctv-detail-dialog .detail-footer .primary { min-height: 34px; padding: 6px 12px; }
+.cctv-detail-dialog .detail-footer button { min-width: 58px; min-height: 34px; padding: 6px 12px; font-size: var(--type-label-size); line-height: var(--type-label-line); font-weight: 650; }
 .cctv-detail-dialog .detail-footer .danger-button { background: var(--surface-danger-subtle); color: var(--text-danger); }
 .cctv-detail-dialog .detail-footer .danger-button:hover:enabled { background: #fbdde2; color: #c91f30; }
 
