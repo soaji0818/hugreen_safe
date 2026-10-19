@@ -167,7 +167,7 @@ export default function AdminLayout({
             >
               <img
                 className="header-brand-image"
-                src="/hugreen-logo.png"
+                src={`${import.meta.env.BASE_URL}hugreen-logo.png`}
                 alt="휴그린 주식회사"
               />
             </a>

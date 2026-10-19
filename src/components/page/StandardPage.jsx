@@ -10,6 +10,7 @@ import Toast from "../ui/Toast";
 
 const statuses = ["미확인", "확인", "조치중", "조치완료", "오탐 종결"];
 const PAGE_SIZE = 15;
+const factoryEventDemoUrl = `${import.meta.env.BASE_URL}factory-event-demo.png`;
 const rowSelectionHiddenScreens = [
   "MES-TD3-001",
   "MES-TD3-005",
@@ -631,7 +632,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
     if (!row) return;
 
     try {
-      const response = await fetch("/factory-event-demo.png");
+      const response = await fetch(factoryEventDemoUrl);
       if (!response.ok) throw new Error("snapshot download failed");
       const url = URL.createObjectURL(await response.blob());
       const a = document.createElement("a");
@@ -1132,7 +1133,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                     <div className="snapshot-sequence">
                       {["감지 3초 전", "감지 시점", "감지 3초 후"].map((label, index) => (
                         <figure key={label} className={index === 1 ? "detected" : ""}>
-                          <img src="/factory-event-demo.png" alt={`${label} 샘플 스냅샷`} />
+                          <img src={factoryEventDemoUrl} alt={`${label} 샘플 스냅샷`} />
                           <figcaption>{label}</figcaption>
                         </figure>
                       ))}
@@ -1289,7 +1290,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                       aria-label="샘플 스냅샷 확대"
                     >
                       <img
-                        src="/factory-event-demo.png"
+                        src={factoryEventDemoUrl}
                         alt="AI로 생성한 프레스 설비와 안전구역의 작업자 샘플"
                       />
                       <span className="image-label">CAM 08 · 스냅샷</span>
@@ -1579,7 +1580,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
           <>
             <img
               className="large-evidence"
-              src="/factory-event-demo.png"
+              src={factoryEventDemoUrl}
               alt="AI 생성 공장 스냅샷 확대"
             />
             <p>AI 생성 샘플 · 실제 촬영 아님</p>

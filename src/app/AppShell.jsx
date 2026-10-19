@@ -105,7 +105,7 @@ export default function AppShell({ groups, pages, initialRows, user, onLogout })
       ) : (
         <section className="home-welcome" aria-label="휴그린 스마트 안전관리 시스템">
           <div className="home-welcome-content">
-            <img src="/hugreen-logo.png" alt="휴그린 주식회사" />
+            <img src={`${import.meta.env.BASE_URL}hugreen-logo.png`} alt="휴그린 주식회사" />
             <p>좌측 사이드바에서 메뉴를 선택해 주세요.</p>
           </div>
         </section>
