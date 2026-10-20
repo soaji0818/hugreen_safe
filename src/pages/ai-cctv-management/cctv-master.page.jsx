@@ -5,6 +5,7 @@ import SearchFilterPanel from "../../components/filters/SearchFilterPanel";
 import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
+import CrudDialog from "../../components/ui/CrudDialog";
 import Icon from "../../components/ui/Icon";
 import RadioOption from "../../components/ui/RadioOption";
 import Select from "../../components/ui/Select";
@@ -15,11 +16,6 @@ import useZoneList from "../../hooks/useZoneList";
 import { removeCamera, updateCamera } from "../../services/cameraService";
 
 const EMPTY_ROWS = [];
-const dialogResizeHandles = [
-  { key: "n-left", direction: "n" },
-  { key: "n-right", direction: "n" },
-  ...["e", "s", "w", "ne", "se", "sw", "nw"].map((direction) => ({ key: direction, direction })),
-];
 const columns = [
   "카메라ID",
   "카메라명",
@@ -141,15 +137,6 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
   );
   const hasUnsavedChanges = editMode
     && (savePending || haveEditValuesChanged(editValues, editBaseline));
-
-  useEffect(() => {
-    const dialog = detailDialog.current;
-    if (!dialog) return;
-
-    const canShowDetail = createMode || Boolean(selectedRow);
-    if (detailOpen && canShowDetail && !dialog.open) dialog.showModal();
-    if ((!detailOpen || !canShowDetail) && dialog.open) dialog.close();
-  }, [createMode, detailOpen, selectedRow]);
 
   useEffect(() => {
     onUnsavedChange?.(hasUnsavedChanges);
@@ -623,54 +610,28 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
       </section>
 
       {(selectedRow || createMode) && (
-        <dialog
-          className="detail-dialog cctv-detail-dialog"
+        <CrudDialog
           ref={detailDialog}
-          style={dialogGeometry ? {
-            position: "fixed",
-            inset: "auto",
-            left: `${dialogGeometry.left}px`,
-            top: `${dialogGeometry.top}px`,
-            width: `${dialogGeometry.width}px`,
-            height: `${dialogGeometry.height}px`,
-            maxWidth: "none",
-            maxHeight: "none",
-            margin: 0,
-          } : undefined}
-          onCancel={(event) => {
-            event.preventDefault();
-            closeDetail();
+          open={detailOpen}
+          mode={createMode ? "create" : editMode ? "edit" : "detail"}
+          titles={{
+            create: "카메라 추가",
+            edit: "카메라 정보 수정",
+            detail: "카메라 상세 정보",
           }}
-          onClick={(event) => {
-            if (event.target === detailDialog.current) closeDetail();
-          }}
-          aria-labelledby="cctv-detail-title"
+          formId="cctv-detail-form"
+          className="cctv-detail-dialog"
+          geometry={dialogGeometry}
+          saving={savePending}
+          resizable
+          onClose={closeDetail}
+          onSubmit={saveChanges}
+          onEdit={startEditing}
+          onDelete={() => openDeleteConfirm([selectedRow.id])}
+          onInteractionStart={startDialogInteraction}
+          onInteractionMove={moveDialogInteraction}
+          onInteractionEnd={stopDialogInteraction}
         >
-          <div className="detail-header">
-            <div className="cctv-detail-heading">
-              <h2 id="cctv-detail-title">
-                {createMode ? "카메라 추가" : editMode ? "카메라 정보 수정" : "카메라 상세 정보"}
-              </h2>
-            </div>
-            <button
-              type="button"
-              className="cctv-dialog-drag-handle"
-              aria-label="팝업 이동"
-              onPointerDown={(event) => startDialogInteraction(event, "drag")}
-              onPointerMove={moveDialogInteraction}
-              onPointerUp={stopDialogInteraction}
-              onPointerCancel={stopDialogInteraction}
-            />
-            <button type="button" className="cctv-detail-close" aria-label="상세 정보 닫기" onClick={closeDetail}>
-              <Icon name="close" size={20} />
-            </button>
-          </div>
-          <form
-            id="cctv-detail-form"
-            className="detail-body"
-            noValidate
-            onSubmit={saveChanges}
-          >
             <dl className="cctv-detail-table">
               {detailFields.map((field) => (
                 <div key={field.key}>
@@ -784,43 +745,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
                 </div>
               </section>
             )}
-          </form>
-          <div className="detail-footer">
-            {!editMode ? (
-              <Button variant="danger-button" onClick={() => openDeleteConfirm([selectedRow.id])}>
-                삭제
-              </Button>
-            ) : <span />}
-            <div>
-              {editMode ? (
-                <Button
-                  key="save-camera"
-                  variant="primary"
-                  type="submit"
-                  form="cctv-detail-form"
-                  disabled={savePending}
-                >
-                  {savePending ? "저장 중..." : "저장"}
-                </Button>
-              ) : (
-                <Button key="edit-camera" variant="primary" type="button" onClick={startEditing}>
-                  수정
-                </Button>
-              )}
-            </div>
-          </div>
-          {dialogResizeHandles.map(({ key, direction }) => (
-            <span
-              key={key}
-              className={`cctv-dialog-resize-handle is-${key}`}
-              aria-hidden="true"
-              onPointerDown={(event) => startDialogInteraction(event, direction)}
-              onPointerMove={moveDialogInteraction}
-              onPointerUp={stopDialogInteraction}
-              onPointerCancel={stopDialogInteraction}
-            />
-          ))}
-        </dialog>
+        </CrudDialog>
       )}
 
       <ConfirmDialog

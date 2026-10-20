@@ -60,6 +60,7 @@ export default function DataTable({
   stateRow,
   emptyState,
   resizableColumns = false,
+  verticalScroll = false,
   className = "",
 }) {
   const [columnWidths, setColumnWidths] = useState([]);
@@ -189,12 +190,17 @@ export default function DataTable({
   const scrollClassName = [
     "table-scroll",
     className,
+    verticalScroll ? "data-table-vertical-scroll" : "",
     resizableColumns ? "resizable-table-scroll" : "",
     columnWidths.length ? "columns-resized-scroll" : "",
   ].filter(Boolean).join(" ");
 
   return (
-    <div className={scrollClassName} tabIndex={0} aria-label="결과 표 가로 스크롤">
+    <div
+      className={scrollClassName}
+      tabIndex={0}
+      aria-label={verticalScroll ? "결과 표 스크롤" : "결과 표 가로 스크롤"}
+    >
       <table
         className={tableClassName || undefined}
         style={tableWidth ? { width: `${tableWidth}px` } : undefined}

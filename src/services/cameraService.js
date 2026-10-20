@@ -1,4 +1,8 @@
-import { deleteCamera, fetchCameras, saveCamera } from "../api/cameraApi";
+import {
+  deleteCamera,
+  fetchCameras,
+  saveCamera,
+} from "../api/cameraApi";
 
 function displayYesNo(value, yesLabel, noLabel) {
   if (value === "Y") return yesLabel;
@@ -21,6 +25,7 @@ export function toCameraRow(camera) {
     "카메라명": camera.cameraNm || "-",
     "공장": camera.factoryCd || "-",
     "설치 위치": camera.installLoc || "-",
+    "설치장비": camera.installLoc || "-",
     "설비 코드": camera.equipCd || "-",
     "대상 설비": camera.equipCd || "-",
     "모델명": camera.modelNm || "-",
@@ -38,7 +43,13 @@ function compareByInsertTime(left, right) {
   const leftValue = left.insertTime;
   const rightValue = right.insertTime;
 
-  if (!leftValue && !rightValue) return 0;
+  if (!leftValue && !rightValue) {
+    return String(left.cameraId || "").localeCompare(
+      String(right.cameraId || ""),
+      undefined,
+      { numeric: true, sensitivity: "base" },
+    );
+  }
   if (!leftValue) return -1;
   if (!rightValue) return 1;
 

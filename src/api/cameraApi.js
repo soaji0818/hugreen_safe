@@ -1,9 +1,9 @@
 import { requestApi } from "./httpClient";
 
-export function fetchCameras({ token, factoryCd, focusYn, useYn, signal }) {
-  return requestApi("/api/web/cameras", {
+export function fetchCameras({ token, factoryCd, focusYn, useYn, statusOnly = false, signal }) {
+  return requestApi(statusOnly ? "/api/web/cameras/status" : "/api/web/cameras", {
     token,
-    query: { factoryCd, focusYn, useYn },
+    query: statusOnly ? { factoryCd } : { factoryCd, focusYn, useYn },
     signal,
     networkMessage: "카메라 목록 서버에 연결할 수 없습니다.",
     errorMessage: "카메라 목록을 불러오지 못했습니다.",

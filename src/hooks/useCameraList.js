@@ -7,6 +7,7 @@ export default function useCameraList({
   factoryCd = "",
   focusYn = "",
   useYn = "",
+  statusOnly = false,
   onUnauthorized,
 }) {
   const [data, setData] = useState([]);
@@ -25,7 +26,7 @@ export default function useCameraList({
     // eslint-disable-next-line react/set-state-in-effect
     setLoading(true);
     setError("");
-    getCameras({ token, factoryCd, focusYn, useYn, signal: controller.signal })
+    getCameras({ token, factoryCd, focusYn, useYn, statusOnly, signal: controller.signal })
       .then(setData)
       .catch((requestError) => {
         if (requestError.name === "AbortError") return;
@@ -40,7 +41,7 @@ export default function useCameraList({
       });
 
     return () => controller.abort();
-  }, [enabled, token, factoryCd, focusYn, useYn, onUnauthorized, requestVersion]);
+  }, [enabled, token, factoryCd, focusYn, useYn, statusOnly, onUnauthorized, requestVersion]);
 
   return { data, loading, error, refetch };
 }
