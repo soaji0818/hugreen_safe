@@ -6,7 +6,6 @@ import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
 import CrudDialog from "../../components/ui/CrudDialog";
 import Icon from "../../components/ui/Icon";
-import RadioOption from "../../components/ui/RadioOption";
 import Select from "../../components/ui/Select";
 import useCameraList from "../../hooks/useCameraList";
 import useCommonCodes from "../../hooks/useCommonCodes";
@@ -23,7 +22,6 @@ const columns = [
   "AI 감지상태",
   "장애상태",
   "최종 수신시각",
-  "사용 여부",
 ];
 
 const detailFields = [
@@ -51,7 +49,6 @@ function cameraCellValue(row, column) {
     "AI 감지상태": row.aiStatus,
     장애상태: row.statusCd,
     "최종 수신시각": row.lastRecvDt,
-    "사용 여부": statusLabel(row.useYn),
   };
   return values[column] ?? row[column] ?? "-";
 }
@@ -75,7 +72,6 @@ function connectionStatusTone(value) {
 
 function CctvMonitoringPage({ user, onUnauthorized }) {
   const [factoryCd, setFactoryCd] = useState("");
-  const [useYn, setUseYn] = useState("");
   const [selectedId, setSelectedId] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [dialogGeometry, setDialogGeometry] = useState(null);
@@ -91,7 +87,6 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
     enabled: true,
     token: user?.token,
     factoryCd,
-    useYn,
     onUnauthorized,
   });
   const {
@@ -181,7 +176,6 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
 
   const resetFilters = () => {
     setFactoryCd("");
-    setUseYn("");
   };
   const startDialogInteraction = (event, mode) => {
     if (event.button !== 0) return;
@@ -278,7 +272,7 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
           </button>
         )}
       >
-        <div className="filter-grid standard-filter-grid cctv-monitoring-filter-grid" data-count="2">
+        <div className="filter-grid standard-filter-grid cctv-monitoring-filter-grid" data-count="1">
           <label>
             <span>공장</span>
             <Select
@@ -294,26 +288,6 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
                 <option key={code.value} value={code.value}>{code.label}</option>
               ))}
             </Select>
-          </label>
-          <label>
-            <span>사용 여부</span>
-            <span className="radio-options" role="radiogroup" aria-label="사용 여부">
-              {[
-                { label: "전체", value: "" },
-                { label: "사용", value: "Y" },
-                { label: "미사용", value: "N" },
-              ].map((option) => (
-                <RadioOption
-                  key={option.label}
-                  name="monitor-use"
-                  value={option.value}
-                  checked={useYn === option.value}
-                  onChange={() => setUseYn(option.value)}
-                >
-                  {option.label}
-                </RadioOption>
-              ))}
-            </span>
           </label>
         </div>
       </SearchFilterPanel>
@@ -360,13 +334,6 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
               );
             }
             if (column === "최종 수신시각") return formatDateTime(value);
-            if (column === "사용 여부") {
-              return (
-                <Badge size="small" variant="weak" tone={row.useYn === "N" ? "gray" : "green"}>
-                  {value}
-                </Badge>
-              );
-            }
             return value;
           }}
           stateRow={((loading && rows.length === 0) || error) ? (
@@ -472,7 +439,7 @@ export default {
   title: "AI CCTV 상태 모니터링",
   Component: CctvMonitoringPage,
   config: {
-    filters: ["공장", "사용 여부"],
+    filters: ["공장"],
     cols: columns,
     detail: "camera",
     detailPresentation: "modal",
