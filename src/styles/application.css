@@ -162,6 +162,7 @@ h2 { color: var(--ink); font-size: var(--type-title-size); line-height: var(--ty
 .table-result-count { align-self: flex-end; margin-right: auto; color: #8b95a1; font-size: var(--type-caption-size); line-height: var(--type-caption-line); }
 .list-actions .secondary, .list-actions .primary, .list-actions .danger-button { min-height: 34px; padding: 6px 11px; font-size: 12px; }
 .list-actions .primary, .list-actions .danger-button { min-width: 72px; }
+.list-actions .cctv-monitoring-refresh { transform: translateY(6px); }
 .export-button { border-color: transparent; background: var(--neutral-button); }
 .export-button:hover:enabled { border-color: transparent; background: var(--neutral-button-hover); }
 input:not([type="radio"]), select, textarea { width: 100%; min-height: 38px; padding: 8px 10px; border: 1px solid var(--line-strong); border-radius: 8px; background: white; color: var(--text); font-size: var(--type-label-size); line-height: var(--type-label-line); }
@@ -247,7 +248,7 @@ textarea { min-height: 76px; resize: vertical; line-height: 1.55; }
 .filter-grid.cctv-master-filter-grid > label { grid-template-columns: 140px minmax(0,1fr); }
 .cctv-master-filter-grid > label > span:first-child { white-space: nowrap; }
 .cctv-master-filter-grid .ui-select { width: 100%; justify-self: stretch; padding-right: 10px; }
-.cctv-monitoring-filter-grid { grid-template-columns: minmax(0,.8fr) minmax(0,2.2fr); }
+.cctv-monitoring-filter-grid { grid-template-columns: minmax(0,1fr); }
 .filter-grid.cctv-monitoring-filter-grid > label { grid-template-columns: 140px minmax(0,1fr); }
 .cctv-monitoring-filter-grid > label > span:first-child { white-space: nowrap; }
 .cctv-monitoring-filter-grid .ui-select { width: 100%; justify-self: stretch; padding-right: 10px; }

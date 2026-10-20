@@ -59,6 +59,10 @@ export default function DataTable({
   renderCell,
   stateRow,
   emptyState,
+  emptyTitle = "검색 결과가 없습니다",
+  emptyDescription = "검색 조건을 변경하거나 초기화해 주세요.",
+  emptyResetLabel = "조건 초기화",
+  onEmptyReset,
   resizableColumns = false,
   verticalScroll = false,
   className = "",
@@ -308,7 +312,17 @@ export default function DataTable({
           })}
         </tbody>
       </table>
-      {!rows.length && !stateRow && emptyState}
+      {!rows.length && !stateRow && (emptyState || (
+        <div className="empty">
+          <h3>{emptyTitle}</h3>
+          <p>{emptyDescription}</p>
+          {onEmptyReset && (
+            <button type="button" className="secondary" onClick={onEmptyReset}>
+              {emptyResetLabel}
+            </button>
+          )}
+        </div>
+      ))}
       {revealedText && createPortal(
         <div
           className="table-cell-popover"

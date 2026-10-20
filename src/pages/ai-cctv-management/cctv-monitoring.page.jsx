@@ -6,7 +6,6 @@ import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
 import CrudDialog from "../../components/ui/CrudDialog";
 import Icon from "../../components/ui/Icon";
-import RadioOption from "../../components/ui/RadioOption";
 import Select from "../../components/ui/Select";
 import useCameraList from "../../hooks/useCameraList";
 import useCommonCodes from "../../hooks/useCommonCodes";
@@ -73,7 +72,6 @@ function connectionStatusTone(value) {
 
 function CctvMonitoringPage({ user, onUnauthorized }) {
   const [factoryCd, setFactoryCd] = useState("");
-  const [autoRefresh, setAutoRefresh] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [dialogGeometry, setDialogGeometry] = useState(null);
@@ -172,14 +170,12 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
   );
 
   useEffect(() => {
-    if (!autoRefresh) return undefined;
     const intervalId = window.setInterval(refetch, 30000);
     return () => window.clearInterval(intervalId);
-  }, [autoRefresh, refetch]);
+  }, [refetch]);
 
   const resetFilters = () => {
     setFactoryCd("");
-    setAutoRefresh(true);
   };
   const startDialogInteraction = (event, mode) => {
     if (event.button !== 0) return;
@@ -276,7 +272,7 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
           </button>
         )}
       >
-        <div className="filter-grid standard-filter-grid cctv-monitoring-filter-grid" data-count="2">
+        <div className="filter-grid standard-filter-grid cctv-monitoring-filter-grid" data-count="1">
           <label>
             <span>공장</span>
             <Select
@@ -293,27 +289,20 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
               ))}
             </Select>
           </label>
-          <label className="toggle-field">
-            <span>자동 새로고침</span>
-            <span className="radio-options" role="radiogroup" aria-label="자동 새로고침">
-              {[true, false].map((enabled) => (
-                <RadioOption
-                  key={String(enabled)}
-                  name="monitor-auto-refresh"
-                  value={String(enabled)}
-                  checked={autoRefresh === enabled}
-                  onChange={() => setAutoRefresh(enabled)}
-                >
-                  {enabled ? "사용" : "미사용"}
-                </RadioOption>
-              ))}
-            </span>
-          </label>
         </div>
       </SearchFilterPanel>
 
       <div className="list-actions" aria-label="목록 작업">
         <span className="table-result-count" role="status">총 {rows.length}건</span>
+        <button
+          type="button"
+          className="text-btn cctv-monitoring-refresh"
+          disabled={loading}
+          onClick={refetch}
+        >
+          <Icon name="reset" size={15} />
+          새로고침
+        </button>
       </div>
 
       <section className="table-panel screen-format-list cctv-monitoring-result-table" aria-label="조회 결과">
@@ -326,6 +315,7 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
           className="cctv-monitoring-table"
           onRowClick={setSelectedId}
           onRowDoubleClick={openDetail}
+          onEmptyReset={resetFilters}
           renderCell={(row, column) => {
             const value = cameraCellValue(row, column);
             if (column === "연결상태") {
@@ -346,7 +336,7 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
             if (column === "최종 수신시각") return formatDateTime(value);
             return value;
           }}
-          stateRow={(loading || error) ? (
+          stateRow={((loading && rows.length === 0) || error) ? (
             <tr className="api-state-row">
               <td colSpan={columns.length}>
                 {loading ? "카메라 목록을 불러오는 중입니다." : (
@@ -449,7 +439,7 @@ export default {
   title: "AI CCTV 상태 모니터링",
   Component: CctvMonitoringPage,
   config: {
-    filters: ["공장", "자동 새로고침"],
+    filters: ["공장"],
     cols: columns,
     detail: "camera",
     detailPresentation: "modal",
