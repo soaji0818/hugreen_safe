@@ -1,4 +1,4 @@
-import { aiCctvPages } from "./ai-cctv-management";
+import { aiCctvHiddenPages, aiCctvPages } from "./ai-cctv-management";
 import { smartSafetyPages } from "./smart-safety-management";
 import { systemManagementPages } from "./system-management";
 import StandardPage from "../components/page/StandardPage";
@@ -20,12 +20,15 @@ const routeByPageId = {
   "MES-TD3-014": "/safety/danger-alerts",
   "MES-TD3-015": "/safety/risk-events",
   "MES-TD3-016": "/ai-cctv/cameras",
+  "MES-TD3-016-PANEL": "/ai-cctv/cameras/panel",
+  "MES-TD3-016-SHRINK-PANEL": "/ai-cctv/cameras/shrink-panel",
+  "MES-TD3-016-BOTTOM": "/ai-cctv/cameras/bottom",
   "MES-TD3-017": "/ai-cctv/monitoring",
+  "MES-TD3-022": "/ai-cctv/equipment-failures",
   "MES-TD3-018": "/ai-cctv/event-ingestion",
   "MES-TD3-019": "/ai-cctv/field-alert-history",
   "MES-TD3-020": "/ai-cctv/equipment-events",
   "MES-TD3-021": "/ai-cctv/inspection-link",
-  "MES-TD3-022": "/ai-cctv/equipment-failures",
 };
 
 const pageGroups = [
@@ -41,8 +44,8 @@ export const groups = pageGroups.map(({ name, icon, pages }) => ({
 }));
 
 export const pages = Object.fromEntries(
-  pageGroups.flatMap(({ pages }) =>
-    pages.map((page) => [
+  [...pageGroups.flatMap(({ pages }) => pages), ...aiCctvHiddenPages]
+    .map((page) => [
       page.id,
       {
         ...page,
@@ -50,5 +53,4 @@ export const pages = Object.fromEntries(
         Component: page.Component || StandardPage,
       },
     ]),
-  ),
 );

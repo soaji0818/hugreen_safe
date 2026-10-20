@@ -844,11 +844,11 @@ export default function StandardPage({ pageDefinition, initialRows }) {
             "MES-TD3-013",
             "MES-TD3-014",
             "MES-TD3-015",
+            "MES-TD3-022",
             "MES-TD3-018",
             "MES-TD3-019",
             "MES-TD3-020",
             "MES-TD3-021",
-            "MES-TD3-022",
           ].includes(current) ? (
             <SearchFilterPanel
               className="access-filter-panel"

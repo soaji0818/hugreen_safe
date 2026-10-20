@@ -21,13 +21,22 @@ export default function AppShell({ groups, pages, initialRows, user, onLogout })
   const [menuQuery, setMenuQuery] = useState("");
   const allowNextNavigation = useRef(false);
   const items = groups.flatMap((group) => group.items);
-  const itemMap = new Map(items.map(([id, label]) => [id, label]));
+  const itemMap = new Map([
+    ...items,
+    ...Object.values(pages).map(({ id, title }) => [id, title]),
+  ]);
   const PageComponent = page?.Component;
+  const viewVariants = page?.viewGroup
+    ? Object.values(pages)
+      .filter((item) => item.viewGroup === page.viewGroup)
+      .sort((left, right) => (left.viewOrder || 0) - (right.viewOrder || 0))
+    : [];
   const hasInlineDetail = Boolean(
     page?.config.detail
-      && page.config.detailPresentation !== "modal"
+      && !["modal", "side-panel", "shrink-panel", "bottom-panel"].includes(page.config.detailPresentation)
       && !["log", "snap", "tree"].includes(page.config.detail),
   );
+  const hasPageScrollDetail = page?.config.detailPresentation === "bottom-panel";
   const blocker = useBlocker(({ currentLocation, nextLocation }) =>
     hasUnsavedChanges
       && !allowNextNavigation.current
@@ -74,8 +83,21 @@ export default function AppShell({ groups, pages, initialRows, user, onLogout })
     routerNavigate(pages[pageId].path);
   };
   const navigateToPage = (pageId) => {
-    if (pageId === currentPageId) return;
+    if (pageId === currentPageId || pageId === page?.menuId) return;
     requestLeave(() => performNavigate(pageId));
+  };
+  const switchPageVariant = (pageId) => {
+    if (pageId === currentPageId || !pages[pageId]) return;
+    requestLeave(() => {
+      setOpenTabs((tabs) => {
+        const nextTabs = tabs.includes(currentPageId)
+          ? tabs.map((tabId) => tabId === currentPageId ? pageId : tabId)
+          : [...tabs, pageId];
+        return [...new Set(nextTabs)];
+      });
+      allowNextNavigation.current = true;
+      routerNavigate(pages[pageId].path);
+    });
   };
   const navigateFromLayout = (pageId, expandMenu = true) => {
     navigateToPage(pageId);
@@ -154,7 +176,7 @@ export default function AppShell({ groups, pages, initialRows, user, onLogout })
       <a className="skip" href="#main">본문으로 이동</a>
       <Sidebar
         groups={groups}
-        current={currentPageId}
+        current={page?.menuId || currentPageId}
         itemMap={itemMap}
         mobileOpen={mobileOpen}
         menuQuery={menuQuery}
@@ -186,7 +208,25 @@ export default function AppShell({ groups, pages, initialRows, user, onLogout })
         />
         <Content
           title={page?.title || "스마트 안전관리 시스템"}
-          mainClassName={hasInlineDetail ? "has-inline-detail" : ""}
+          titleActions={viewVariants.length > 1 ? (
+            <div className="workspace-view-switch" role="group" aria-label="상세 표시 방식">
+              {viewVariants.map((variant) => (
+                <button
+                  key={variant.id}
+                  type="button"
+                  className={variant.id === currentPageId ? "active" : ""}
+                  aria-pressed={variant.id === currentPageId}
+                  onClick={() => switchPageVariant(variant.id)}
+                >
+                  {variant.viewLabel}
+                </button>
+              ))}
+            </div>
+          ) : null}
+          mainClassName={[
+            hasInlineDetail ? "has-inline-detail" : "",
+            hasPageScrollDetail ? "has-page-scroll-detail" : "",
+          ].filter(Boolean).join(" ")}
         >
           {PageComponent ? (
             <PageComponent

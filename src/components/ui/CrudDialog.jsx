@@ -1,8 +1,8 @@
 import {
   forwardRef,
-  useEffect,
   useId,
   useImperativeHandle,
+  useLayoutEffect,
   useRef,
 } from "react";
 import Button from "./Button";
@@ -38,31 +38,41 @@ const CrudDialog = forwardRef(function CrudDialog({
   onSubmit,
   onEdit,
   onDelete,
+  onCancelEdit,
   onInteractionStart,
   onInteractionMove,
   onInteractionEnd,
   resizable = false,
+  presentation = "modal",
 }, ref) {
   const dialogRef = useRef(null);
   const titleId = useId();
   const editing = mode === "create" || mode === "edit";
   const title = titles[mode] || defaultTitles[mode];
-  const showFooter = editing || Boolean(onEdit) || Boolean(onDelete);
+  const sidePanel = presentation === "side-panel";
+  const shrinkPanel = presentation === "shrink-panel";
+  const bottomPanel = presentation === "bottom-panel";
+  const showFooter = !bottomPanel && (editing || Boolean(onEdit) || Boolean(onDelete));
+  const panel = sidePanel || shrinkPanel || bottomPanel;
+  const Root = sidePanel || shrinkPanel ? "aside" : bottomPanel ? "section" : "dialog";
 
   useImperativeHandle(ref, () => dialogRef.current);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (panel) return;
     const dialog = dialogRef.current;
     if (!dialog) return;
     if (open && !dialog.open) dialog.showModal();
     if (!open && dialog.open) dialog.close();
-  }, [open]);
+  }, [open, panel]);
+
+  if (panel && !open) return null;
 
   return (
-    <dialog
+    <Root
       ref={dialogRef}
-      className={`detail-dialog crud-dialog ${className}`.trim()}
-      style={geometry ? {
+      className={`detail-dialog crud-dialog${sidePanel ? " crud-dialog--side-panel" : ""}${shrinkPanel ? " crud-dialog--shrink-panel" : ""}${bottomPanel ? " crud-dialog--bottom-panel" : ""} ${className}`.trim()}
+      style={!panel && geometry ? {
         position: "fixed",
         inset: "auto",
         left: `${geometry.left}px`,
@@ -73,18 +83,19 @@ const CrudDialog = forwardRef(function CrudDialog({
         maxHeight: "none",
         margin: 0,
       } : undefined}
-      onCancel={(event) => {
+      role={sidePanel || shrinkPanel ? "dialog" : undefined}
+      onCancel={!panel ? (event) => {
         event.preventDefault();
         onClose();
-      }}
-      onClick={(event) => {
+      } : undefined}
+      onClick={!panel ? (event) => {
         if (event.target === dialogRef.current) onClose();
-      }}
+      } : undefined}
       aria-labelledby={titleId}
     >
       <div className="detail-header">
         <div className="cctv-detail-heading">
-          <h2 id={titleId}>{title}</h2>
+          <h2 id={titleId} className={bottomPanel ? "cctv-bottom-detail-title" : undefined} tabIndex={bottomPanel ? -1 : undefined}>{title}</h2>
         </div>
         {onInteractionStart && (
           <button
@@ -97,14 +108,32 @@ const CrudDialog = forwardRef(function CrudDialog({
             onPointerCancel={onInteractionEnd}
           />
         )}
-        <button
-          type="button"
-          className="cctv-detail-close"
-          aria-label={`${title} 닫기`}
-          onClick={onClose}
-        >
-          <Icon name="close" size={20} />
-        </button>
+        {bottomPanel ? (
+          <div className="cctv-bottom-detail-actions">
+            {editing ? (
+              <>
+                <Button variant="secondary" type="button" onClick={onCancelEdit} disabled={saving}>취소</Button>
+                <Button variant="primary" type="submit" form={formId} disabled={saving}>
+                  {saving ? savingLabel : saveLabel}
+                </Button>
+              </>
+            ) : (
+              <>
+                {onDelete && <Button variant="danger-button" type="button" onClick={onDelete}>삭제</Button>}
+                {onEdit && <Button variant="secondary" type="button" onClick={onEdit}>수정</Button>}
+              </>
+            )}
+          </div>
+        ) : (
+          <button
+            type="button"
+            className="cctv-detail-close"
+            aria-label={`${title} 닫기`}
+            onClick={onClose}
+          >
+            <Icon name="close" size={20} />
+          </button>
+        )}
       </div>
 
       <form
@@ -153,7 +182,7 @@ const CrudDialog = forwardRef(function CrudDialog({
           onPointerCancel={onInteractionEnd}
         />
       ))}
-    </dialog>
+    </Root>
   );
 });
 

@@ -46,12 +46,18 @@ function haveEditValuesChanged(values, baseline) {
   );
 }
 
-function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
+export function CctvMasterPage({
+  user,
+  onUnauthorized,
+  onUnsavedChange,
+  detailPresentation = "modal",
+}) {
   const [filters, setFilters] = useState({ factoryCd: "", focusYn: "", useYn: "", keyword: "" });
   const [localRows, setLocalRows] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
+  const [detailDataReady, setDetailDataReady] = useState(true);
   const [createMode, setCreateMode] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editValues, setEditValues] = useState(null);
@@ -69,6 +75,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
   const dialogInteraction = useRef(null);
   const saveController = useRef(null);
   const detailCameraAfterRefetch = useRef("");
+  const detailRequestsStarted = useRef(false);
 
   const { data: serverRows, loading, error, refetch } = useCameraList({
     enabled: true,
@@ -97,6 +104,8 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     setSelectedId(detailRow?.id || serverRows[0]?.id || null);
     setCreateMode(false);
     setDetailOpen(Boolean(detailRow));
+    setDetailDataReady(!detailRow);
+    detailRequestsStarted.current = false;
     detailCameraAfterRefetch.current = "";
   }, [serverRows]);
 
@@ -135,6 +144,18 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     () => new Map(eventTypeCodes.map((code) => [code.value, code.label])),
     [eventTypeCodes],
   );
+  useEffect(() => {
+    if (!detailOpen || editMode || !selectedCameraId) {
+      detailRequestsStarted.current = false;
+      setDetailDataReady(true);
+      return;
+    }
+    if (zonesLoading || eventTypesLoading) {
+      detailRequestsStarted.current = true;
+      return;
+    }
+    if (detailRequestsStarted.current) setDetailDataReady(true);
+  }, [detailOpen, editMode, selectedCameraId, zonesLoading, eventTypesLoading]);
   const hasUnsavedChanges = editMode
     && (savePending || haveEditValuesChanged(editValues, editBaseline));
 
@@ -248,6 +269,8 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     setEditMode(false);
     setEditValues(null);
     setDetailOpen(true);
+    setDetailDataReady(false);
+    detailRequestsStarted.current = false;
   };
   const openCreate = () => {
     const initialValues = {
@@ -269,6 +292,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
     setEditValues(initialValues);
     setEditMode(true);
     setDetailOpen(true);
+    setDetailDataReady(true);
   };
   const discardAndCloseDetail = () => {
     saveController.current?.abort();
@@ -476,7 +500,10 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
   };
 
   return (
-    <section className="work-panel screen-format-list-detail cctv-master-page" aria-label="AI CCTV 기준정보 관리 업무 영역">
+    <section
+      className={`work-panel screen-format-list-detail cctv-master-page${detailPresentation === "shrink-panel" && detailOpen ? " is-shrink-panel-open" : ""}`}
+      aria-label="AI CCTV 기준정보 관리 업무 영역"
+    >
       <SearchFilterPanel
         className="standard-filter-panel"
         ariaLabel="AI CCTV 기준정보 관리 조회 조건"
@@ -500,7 +527,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
               disabled={factoryLoading}
               onChange={(event) => updateFilters({ factoryCd: event.target.value })}
             >
-              <option value="">{factoryLoading ? "공장 코드를 불러오는 중입니다." : "전체"}</option>
+              <option value="">전체</option>
               {factoryCodes.map((code) => (
                 <option key={code.value} value={code.value}>{code.label}</option>
               ))}
@@ -555,8 +582,9 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
         <Button variant="primary" icon="plus" onClick={openCreate}>추가</Button>
       </div>
 
-      <section className="table-panel screen-format-list-detail cctv-master-table" aria-label="조회 결과">
-        <DataTable
+      <div className={`cctv-master-content${detailPresentation === "shrink-panel" && detailOpen ? " has-shrink-panel" : ""}`}>
+        <section className="table-panel screen-format-list-detail cctv-master-table" aria-label="조회 결과">
+          <DataTable
           columns={columns}
           rows={filteredRows}
           selectedId={selectedId}
@@ -566,15 +594,16 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
           onRowDoubleClick={openDetail}
           onToggleRow={toggleRow}
           onToggleAll={toggleAllRows}
+          emptyState={loading ? <></> : undefined}
           renderCell={(row, column) => column === "사용 여부" ? (
             <Badge size="small" variant="weak" tone={row.useYn === "N" ? "gray" : "green"}>
               {row[column]}
             </Badge>
           ) : row[column]}
-          stateRow={(loading || error || filteredRows.length === 0) ? (
+          stateRow={(error || (!loading && filteredRows.length === 0)) ? (
             <tr className="api-state-row">
               <td colSpan={columns.length + 1}>
-                {loading ? "카메라 목록을 불러오는 중입니다." : error ? (
+                {error ? (
                   <div className="cctv-empty-state">
                     <span className="cctv-empty-icon" aria-hidden="true">
                       <Icon name="file" size={48} />
@@ -606,13 +635,14 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
               </td>
             </tr>
           ) : null}
-        />
-      </section>
+          />
+        </section>
 
-      {(selectedRow || createMode) && (
-        <CrudDialog
+        {(selectedRow || createMode) && (
+          <CrudDialog
           ref={detailDialog}
-          open={detailOpen}
+          open={detailPresentation === "modal" ? detailOpen && detailDataReady : detailOpen}
+          presentation={detailPresentation}
           mode={createMode ? "create" : editMode ? "edit" : "detail"}
           titles={{
             create: "카메라 추가",
@@ -621,16 +651,16 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
           }}
           formId="cctv-detail-form"
           className="cctv-detail-dialog"
-          geometry={dialogGeometry}
+          geometry={detailPresentation === "modal" ? dialogGeometry : undefined}
           saving={savePending}
-          resizable
+          resizable={detailPresentation === "modal"}
           onClose={closeDetail}
           onSubmit={saveChanges}
           onEdit={startEditing}
           onDelete={() => openDeleteConfirm([selectedRow.id])}
-          onInteractionStart={startDialogInteraction}
-          onInteractionMove={moveDialogInteraction}
-          onInteractionEnd={stopDialogInteraction}
+          onInteractionStart={detailPresentation === "modal" ? startDialogInteraction : undefined}
+          onInteractionMove={detailPresentation === "modal" ? moveDialogInteraction : undefined}
+          onInteractionEnd={detailPresentation === "modal" ? stopDialogInteraction : undefined}
         >
             <dl className="cctv-detail-table">
               {detailFields.map((field) => (
@@ -702,9 +732,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
                   </span>
                 </div>
                 <div id="cctv-zone-content">
-                    {zonesLoading ? (
-                      <p className="cctv-zone-state">감지구역을 불러오는 중입니다.</p>
-                    ) : zonesError ? (
+                    {zonesLoading ? null : zonesError ? (
                       <div className="cctv-zone-state is-error">
                         <p>{zonesError}</p>
                         <Button type="button" variant="secondary" onClick={refetchZones}>다시 불러오기</Button>
@@ -723,9 +751,7 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
                             </div>
                             <div className="cctv-zone-events" aria-label={`${zone.zoneNm || zone.zoneId} 감지 이벤트 유형`}>
                               <span className="cctv-zone-events-label">감지 이벤트 유형</span>
-                              {eventTypesLoading ? (
-                                <span className="cctv-zone-event-empty">불러오는 중</span>
-                              ) : zone.eventTypeCds.length > 0 ? (
+                              {eventTypesLoading ? null : zone.eventTypeCds.length > 0 ? (
                                 zone.eventTypeCds.map((code) => (
                                   <span className="cctv-zone-event-tag" key={code}>
                                     {eventTypeNameByCode.get(code) || code}
@@ -745,8 +771,9 @@ function CctvMasterPage({ user, onUnauthorized, onUnsavedChange }) {
                 </div>
               </section>
             )}
-        </CrudDialog>
-      )}
+          </CrudDialog>
+        )}
+      </div>
 
       <ConfirmDialog
         open={leaveConfirmOpen}
@@ -783,6 +810,9 @@ export default {
   id: "MES-TD3-016",
   title: "AI CCTV 기준정보 관리",
   Component: CctvMasterPage,
+  viewGroup: "cctv-master",
+  viewLabel: "모달형",
+  viewOrder: 1,
   config: {
     actions: { save: true, export: false, create: true, delete: true, createLabel: "추가" },
     filters: ["공장", "집중감시구역 여부", "사용 여부"],

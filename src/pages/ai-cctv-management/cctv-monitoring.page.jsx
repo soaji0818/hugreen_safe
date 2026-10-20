@@ -281,9 +281,7 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
               disabled={factoryLoading}
               onChange={(event) => setFactoryCd(event.target.value)}
             >
-              <option value="">
-                {factoryLoading ? "공장 코드를 불러오는 중입니다." : "전체 공장"}
-              </option>
+              <option value="">전체 공장</option>
               {factoryCodes.map((code) => (
                 <option key={code.value} value={code.value}>{code.label}</option>
               ))}
@@ -316,6 +314,7 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
           onRowClick={setSelectedId}
           onRowDoubleClick={openDetail}
           onEmptyReset={resetFilters}
+          emptyState={loading ? <></> : undefined}
           renderCell={(row, column) => {
             const value = cameraCellValue(row, column);
             if (column === "연결상태") {
@@ -336,16 +335,14 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
             if (column === "최종 수신시각") return formatDateTime(value);
             return value;
           }}
-          stateRow={((loading && rows.length === 0) || error) ? (
+          stateRow={error ? (
             <tr className="api-state-row">
               <td colSpan={columns.length}>
-                {loading ? "카메라 목록을 불러오는 중입니다." : (
-                  <div className="cctv-empty-state">
-                    <h3>화면을 불러오지 못했습니다.</h3>
-                    <p>{error}</p>
-                    <Button variant="primary" onClick={refetch}>다시 시도하기</Button>
-                  </div>
-                )}
+                <div className="cctv-empty-state">
+                  <h3>화면을 불러오지 못했습니다.</h3>
+                  <p>{error}</p>
+                  <Button variant="primary" onClick={refetch}>다시 시도하기</Button>
+                </div>
               </td>
             </tr>
           ) : undefined}
@@ -386,9 +383,7 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
               </span>
             </div>
             <div>
-              {zonesLoading ? (
-                <p className="cctv-zone-state">감지구역을 불러오는 중입니다.</p>
-              ) : zonesError ? (
+              {zonesLoading ? null : zonesError ? (
                 <div className="cctv-zone-state is-error">
                   <p>{zonesError}</p>
                   <Button type="button" variant="secondary" onClick={refetchZones}>다시 불러오기</Button>
@@ -407,9 +402,7 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
                       </div>
                       <div className="cctv-zone-events" aria-label={`${zone.zoneNm || zone.zoneId} 감지 이벤트 유형`}>
                         <span className="cctv-zone-events-label">감지 이벤트 유형</span>
-                        {eventTypesLoading ? (
-                          <span className="cctv-zone-event-empty">불러오는 중</span>
-                        ) : zone.eventTypeCds.length > 0 ? (
+                        {eventTypesLoading ? null : zone.eventTypeCds.length > 0 ? (
                           zone.eventTypeCds.map((code) => (
                             <span className="cctv-zone-event-tag" key={code}>
                               {eventTypeNameByCode.get(code) || code}

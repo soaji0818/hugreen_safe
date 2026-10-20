@@ -80,9 +80,14 @@
 .sidebar-bottom small { display: block; margin-top: 2px; color: #8b95a1; font-size: 11px; }
 .role { margin-left: auto; padding: 4px 7px; border-radius: 6px; background: #f2f4f6; color: #6b7684; font-size: 10px; }
 
-.workspace { min-width: 0; flex: 1; padding-top: 56px; background: var(--canvas); }
-.workspace-title { flex: none; margin: 0 16px; padding: 22px 8px 14px; }
+.workspace { min-width: 0; min-height: var(--scaled-viewport-height); display: flex; flex: 1; flex-direction: column; padding-top: 56px; background: var(--canvas); }
+.workspace-title { display: flex; flex: none; align-items: center; gap: 12px; margin: 0 16px; padding: 22px 8px 14px; }
 .workspace-title h1 { margin: 0; }
+.workspace-view-switch { display: inline-flex; align-items: center; padding: 2px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--white); }
+.workspace-view-switch button { min-width: 68px; min-height: 30px; padding: 5px 10px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); font-size: var(--type-caption-size); line-height: var(--type-caption-line); font-weight: 650; }
+.workspace-view-switch button:hover { background: var(--neutral-button); color: var(--text); }
+.workspace-view-switch button.active { background: var(--green-pale); color: var(--green); }
+.workspace-view-switch button.active:hover { background: var(--green-pale); }
 .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 40; height: 56px; display: flex; align-items: center; gap: 0; margin: 0; padding: 0; overflow: hidden; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: rgba(255,255,255,.98); box-shadow: none; }
 .header-leading { width: 270px; height: 56px; display: flex; align-items: center; flex: none; }
 .header-menu { width: 32px; height: 32px; display: grid; place-items: center; flex: none; margin: 0 4px 0 10px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: #8b95a1; }
@@ -114,7 +119,7 @@
 .header-logout:active { background: #fbdde2; }
 .header-logout:focus-visible { outline: 2px solid rgba(229,45,61,.28); outline-offset: 2px; }
 
-main { width: auto; margin: 0 16px 16px; padding: 0; overflow: hidden; border-radius: 12px; background: var(--white); box-shadow: var(--shadow-xs); scroll-margin-top: 56px; }
+main { width: auto; min-height: calc(var(--scaled-viewport-height) - 145px); display: block; flex: 1 0 auto; margin: 0 16px 16px; padding: 0; overflow: hidden; border-radius: 12px; background: var(--white); box-shadow: var(--shadow-xs); scroll-margin-top: 56px; }
 .home-welcome { min-height: calc(var(--scaled-viewport-height) - 145px); display: grid; place-items: center; padding: 48px; }
 .home-welcome-content { display: grid; justify-items: center; gap: 18px; text-align: center; }
 .home-welcome img { width: min(260px, 52vw); height: auto; display: block; }
@@ -248,10 +253,12 @@ textarea { min-height: 76px; resize: vertical; line-height: 1.55; }
 .filter-grid.cctv-master-filter-grid > label { grid-template-columns: 140px minmax(0,1fr); }
 .cctv-master-filter-grid > label > span:first-child { white-space: nowrap; }
 .cctv-master-filter-grid .ui-select { width: 100%; justify-self: stretch; padding-right: 10px; }
+.cctv-master-filter-grid .ui-select::picker-icon { margin-right: auto; margin-left: 4px; }
 .cctv-monitoring-filter-grid { grid-template-columns: minmax(0,1fr); }
 .filter-grid.cctv-monitoring-filter-grid > label { grid-template-columns: 140px minmax(0,1fr); }
 .cctv-monitoring-filter-grid > label > span:first-child { white-space: nowrap; }
 .cctv-monitoring-filter-grid .ui-select { width: 100%; justify-self: stretch; padding-right: 10px; }
+.cctv-monitoring-filter-grid .ui-select::picker-icon { margin-right: auto; margin-left: 4px; }
 .cctv-master-page .standard-filter-panel,
 .cctv-monitoring-page .standard-filter-panel { padding-top: 0; }
 .cctv-master-page .filter-actions.no-keyword,
@@ -328,6 +335,29 @@ textarea { min-height: 76px; resize: vertical; line-height: 1.55; }
 .cctv-master-table .resizable-table th { position: sticky; top: 0; z-index: 3; }
 .cctv-master-table .resizable-table th.selection-col { padding: 0; text-align: center; vertical-align: middle; }
 .cctv-master-table .resizable-table th.selection-col input[type="checkbox"] { margin: auto; }
+.cctv-master-content { min-height: 180px; display: flex; flex: 1; overflow: hidden; }
+.cctv-master-content > .cctv-master-table { min-width: 0; flex: 1; }
+.cctv-master-content.has-bottom-panel { flex-direction: column; }
+section.cctv-master-page.is-shrink-panel-open { padding-right: 424px; }
+main.has-page-scroll-detail { overflow: visible; }
+section.cctv-master-page.is-bottom-panel-page { height: auto; min-height: calc(var(--scaled-viewport-height) - 145px); flex: none; overflow: visible; }
+section.cctv-master-page.is-bottom-panel-page .cctv-master-content { min-height: 0; display: block; flex: none; overflow: visible; }
+section.cctv-master-page.is-bottom-panel-page .cctv-master-table { min-height: 0; display: block; overflow: visible; }
+section.cctv-master-page.is-bottom-panel-page .cctv-master-table .table-scroll { height: auto; max-height: 394px; overflow: auto; }
+section.cctv-master-page.is-bottom-panel-page .cctv-master-table { margin-bottom: 0; }
+section.crud-dialog--bottom-panel.cctv-detail-dialog { position: static; width: auto; max-width: none; min-height: 0; display: block; margin: 0 24px 24px; padding: 0; overflow: visible; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; box-shadow: none; animation: cctv-bottom-detail-in .18s cubic-bezier(.2,.75,.25,1) both; scroll-margin-top: 72px; }
+@keyframes cctv-bottom-detail-in {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+section.crud-dialog--bottom-panel.cctv-detail-dialog .detail-header { position: static; min-height: 50px; display: flex; justify-content: space-between; padding: 8px 0; border: 0; background: transparent; }
+section.crud-dialog--bottom-panel.cctv-detail-dialog .cctv-bottom-detail-title { margin: 0; color: #4a4f55; font-size: 16px; line-height: var(--type-label-line); font-weight: 700; }
+section.crud-dialog--bottom-panel.cctv-detail-dialog .cctv-bottom-detail-actions { display: flex; align-items: center; gap: 8px; }
+section.crud-dialog--bottom-panel.cctv-detail-dialog .cctv-bottom-detail-actions .ui-button { min-width: 58px; min-height: 34px; padding: 6px 12px; font-size: 12px; line-height: var(--type-label-line); font-weight: 600; }
+section.crud-dialog--bottom-panel.cctv-detail-dialog .cctv-bottom-detail-actions .secondary { border-color: transparent; background: var(--neutral-button); color: #4e5968; }
+section.crud-dialog--bottom-panel.cctv-detail-dialog .cctv-bottom-detail-actions .danger-button { background: var(--surface-danger-subtle); color: var(--text-danger); }
+section.crud-dialog--bottom-panel.cctv-detail-dialog .cctv-bottom-detail-actions .danger-button:hover:enabled { background: #fbdde2; color: #c91f30; }
+section.crud-dialog--bottom-panel.cctv-detail-dialog .detail-body { min-height: 0; display: block; flex: none; gap: 0; overflow: visible; padding: 0 0 20px; }
 table { width: 100%; border-collapse: collapse; color: var(--text); font-size: var(--type-label-size); line-height: var(--type-label-line); white-space: nowrap; }
 th { height: 34px; padding: 5px 10px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: #f2f4f6; color: #4e5968; font-size: var(--type-label-size); line-height: var(--type-label-line); font-weight: 650; text-align: left; }
 td { height: 36px; padding: 3px 10px; border-right: 1px solid #edf0f2; border-bottom: 1px solid #edf0f2; color: #333d4b; line-height: var(--type-label-line); }
@@ -647,6 +677,26 @@ dialog form > .primary { width: 100%; }
 dialog.cctv-detail-dialog { width: 440px; max-width: calc(100vw - 32px); max-height: calc(100vh - 32px); padding: 0; overflow: hidden; border: 1px solid #e5e8eb; border-radius: 14px; background: var(--white); box-shadow: 0 24px 72px rgba(25,31,40,.32); -webkit-font-smoothing: auto; text-rendering: auto; }
 dialog.cctv-detail-dialog::backdrop { backdrop-filter: none; }
 .cctv-detail-dialog[open] { display: flex; flex-direction: column; }
+dialog.cctv-detail-dialog[open] { animation: cctv-modal-in .18s cubic-bezier(.2,.75,.25,1) both; }
+dialog.cctv-detail-dialog[open]::backdrop { animation: cctv-modal-backdrop-in .16s ease-out both; }
+@keyframes cctv-modal-in {
+  from { opacity: 0; transform: translateY(7px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes cctv-modal-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+aside.crud-dialog--side-panel.cctv-detail-dialog { position: fixed; top: 56px; right: 0; bottom: 0; z-index: 39; width: 440px; max-width: calc(100vw - 24px); display: flex; flex-direction: column; padding: 0; overflow: hidden; border: 0; border-left: 1px solid #dfe3e6; border-radius: 0; background: var(--white); box-shadow: -16px 0 36px rgba(25,31,40,.14); animation: cctv-side-panel-in .32s cubic-bezier(.2,.8,.2,1) both; -webkit-font-smoothing: auto; text-rendering: auto; }
+aside.crud-dialog--side-panel.cctv-detail-dialog .detail-header { flex: none; }
+aside.crud-dialog--side-panel.cctv-detail-dialog .detail-footer { flex: none; border-top: 1px solid #edf0f2; }
+aside.crud-dialog--shrink-panel.cctv-detail-dialog { position: fixed; top: 56px; right: 0; bottom: 0; z-index: 39; width: 440px; max-width: calc(100vw - 24px); display: flex; flex-direction: column; padding: 0; overflow: hidden; border: 0; border-left: 1px solid #dfe3e6; border-radius: 0; background: var(--white); box-shadow: -16px 0 36px rgba(25,31,40,.14); animation: cctv-side-panel-in .32s cubic-bezier(.2,.8,.2,1) both; -webkit-font-smoothing: auto; text-rendering: auto; }
+aside.crud-dialog--shrink-panel.cctv-detail-dialog .detail-header { flex: none; }
+aside.crud-dialog--shrink-panel.cctv-detail-dialog .detail-footer { flex: none; border-top: 1px solid #edf0f2; }
+@keyframes cctv-side-panel-in {
+  from { opacity: 0; transform: translateX(18px); }
+  to { opacity: 1; transform: translateX(0); }
+}
 .cctv-detail-dialog .detail-header { position: relative; min-height: 56px; padding: 10px 20px; border-bottom: 1px solid #e5e8eb; background: var(--white); }
 .cctv-detail-heading { min-width: 0; }
 .cctv-detail-heading h2 { margin: 0; font-size: 16px; line-height: 24px; font-weight: 750; }
@@ -736,8 +786,8 @@ dialog.cctv-detail-dialog::backdrop { backdrop-filter: none; }
 .cctv-detail-dialog .detail-footer .danger-button:hover:enabled { background: #fbdde2; color: #c91f30; }
 
 @media (min-width: 801px) {
-  .workspace { min-height: var(--scaled-viewport-height); height: auto; display: block; overflow: visible; }
-  main { min-height: calc(var(--scaled-viewport-height) - 145px); display: block; overflow: hidden; padding-bottom: 0; }
+  .workspace { min-height: var(--scaled-viewport-height); height: auto; display: flex; flex-direction: column; overflow: visible; }
+  main { min-height: calc(var(--scaled-viewport-height) - 145px); display: block; flex: 1 0 auto; overflow: hidden; padding-bottom: 0; }
   main.has-inline-detail { overflow: hidden; }
   .work-panel { flex: none; }
   .cctv-master-page { height: calc(var(--scaled-viewport-height) - 145px); }
@@ -861,5 +911,7 @@ dialog.cctv-detail-dialog::backdrop { backdrop-filter: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  section.crud-dialog--bottom-panel.cctv-detail-dialog { animation: none; }
+  dialog.cctv-detail-dialog[open], dialog.cctv-detail-dialog[open]::backdrop { animation: none; }
   .top-toast.is-open, .top-toast.is-closing { animation: none; transform: translateX(-50%); }
 }
