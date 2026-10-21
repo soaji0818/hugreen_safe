@@ -114,7 +114,19 @@ const CrudModal = forwardRef(function CrudModal({
             ) : (
               <>
                 {onDelete && <Button variant="fill" className="danger-button" type="button" onClick={onDelete}>삭제</Button>}
-                {onEdit && <Button variant="weak" type="button" onClick={onEdit}>수정</Button>}
+                {onEdit && (
+                  <Button
+                    variant="weak"
+                    type="button"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      onEdit();
+                    }}
+                  >
+                    수정
+                  </Button>
+                )}
               </>
             )}
           </div>
@@ -157,7 +169,15 @@ const CrudModal = forwardRef(function CrudModal({
                 {saving ? savingLabel : saveLabel}
               </Button>
             ) : onEdit ? (
-              <Button variant="fill" type="button" onClick={onEdit}>
+              <Button
+                variant="fill"
+                type="button"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  onEdit();
+                }}
+              >
                 수정
               </Button>
             ) : null}

@@ -3,7 +3,7 @@ import cctvMasterBottom from "./cctv-master-bottom.page.jsx";
 import cctvMasterPanel from "./cctv-master-panel.page.jsx";
 import cctvMasterShrinkPanel from "./cctv-master-shrink-panel.page.jsx";
 import cctvMonitoring from "./cctv-monitoring.page.jsx";
-import equipmentFailures from "./equipment-failures.page";
+import equipmentFailures from "./equipment-failures.page.jsx";
 import cctvEventIngestion from "./cctv-event-ingestion.page";
 import fieldAlertHistory from "./field-alert-history.page";
 import equipmentEvents from "./equipment-events.page";
