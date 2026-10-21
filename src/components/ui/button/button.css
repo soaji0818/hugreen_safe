@@ -1,0 +1,63 @@
+.ui-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: var(--radius-control);
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.ui-button--small {
+  min-height: 32px;
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.ui-button--medium {
+  min-height: 38px;
+  padding: 8px 13px;
+  font-size: var(--type-label-size);
+  line-height: var(--type-label-line);
+}
+
+.ui-button--large {
+  min-height: 44px;
+  padding: 10px 16px;
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.ui-button--xlarge {
+  min-height: 52px;
+  padding: 13px 20px;
+  font-size: 15px;
+  line-height: 22px;
+}
+
+.ui-button--fill {
+  border: 1px solid var(--green);
+  background: var(--green);
+  color: var(--text-on-color);
+}
+
+.ui-button--fill:hover:enabled {
+  border-color: var(--green-hover);
+  background: var(--green-hover);
+}
+
+.ui-button--weak {
+  border: 1px solid transparent;
+  background: rgba(0, 128, 102, 0.1);
+  color: var(--text-brand);
+}
+
+.ui-button--weak:hover:enabled {
+  background: rgba(0, 128, 102, 0.16);
+}
+
+.ui-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}

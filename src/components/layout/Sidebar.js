@@ -1,7 +1,13 @@
 import { createElement as h } from "react";
-import Icon from "../ui/Icon";
+import {
+  CameraIcon,
+  SearchIcon,
+  SettingsIcon,
+  ShieldIcon,
+} from "../ui/Icon";
 
 const favoriteMenus = ["MES-TD3-007", "MES-TD3-017", "MES-TD3-008"];
+const groupIcons = [ShieldIcon, CameraIcon, SettingsIcon];
 
 function releaseMouseFocus(event) {
   if (event.pointerType === "mouse") event.currentTarget.blur();
@@ -60,7 +66,7 @@ export default function Sidebar({
           onPointerUp: releaseMouseFocus,
           onClick: () => onToggleGroup(group.name),
         },
-        h(Icon, { name: ["shield", "camera", "settings"][index] }),
+        h(groupIcons[index] || SettingsIcon, { "aria-hidden": true }),
         h("strong", null, group.name),
         h("span", null, openGroups.includes(group.name) ? "⌄" : "›"),
       ),
@@ -74,7 +80,7 @@ export default function Sidebar({
     h(
       "div",
       { className: "nav-search" },
-      h(Icon, { name: "search" }),
+      h(SearchIcon, { "aria-hidden": true }),
       h("input", {
         "aria-label": "메뉴 검색",
         placeholder: "메뉴 검색",

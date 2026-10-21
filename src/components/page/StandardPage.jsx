@@ -1,14 +1,24 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import DataTable from "../data-table/DataTable";
 import Pagination from "../data-table/Pagination";
 import SearchFilterPanel from "../filters/SearchFilterPanel";
-import Badge from "../ui/Badge";
-import Button from "../ui/Button";
-import Icon from "../ui/Icon";
+import Badge from "../ui/badge/badge";
+import Button from "../ui/button/button";
+import {
+  CameraIcon,
+  CheckIcon,
+  ChevronIcon,
+  CloseIcon,
+  DownloadIcon,
+  PlusIcon,
+  SearchIcon,
+  TrashIcon,
+} from "../ui/Icon";
 import RadioOption from "../ui/RadioOption";
 import Select from "../ui/Select";
 import StateEmoji from "../ui/StateEmoji";
 import Toast from "../ui/Toast";
+import useNativeDialog from "../../hooks/useNativeDialog";
 
 const statuses = ["미확인", "확인", "조치중", "조치완료", "오탐 종결"];
 const PAGE_SIZE = 15;
@@ -321,11 +331,11 @@ function TreeView({ nodes, selectedId, expanded, query, onQueryChange, onToggle,
     <aside className="tree-pane">
       <div className="pane-heading">
         <h2>점검 문서</h2>
-        <button className="primary" onClick={onAddDocument}><Icon name="plus" size={14} /> 문서 추가</button>
+        <button className="primary" onClick={onAddDocument}><PlusIcon size={14} aria-hidden="true" /> 문서 추가</button>
       </div>
       <div className="tree-search-wrap">
         <label className="tree-search">
-          <Icon name="search" size={15} />
+          <SearchIcon size={15} aria-hidden="true" />
           <input type="search" aria-label="점검 문서 검색" placeholder="문서 검색" value={query} onChange={(event) => onQueryChange(event.target.value)} />
         </label>
       </div>
@@ -349,7 +359,7 @@ function TreeView({ nodes, selectedId, expanded, query, onQueryChange, onToggle,
             >
               {children.length ? (
                 <button className={`tree-toggle ${isOpen(node.id) ? "open" : ""}`} aria-label={isOpen(node.id) ? "접기" : "펼치기"} tabIndex={-1} onClick={(event) => { event.stopPropagation(); onToggle(node.id); }}>
-                  <Icon name="chevron" size={16} />
+                  <ChevronIcon size={16} aria-hidden="true" />
                 </button>
               ) : <span className="tree-toggle-spacer" />}
               <span className="tree-node-label">{prefix && <span className="tree-number">{prefix}</span>}{highlightedText(node.name, query.trim())}</span>
@@ -382,7 +392,7 @@ function DetailPanel({ nodes, selectedId, activeTab, mode, draft, onTab, onEdit,
         <div className="tree-detail-actions">
           <button className="secondary" disabled={!['document','chapter'].includes(selectedNode.type) || mode !== 'view'} onClick={() => onAdd('chapter')}>목차 추가</button>
           <button className="secondary" disabled={selectedNode.type !== 'chapter' || mode !== 'view'} onClick={() => onAdd('item')}>항목 추가</button>
-          <button className="danger-button" disabled={mode !== 'view'} onClick={onDelete}><Icon name="trash" size={14} /> 삭제</button>
+          <button className="danger-button" disabled={mode !== 'view'} onClick={onDelete}><TrashIcon size={14} aria-hidden="true" /> 삭제</button>
           <button className="primary" disabled={mode !== 'view'} onClick={onEdit}>수정</button>
         </div>
       </header>
@@ -417,7 +427,7 @@ function DetailPanel({ nodes, selectedId, activeTab, mode, draft, onTab, onEdit,
           </section>
         )}
       </div>
-      {mode !== "view" && <footer className="tree-save-bar"><span>변경 내용은 현재 화면에만 저장됩니다.</span><div><button className="secondary" onClick={onCancel}>변경 취소</button><button className="primary" onClick={onSave}><Icon name="check" size={14} /> 저장</button></div></footer>}
+      {mode !== "view" && <footer className="tree-save-bar"><span>변경 내용은 현재 화면에만 저장됩니다.</span><div><button className="secondary" onClick={onCancel}>변경 취소</button><button className="primary" onClick={onSave}><CheckIcon size={14} aria-hidden="true" /> 저장</button></div></footer>}
     </section>
   );
 }
@@ -500,15 +510,8 @@ export default function StandardPage({ pageDefinition, initialRows }) {
   const notify = (message) => {
     setToast(message);
   };
-  useEffect(() => {
-    if (modal) dialog.current?.showModal();
-    else dialog.current?.close();
-  }, [modal]);
-  useEffect(() => {
-    if (inlineDetail) return;
-    if (detailOpen) detailDialog.current?.showModal();
-    else detailDialog.current?.close();
-  }, [detailOpen, inlineDetail]);
+  useNativeDialog(dialog, Boolean(modal));
+  useNativeDialog(detailDialog, Boolean(detailOpen), { enabled: !inlineDetail });
   const applyQuery = (nextQuery) => {
     setQuery(nextQuery);
     const hasDateFilter = conf.filters.some(
@@ -1019,14 +1022,14 @@ export default function StandardPage({ pageDefinition, initialRows }) {
             <div className="list-actions" aria-label="목록 작업">
               <span className="table-result-count" role="status">총 {sorted.length}건</span>
               {canExport && (
-                <Button variant="secondary" className="export-button" icon="download" onClick={exportCsv}>
+                <Button variant="weak" className="export-button" icon={DownloadIcon} onClick={exportCsv}>
                   엑셀 내보내기
                 </Button>
               )}
               {conf.download && (
                 <Button
-                  variant="secondary"
-                  icon="download"
+                  variant="weak"
+                  icon={DownloadIcon}
                   disabled={!row}
                   onClick={downloadSnapshot}
                 >
@@ -1035,8 +1038,9 @@ export default function StandardPage({ pageDefinition, initialRows }) {
               )}
               {supportsDelete && selectedRows.length > 0 && (
                 <Button
-                  variant="danger-button"
-                  icon="trash"
+                  variant="fill"
+                  className="danger-button"
+                  icon={TrashIcon}
                   disabled={!deletableSelectedRows.length}
                   onClick={() => setModal("delete")}
                 >
@@ -1045,8 +1049,8 @@ export default function StandardPage({ pageDefinition, initialRows }) {
               )}
               {canCreate && selectedRows.length === 0 && (
                 <Button
-                  variant="primary"
-                  icon="plus"
+                  variant="fill"
+                  icon={PlusIcon}
                   onClick={() =>
                     conf.detail === "sensor"
                       ? beginSensorCreate()
@@ -1171,7 +1175,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                 ) : (
                   <div className="snapshot-placeholder">
                     <span className="snapshot-empty-icon" aria-hidden="true">
-                      <Icon name="camera" size={36} />
+                      <CameraIcon size={36} aria-hidden="true" />
                     </span>
                     <p>이벤트를 선택하면 상세 정보가 표시됩니다.</p>
                   </div>
@@ -1253,7 +1257,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                             className="danger-button"
                             onClick={() => setModal("delete")}
                           >
-                            <Icon name="trash" size={14} />
+                            <TrashIcon size={14} aria-hidden="true" />
                             삭제
                           </button>
                         )}
@@ -1298,7 +1302,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                       onClick={() => setDetailOpen(false)}
                       aria-label="상세 정보 닫기"
                     >
-                      <Icon name="close" size={17} />
+                      <CloseIcon size={17} aria-hidden="true" />
                     </button>
                   )}
                 </div>
@@ -1521,7 +1525,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                         className="danger-button"
                         onClick={() => setModal("delete")}
                       >
-                        <Icon name="trash" size={16} />
+                        <TrashIcon size={16} aria-hidden="true" />
                         삭제
                       </button>
                     )}
@@ -1563,7 +1567,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                         })
                       }
                     >
-                      <Icon name="check" size={16} />
+                      <CheckIcon size={16} aria-hidden="true" />
                       변경 저장
                     </button>
                   </div>
@@ -1596,7 +1600,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
             onClick={() => setModal(null)}
             aria-label="대화상자 닫기"
           >
-            <Icon name="close" />
+            <CloseIcon aria-hidden="true" />
           </button>
         </div>
         {modal === "image" ? (
@@ -1640,7 +1644,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                 );
               }}
             >
-              <Icon name="trash" size={16} />
+              <TrashIcon size={16} aria-hidden="true" />
               삭제
             </button>
           </>

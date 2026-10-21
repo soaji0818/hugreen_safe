@@ -1,4 +1,4 @@
-import Icon from "../ui/Icon";
+import { ResetIcon, SearchIcon } from "../ui/Icon";
 
 export default function SearchFilterPanel({
   ariaLabel,
@@ -23,7 +23,7 @@ export default function SearchFilterPanel({
         {startAction}
         {showKeyword && (
           <label className="filter-keyword">
-            <Icon name="search" size={15} />
+            <SearchIcon size={15} aria-hidden="true" />
             <input
               aria-label="통합 검색"
               placeholder={keywordPlaceholder}
@@ -34,7 +34,7 @@ export default function SearchFilterPanel({
         )}
         {showReset && (
           <button type="button" className="text-btn" onClick={onReset}>
-            <Icon name="reset" size={15} />
+            <ResetIcon size={15} aria-hidden="true" />
             초기화
           </button>
         )}

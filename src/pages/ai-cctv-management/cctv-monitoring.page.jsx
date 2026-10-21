@@ -2,10 +2,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import DataTable from "../../components/data-table/DataTable";
 import SearchFilterPanel from "../../components/filters/SearchFilterPanel";
-import Badge from "../../components/ui/Badge";
-import Button from "../../components/ui/Button";
-import CrudDialog from "../../components/ui/CrudDialog";
-import Icon from "../../components/ui/Icon";
+import Badge from "../../components/ui/badge/badge";
+import Button from "../../components/ui/button/button";
+import CrudModal from "../../components/ui/CrudModal";
+import { ResetIcon } from "../../components/ui/Icon";
 import Select from "../../components/ui/Select";
 import useCameraList from "../../hooks/useCameraList";
 import useCommonCodes from "../../hooks/useCommonCodes";
@@ -267,7 +267,7 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
         startAction={<span className="cctv-filter-heading">조회조건</span>}
         endAction={(
           <button type="button" className="text-btn" onClick={resetFilters}>
-            <Icon name="reset" size={15} />
+            <ResetIcon size={15} aria-hidden="true" />
             초기화
           </button>
         )}
@@ -298,7 +298,7 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
           disabled={loading}
           onClick={refetch}
         >
-          <Icon name="reset" size={15} />
+          <ResetIcon size={15} aria-hidden="true" />
           새로고침
         </button>
       </div>
@@ -341,7 +341,7 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
                 <div className="cctv-empty-state">
                   <h3>화면을 불러오지 못했습니다.</h3>
                   <p>{error}</p>
-                  <Button variant="primary" onClick={refetch}>다시 시도하기</Button>
+                  <Button variant="fill" onClick={refetch}>다시 시도하기</Button>
                 </div>
               </td>
             </tr>
@@ -350,7 +350,7 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
       </section>
 
       {selectedRow && (
-        <CrudDialog
+        <CrudModal
           ref={detailDialog}
           open={detailOpen}
           mode="detail"
@@ -386,7 +386,7 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
               {zonesLoading ? null : zonesError ? (
                 <div className="cctv-zone-state is-error">
                   <p>{zonesError}</p>
-                  <Button type="button" variant="secondary" onClick={refetchZones}>다시 불러오기</Button>
+                  <Button type="button" variant="weak" onClick={refetchZones}>다시 불러오기</Button>
                 </div>
               ) : zones.length === 0 ? (
                 <p className="cctv-zone-state">등록된 감지구역이 없습니다.</p>
@@ -421,7 +421,7 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
               )}
             </div>
           </section>
-        </CrudDialog>
+        </CrudModal>
       )}
     </section>
   );

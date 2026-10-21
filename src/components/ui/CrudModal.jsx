@@ -2,11 +2,11 @@ import {
   forwardRef,
   useId,
   useImperativeHandle,
-  useLayoutEffect,
   useRef,
 } from "react";
-import Button from "./Button";
-import Icon from "./Icon";
+import Button from "./button/button";
+import { CloseIcon } from "./Icon";
+import useNativeDialog from "../../hooks/useNativeDialog";
 
 const resizeHandles = [
   { key: "n-left", direction: "n" },
@@ -23,7 +23,7 @@ const defaultTitles = {
   detail: "상세 정보",
 };
 
-const CrudDialog = forwardRef(function CrudDialog({
+const CrudModal = forwardRef(function CrudModal({
   open,
   mode = "detail",
   titles = defaultTitles,
@@ -58,13 +58,7 @@ const CrudDialog = forwardRef(function CrudDialog({
 
   useImperativeHandle(ref, () => dialogRef.current);
 
-  useLayoutEffect(() => {
-    if (panel) return;
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
-    if (!open && dialog.open) dialog.close();
-  }, [open, panel]);
+  useNativeDialog(dialogRef, open, { enabled: !panel });
 
   if (panel && !open) return null;
 
@@ -112,15 +106,15 @@ const CrudDialog = forwardRef(function CrudDialog({
           <div className="cctv-bottom-detail-actions">
             {editing ? (
               <>
-                <Button variant="secondary" type="button" onClick={onCancelEdit} disabled={saving}>취소</Button>
-                <Button variant="primary" type="submit" form={formId} disabled={saving}>
+                <Button variant="weak" type="button" onClick={onCancelEdit} disabled={saving}>취소</Button>
+                <Button variant="fill" type="submit" form={formId} disabled={saving}>
                   {saving ? savingLabel : saveLabel}
                 </Button>
               </>
             ) : (
               <>
-                {onDelete && <Button variant="danger-button" type="button" onClick={onDelete}>삭제</Button>}
-                {onEdit && <Button variant="secondary" type="button" onClick={onEdit}>수정</Button>}
+                {onDelete && <Button variant="fill" className="danger-button" type="button" onClick={onDelete}>삭제</Button>}
+                {onEdit && <Button variant="weak" type="button" onClick={onEdit}>수정</Button>}
               </>
             )}
           </div>
@@ -131,7 +125,7 @@ const CrudDialog = forwardRef(function CrudDialog({
             aria-label={`${title} 닫기`}
             onClick={onClose}
           >
-            <Icon name="close" size={20} />
+            <CloseIcon size={20} aria-hidden="true" />
           </button>
         )}
       </div>
@@ -148,14 +142,14 @@ const CrudDialog = forwardRef(function CrudDialog({
       {showFooter && (
         <div className="detail-footer">
           {!editing && onDelete ? (
-            <Button variant="danger-button" type="button" onClick={onDelete}>
+            <Button variant="fill" className="danger-button" type="button" onClick={onDelete}>
               삭제
             </Button>
           ) : <span />}
           <div>
             {editing ? (
               <Button
-                variant="primary"
+                variant="fill"
                 type="submit"
                 form={formId}
                 disabled={saving}
@@ -163,7 +157,7 @@ const CrudDialog = forwardRef(function CrudDialog({
                 {saving ? savingLabel : saveLabel}
               </Button>
             ) : onEdit ? (
-              <Button variant="primary" type="button" onClick={onEdit}>
+              <Button variant="fill" type="button" onClick={onEdit}>
                 수정
               </Button>
             ) : null}
@@ -186,4 +180,4 @@ const CrudDialog = forwardRef(function CrudDialog({
   );
 });
 
-export default CrudDialog;
+export default CrudModal;

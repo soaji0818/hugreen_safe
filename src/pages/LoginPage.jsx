@@ -1,19 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
+import { EyeIcon, EyeOffIcon } from "../components/ui/Icon";
 import { login } from "../services/authService";
 import "../styles/login.css";
-
-function EyeIcon({ open }) {
-  return open ? (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M3 12s3.2-5 9-5 9 5 9 5-3.2 5-9 5-9-5-9-5Z" />
-      <circle cx="12" cy="12" r="2.25" />
-    </svg>
-  ) : (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="m4 4 16 16M10.6 7.1A9.7 9.7 0 0 1 12 7c5.8 0 9 5 9 5a14.5 14.5 0 0 1-2.1 2.5M14.1 16.7A9.5 9.5 0 0 1 12 17c-5.8 0-9-5-9-5a14 14 0 0 1 3.1-3.5" />
-    </svg>
-  );
-}
 
 function HugreenLoginLogo() {
   return (
@@ -119,7 +107,9 @@ export default function LoginPage({ onLogin }) {
                   aria-pressed={showPassword}
                   onClick={() => setShowPassword((value) => !value)}
                 >
-                  <EyeIcon open={showPassword} />
+                  {showPassword
+                    ? <EyeIcon aria-hidden="true" />
+                    : <EyeOffIcon aria-hidden="true" />}
                 </button>
               </span>
             </label>

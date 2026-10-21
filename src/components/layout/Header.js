@@ -1,6 +1,6 @@
 /* oxlint-disable react/refs -- Refs are passed to React elements and read only inside the layout effect. */
 import { createElement as h, useLayoutEffect, useRef } from "react";
-import Icon from "../ui/Icon";
+import { CloseIcon, MenuIcon } from "../ui/Icon";
 
 export default function Header({
   current,
@@ -61,7 +61,7 @@ export default function Header({
         disabled: tabs.length === 1,
         onClick: () => onCloseTab(id),
       },
-      h(Icon, { name: "close", size: 13 }),
+      h(CloseIcon, { size: 13, "aria-hidden": true }),
     ),
   ));
 
@@ -80,7 +80,7 @@ export default function Header({
           "aria-expanded": mobileOpen || !sidebarCollapsed,
           onClick: onToggleSidebar,
         },
-        h(Icon, { name: "menu" }),
+        h(MenuIcon, { "aria-hidden": true }),
       ),
       h(
         "a",

@@ -3,7 +3,7 @@ import { useBlocker, useLocation, useNavigate } from "react-router-dom";
 import Content from "../components/layout/Content";
 import Header from "../components/layout/Header";
 import Sidebar from "../components/layout/Sidebar";
-import ConfirmDialog from "../components/ui/ConfirmDialog";
+import ConfirmDialog from "../components/ui/dialog/ConfirmDialog";
 
 const MAX_OPEN_TABS = 7;
 

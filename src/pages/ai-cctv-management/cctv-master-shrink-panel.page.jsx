@@ -2,11 +2,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import DataTable from "../../components/data-table/DataTable";
 import SearchFilterPanel from "../../components/filters/SearchFilterPanel";
-import Badge from "../../components/ui/Badge";
-import Button from "../../components/ui/Button";
-import ConfirmDialog from "../../components/ui/ConfirmDialog";
-import CrudDialog from "../../components/ui/CrudDialog";
-import Icon from "../../components/ui/Icon";
+import Badge from "../../components/ui/badge/badge";
+import Button from "../../components/ui/button/button";
+import ConfirmDialog from "../../components/ui/dialog/ConfirmDialog";
+import CrudModal from "../../components/ui/CrudModal";
+import { FileIcon, PlusIcon, ResetIcon, SearchIcon, TrashIcon } from "../../components/ui/Icon";
 import RadioOption from "../../components/ui/RadioOption";
 import Select from "../../components/ui/Select";
 import Toast, { TOAST_MESSAGES } from "../../components/ui/Toast";
@@ -494,7 +494,7 @@ export function CctvMasterPage({
         startAction={<span className="cctv-filter-heading">조회조건</span>}
         endAction={(
           <button type="button" className="text-btn" onClick={resetFilters}>
-            <Icon name="reset" size={15} />
+            <ResetIcon size={15} aria-hidden="true" />
             초기화
           </button>
         )}
@@ -552,15 +552,15 @@ export function CctvMasterPage({
       <div className="list-actions" aria-label="목록 작업">
         <span className="table-result-count" role="status">총 {filteredRows.length}건</span>
         <Button
-          variant="danger-button"
-          className="cctv-toolbar-delete"
-          icon="trash"
+          variant="fill"
+          className="danger-button cctv-toolbar-delete"
+          icon={TrashIcon}
           disabled={selectedIds.length === 0}
           onClick={() => openDeleteConfirm(selectedIds)}
         >
           삭제
         </Button>
-        <Button variant="primary" icon="plus" onClick={openCreate}>추가</Button>
+        <Button variant="fill" icon={PlusIcon} onClick={openCreate}>추가</Button>
       </div>
 
       <div className={`cctv-master-content${detailPresentation === "shrink-panel" && detailOpen ? " has-shrink-panel" : ""}`}>
@@ -587,12 +587,12 @@ export function CctvMasterPage({
                 {error ? (
                   <div className="cctv-empty-state">
                     <span className="cctv-empty-icon" aria-hidden="true">
-                      <Icon name="file" size={48} />
+                      <FileIcon size={48} aria-hidden="true" />
                     </span>
                     <h3>화면을 불러오지 못했습니다.</h3>
                     <p>시스템에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해 주십시오.</p>
                     <Button
-                      variant="primary"
+                      variant="fill"
                       onClick={() => {
                         resetFilters();
                         refetch();
@@ -604,11 +604,11 @@ export function CctvMasterPage({
                 ) : (
                   <div className="cctv-empty-state">
                     <span className="cctv-empty-icon" aria-hidden="true">
-                      <Icon name="search" size={48} />
+                      <SearchIcon size={48} aria-hidden="true" />
                     </span>
                     <h3>검색 결과가 없습니다</h3>
                     <p>검색 조건을 변경하거나 초기화해 주세요.</p>
-                    <Button variant="secondary" onClick={resetFilters}>
+                    <Button variant="weak" onClick={resetFilters}>
                       조건 초기화
                     </Button>
                   </div>
@@ -620,7 +620,7 @@ export function CctvMasterPage({
         </section>
 
         {(selectedRow || createMode) && (
-          <CrudDialog
+          <CrudModal
           ref={detailDialog}
           open={detailOpen}
           presentation={detailPresentation}
@@ -716,7 +716,7 @@ export function CctvMasterPage({
                     {zonesLoading ? null : zonesError ? (
                       <div className="cctv-zone-state is-error">
                         <p>{zonesError}</p>
-                        <Button type="button" variant="secondary" onClick={refetchZones}>다시 불러오기</Button>
+                        <Button type="button" variant="weak" onClick={refetchZones}>다시 불러오기</Button>
                       </div>
                     ) : zones.length === 0 ? (
                       <p className="cctv-zone-state">등록된 감지구역이 없습니다.</p>
@@ -752,7 +752,7 @@ export function CctvMasterPage({
                 </div>
               </section>
             )}
-          </CrudDialog>
+          </CrudModal>
         )}
       </div>
 
@@ -770,7 +770,8 @@ export function CctvMasterPage({
         description="이 작업은 되돌릴 수 없습니다."
         cancelDisabled={deletePending}
         confirmLabel={deletePending ? "처리 중..." : "삭제하기"}
-        confirmVariant="danger-button"
+        confirmVariant="fill"
+        confirmClassName="danger-button"
         confirmDisabled={deletePending}
         onCancel={() => {
           setDeleteOpen(false);
