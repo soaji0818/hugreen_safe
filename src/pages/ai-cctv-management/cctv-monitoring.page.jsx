@@ -1,12 +1,12 @@
 /* oxlint-disable react/only-export-components -- Page metadata and its dedicated component intentionally share this module. */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import DataTable from "../../components/data-table/DataTable";
-import SearchFilterPanel from "../../components/filters/SearchFilterPanel";
-import Badge from "../../components/ui/badge/badge";
-import Button from "../../components/ui/button/button";
-import CrudModal from "../../components/ui/CrudModal";
-import { ResetIcon } from "../../components/ui/Icon";
-import Select from "../../components/ui/Select";
+import DataTable from "../../components/organisms/DataTable/DataTable";
+import SearchConditions from "../../components/organisms/SearchConditions/SearchConditions";
+import DropCondition from "../../components/molecules/SearchConditions/DropCondition";
+import Badge from "../../components/atoms/Badge/Badge";
+import Button from "../../components/atoms/Button/Button";
+import CrudModal from "../../components/organisms/CrudModal/CrudModal";
+import { ResetIcon } from "../../components/atoms/Icon/Icon";
 import useCameraList from "../../hooks/useCameraList";
 import useCommonCodes from "../../hooks/useCommonCodes";
 import useZoneList from "../../hooks/useZoneList";
@@ -259,36 +259,18 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
 
   return (
     <section className="work-panel screen-format-list cctv-monitoring-page" aria-label="AI CCTV 상태 모니터링 업무 영역">
-      <SearchFilterPanel
-        className="standard-filter-panel"
-        ariaLabel="AI CCTV 상태 모니터링 조회 조건"
-        showKeyword={false}
-        showReset={false}
-        startAction={<span className="cctv-filter-heading">조회조건</span>}
-        endAction={(
-          <button type="button" className="text-btn" onClick={resetFilters}>
-            <ResetIcon size={15} aria-hidden="true" />
-            초기화
-          </button>
-        )}
-      >
-        <div className="filter-grid standard-filter-grid cctv-monitoring-filter-grid" data-count="1">
-          <label>
-            <span>공장</span>
-            <Select
-              aria-label="공장"
-              value={factoryCd}
-              disabled={factoryLoading}
-              onChange={(event) => setFactoryCd(event.target.value)}
-            >
-              <option value="">전체 공장</option>
-              {factoryCodes.map((code) => (
-                <option key={code.value} value={code.value}>{code.label}</option>
-              ))}
-            </Select>
-          </label>
-        </div>
-      </SearchFilterPanel>
+      <SearchConditions className="standard-filter-panel" onReset={resetFilters}>
+        <SearchConditions.Row columns={1} className="cctv-monitoring-filter-grid">
+          <DropCondition
+            label="공장"
+            value={factoryCd}
+            disabled={factoryLoading}
+            onChange={setFactoryCd}
+            placeholder="전체 공장"
+            options={factoryCodes}
+          />
+        </SearchConditions.Row>
+      </SearchConditions>
 
       <div className="list-actions" aria-label="목록 작업">
         <span className="table-result-count" role="status">총 {rows.length}건</span>

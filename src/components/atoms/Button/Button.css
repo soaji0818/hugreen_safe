@@ -57,6 +57,23 @@
   background: rgba(0, 128, 102, 0.16);
 }
 
+.ui-button--text {
+  min-height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #8b95a1;
+  font-size: var(--type-caption-size);
+  font-weight: 400;
+  line-height: var(--type-caption-line);
+}
+
+.ui-button--text:hover:enabled {
+  background: transparent;
+  color: #4e5968;
+}
+
 .ui-button:disabled {
   cursor: not-allowed;
   opacity: 0.48;

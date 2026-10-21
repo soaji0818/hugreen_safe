@@ -1,15 +1,16 @@
 /* oxlint-disable react/only-export-components -- Page metadata and its dedicated component intentionally share this module. */
 import { useEffect, useMemo, useRef, useState } from "react";
-import DataTable from "../../components/data-table/DataTable";
-import SearchFilterPanel from "../../components/filters/SearchFilterPanel";
-import Badge from "../../components/ui/badge/badge";
-import Button from "../../components/ui/button/button";
-import ConfirmDialog from "../../components/ui/dialog/ConfirmDialog";
-import CrudModal from "../../components/ui/CrudModal";
-import { FileIcon, PlusIcon, ResetIcon, SearchIcon, TrashIcon } from "../../components/ui/Icon";
-import RadioOption from "../../components/ui/RadioOption";
-import Select from "../../components/ui/Select";
-import Toast, { TOAST_MESSAGES } from "../../components/ui/Toast";
+import DataTable from "../../components/organisms/DataTable/DataTable";
+import SearchConditions from "../../components/organisms/SearchConditions/SearchConditions";
+import DropCondition from "../../components/molecules/SearchConditions/DropCondition";
+import RadioCondition from "../../components/molecules/SearchConditions/RadioConditioin";
+import Badge from "../../components/atoms/Badge/Badge";
+import Button from "../../components/atoms/Button/Button";
+import ConfirmDialog from "../../components/molecules/ConfirmDialog/ConfirmDialog";
+import CrudModal from "../../components/organisms/CrudModal/CrudModal";
+import { FileIcon, PlusIcon, SearchIcon, TrashIcon } from "../../components/atoms/Icon/Icon";
+import Select from "../../components/atoms/Select/Select";
+import Toast, { TOAST_MESSAGES } from "../../components/molecules/Toast/Toast";
 import useCameraList from "../../hooks/useCameraList";
 import useCommonCodes from "../../hooks/useCommonCodes";
 import useZoneList from "../../hooks/useZoneList";
@@ -504,69 +505,31 @@ export function CctvMasterPage({
       className={`work-panel screen-format-list-detail cctv-master-page${detailPresentation === "shrink-panel" && detailOpen ? " is-shrink-panel-open" : ""}`}
       aria-label="AI CCTV 기준정보 관리 업무 영역"
     >
-      <SearchFilterPanel
-        className="standard-filter-panel"
-        ariaLabel="AI CCTV 기준정보 관리 조회 조건"
-        onReset={resetFilters}
-        showKeyword={false}
-        showReset={false}
-        startAction={<span className="cctv-filter-heading">조회조건</span>}
-        endAction={(
-          <button type="button" className="text-btn" onClick={resetFilters}>
-            <ResetIcon size={15} aria-hidden="true" />
-            초기화
-          </button>
-        )}
-      >
-        <div className="filter-grid standard-filter-grid cctv-master-filter-grid" data-count="3" style={{ "--filter-columns": 3 }}>
-          <label>
-            <span>공장</span>
-            <Select
-              aria-label="공장"
-              value={filters.factoryCd}
-              disabled={factoryLoading}
-              onChange={(event) => updateFilters({ factoryCd: event.target.value })}
-            >
-              <option value="">전체</option>
-              {factoryCodes.map((code) => (
-                <option key={code.value} value={code.value}>{code.label}</option>
-              ))}
-            </Select>
-          </label>
-          <label>
-            <span>집중감시구역 여부</span>
-            <span className="radio-options" role="radiogroup" aria-label="집중감시구역 여부">
-              {[{ label: "전체", value: "" }, { label: "집중감시", value: "Y" }, { label: "일반구역", value: "N" }].map((option) => (
-                <RadioOption
-                  key={option.value || "all"}
-                  name="cctv-focus"
-                  value={option.value}
-                  checked={filters.focusYn === option.value}
-                  onChange={() => updateFilters({ focusYn: option.value })}
-                >
-                  {option.label}
-                </RadioOption>
-              ))}
-            </span>
-          </label>
-          <label>
-            <span>사용 여부</span>
-            <span className="radio-options" role="radiogroup" aria-label="사용 여부">
-              {[{ label: "전체", value: "" }, { label: "사용", value: "Y" }, { label: "미사용", value: "N" }].map((option) => (
-                <RadioOption
-                  key={option.label}
-                  name="cctv-use"
-                  value={option.value}
-                  checked={filters.useYn === option.value}
-                  onChange={() => updateFilters({ useYn: option.value })}
-                >
-                  {option.label}
-                </RadioOption>
-              ))}
-            </span>
-          </label>
-        </div>
-      </SearchFilterPanel>
+      <SearchConditions className="standard-filter-panel" onReset={resetFilters}>
+        <SearchConditions.Row columns={3} className="cctv-master-filter-grid">
+          <DropCondition
+            label="공장"
+            value={filters.factoryCd}
+            disabled={factoryLoading}
+            onChange={(factoryCd) => updateFilters({ factoryCd })}
+            options={factoryCodes}
+          />
+          <RadioCondition
+            label="집중감시구역 여부"
+            name="cctv-focus"
+            value={filters.focusYn}
+            onChange={(focusYn) => updateFilters({ focusYn })}
+            options={[{ label: "전체", value: "" }, { label: "집중감시", value: "Y" }, { label: "일반구역", value: "N" }]}
+          />
+          <RadioCondition
+            label="사용 여부"
+            name="cctv-use"
+            value={filters.useYn}
+            onChange={(useYn) => updateFilters({ useYn })}
+            options={[{ label: "전체", value: "" }, { label: "사용", value: "Y" }, { label: "미사용", value: "N" }]}
+          />
+        </SearchConditions.Row>
+      </SearchConditions>
 
       <div className="list-actions" aria-label="목록 작업">
         <span className="table-result-count" role="status">총 {filteredRows.length}건</span>

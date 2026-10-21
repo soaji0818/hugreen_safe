@@ -1,4 +1,4 @@
-import "./button.css";
+import "./Button.css";
 
 const ICON_SIZE_BY_BUTTON_SIZE = {
   small: 14,
@@ -8,7 +8,7 @@ const ICON_SIZE_BY_BUTTON_SIZE = {
 };
 
 const buttonSizes = new Set(["small", "medium", "large", "xlarge"]);
-const buttonVariants = new Set(["fill", "weak"]);
+const buttonVariants = new Set(["fill", "weak", "text"]);
 
 export default function Button({
   variant = "fill",

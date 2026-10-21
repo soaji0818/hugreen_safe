@@ -4,7 +4,7 @@
 
 import { useId, useRef } from "react";
 import useNativeDialog from "../../../hooks/useNativeDialog";
-import Button from "../button/button"; // 액션 버튼 컴포넌트 임포트
+import Button from "../../atoms/Button/Button"; // 액션 버튼 컴포넌트 임포트
 import "./AlertDialog.css";
 
 export default function AlertDialog({

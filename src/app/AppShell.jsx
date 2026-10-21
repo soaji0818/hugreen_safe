@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useBlocker, useLocation, useNavigate } from "react-router-dom";
-import Content from "../components/layout/Content";
-import Header from "../components/layout/Header";
-import Sidebar from "../components/layout/Sidebar";
-import ConfirmDialog from "../components/ui/dialog/ConfirmDialog";
+import Content from "../components/templates/Content/Content";
+import Header from "../components/organisms/Header/Header";
+import Sidebar from "../components/organisms/Sidebar/Sidebar";
+import ConfirmDialog from "../components/molecules/ConfirmDialog/ConfirmDialog";
 
 const MAX_OPEN_TABS = 7;
 

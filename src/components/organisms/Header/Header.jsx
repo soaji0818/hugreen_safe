@@ -1,6 +1,6 @@
 /* oxlint-disable react/refs -- Refs are passed to React elements and read only inside the layout effect. */
 import { createElement as h, useLayoutEffect, useRef } from "react";
-import { CloseIcon, MenuIcon } from "../ui/Icon";
+import { CloseIcon, MenuIcon } from "../../atoms/Icon/Icon";
 
 export default function Header({
   current,

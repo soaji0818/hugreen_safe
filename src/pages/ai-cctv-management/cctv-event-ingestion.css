@@ -1,0 +1,18 @@
+.cctv-event-ingestion-page {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cctv-event-ingestion-page > .search-conditions {
+  flex: none;
+  margin: 20px 24px 16px;
+}
+
+.cctv-event-ingestion-page > .work-panel {
+  padding-top: 0;
+}
+
+.cctv-event-ingestion-page > .work-panel > .filter-panel {
+  display: none;
+}

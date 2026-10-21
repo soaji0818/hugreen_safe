@@ -2,7 +2,7 @@
 //ConfirmDialog 컴포넌트는 사용자의 액션이나 선택이 필요한 상황에서 사용되는 인터페이스를 제공 
 //확인과 취소, 두 개의 버튼을 통해 사용자가 명확한 선택을 할 수 있도록 도와줌
 import { useId, useRef } from "react";
-import Button from "../button/button";
+import Button from "../../atoms/Button/Button";
 import useNativeDialog from "../../../hooks/useNativeDialog";
 import "./ConfirmDialog.css";
 

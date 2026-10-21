@@ -4,7 +4,7 @@ import {
   SearchIcon,
   SettingsIcon,
   ShieldIcon,
-} from "../ui/Icon";
+} from "../../atoms/Icon/Icon";
 
 const favoriteMenus = ["MES-TD3-007", "MES-TD3-017", "MES-TD3-008"];
 const groupIcons = [ShieldIcon, CameraIcon, SettingsIcon];

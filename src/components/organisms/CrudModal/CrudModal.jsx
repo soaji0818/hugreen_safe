@@ -4,9 +4,9 @@ import {
   useImperativeHandle,
   useRef,
 } from "react";
-import Button from "./button/button";
-import { CloseIcon } from "./Icon";
-import useNativeDialog from "../../hooks/useNativeDialog";
+import Button from "../../atoms/Button/Button";
+import { CloseIcon } from "../../atoms/Icon/Icon";
+import useNativeDialog from "../../../hooks/useNativeDialog";
 
 const resizeHandles = [
   { key: "n-left", direction: "n" },

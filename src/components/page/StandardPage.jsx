@@ -1,9 +1,9 @@
 import { useLayoutEffect, useRef, useState } from "react";
-import DataTable from "../data-table/DataTable";
-import Pagination from "../data-table/Pagination";
-import SearchFilterPanel from "../filters/SearchFilterPanel";
-import Badge from "../ui/badge/badge";
-import Button from "../ui/button/button";
+import DataTable from "../organisms/DataTable/DataTable";
+import Pagination from "../molecules/Pagination/Pagination";
+import SearchConditions from "../organisms/SearchConditions/SearchConditions";
+import Badge from "../atoms/Badge/Badge";
+import Button from "../atoms/Button/Button";
 import {
   CameraIcon,
   CheckIcon,
@@ -13,11 +13,11 @@ import {
   PlusIcon,
   SearchIcon,
   TrashIcon,
-} from "../ui/Icon";
-import RadioOption from "../ui/RadioOption";
-import Select from "../ui/Select";
-import StateEmoji from "../ui/StateEmoji";
-import Toast from "../ui/Toast";
+} from "../atoms/Icon/Icon";
+import RadioOption from "../atoms/RadioOption/RadioOption";
+import Select from "../atoms/Select/Select";
+import StateEmoji from "../atoms/StateEmoji/StateEmoji";
+import Toast from "../molecules/Toast/Toast";
 import useNativeDialog from "../../hooks/useNativeDialog";
 
 const statuses = ["미확인", "확인", "조치중", "조치완료", "오탐 종결"];
@@ -853,8 +853,9 @@ export default function StandardPage({ pageDefinition, initialRows }) {
             "MES-TD3-020",
             "MES-TD3-021",
           ].includes(current) ? (
-            <SearchFilterPanel
+            <SearchConditions
               className="access-filter-panel"
+              title=""
               ariaLabel={`${name} 조회 조건`}
               keyword={query.keyword || ""}
               onKeywordChange={(keyword) => applyQuery({ ...query, keyword })}
@@ -926,11 +927,12 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                   </label>
                 ))}
               </div>
-            </SearchFilterPanel>
-          ) : conf.filters.length > 0 && <SearchFilterPanel
+            </SearchConditions>
+          ) : conf.filters.length > 0 && <SearchConditions
             className={`standard-filter-panel ${
               current === "MES-TD3-006" ? "single-row-filter-panel" : ""
             }`}
+            title=""
             ariaLabel={`${name} 조회 조건`}
             keyword={query.keyword || ""}
             onKeywordChange={(keyword) => applyQuery({ ...query, keyword })}
@@ -1017,7 +1019,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
               ))}
               <span className="filter-empty empty-one" aria-hidden="true" />
             </div>
-          </SearchFilterPanel>}
+          </SearchConditions>}
           {conf.layout !== "tree" && (
             <div className="list-actions" aria-label="목록 작업">
               <span className="table-result-count" role="status">총 {sorted.length}건</span>

@@ -1,15 +1,17 @@
 /* oxlint-disable react/only-export-components -- Page metadata and its component intentionally share this module. */
 import { useEffect, useMemo, useRef, useState } from "react";
-import DataTable from "../../components/data-table/DataTable";
-import SearchFilterPanel from "../../components/filters/SearchFilterPanel";
-import Badge from "../../components/ui/badge/badge";
-import Button from "../../components/ui/button/button";
-import ConfirmDialog from "../../components/ui/dialog/ConfirmDialog";
-import CrudModal from "../../components/ui/CrudModal";
-import { PlusIcon, ResetIcon, SearchIcon } from "../../components/ui/Icon";
-import RadioOption from "../../components/ui/RadioOption";
-import Select from "../../components/ui/Select";
-import Toast from "../../components/ui/Toast";
+import DataTable from "../../components/organisms/DataTable/DataTable";
+import SearchConditions from "../../components/organisms/SearchConditions/SearchConditions";
+import DateCondition from "../../components/molecules/SearchConditions/DateCondition";
+import RadioCondition from "../../components/molecules/SearchConditions/RadioConditioin";
+import DropCondition from "../../components/molecules/SearchConditions/DropCondition";
+import Badge from "../../components/atoms/Badge/Badge";
+import Button from "../../components/atoms/Button/Button";
+import ConfirmDialog from "../../components/molecules/ConfirmDialog/ConfirmDialog";
+import CrudModal from "../../components/organisms/CrudModal/CrudModal";
+import { PlusIcon, SearchIcon } from "../../components/atoms/Icon/Icon";
+import Select from "../../components/atoms/Select/Select";
+import Toast from "../../components/molecules/Toast/Toast";
 import useCommonCodes from "../../hooks/useCommonCodes";
 import useCameraList from "../../hooks/useCameraList";
 import useDeviceList from "../../hooks/useDeviceList";
@@ -524,113 +526,55 @@ function EquipmentFailuresPage({ user, onUnauthorized, onUnsavedChange }) {
 
   return (
     <section className="work-panel failure-management-page">
-      <SearchFilterPanel
-        ariaLabel="장비 장애 조회조건"
-        className="standard-filter-panel failure-filter-panel"
-        showKeyword={false}
-        showReset={false}
-        startAction={<span className="cctv-filter-heading">조회조건</span>}
-        onReset={resetFilters}
-        endAction={(
-          <button type="button" className="text-btn" onClick={resetFilters}>
-            <ResetIcon size={15} aria-hidden="true" />
-            초기화
-          </button>
-        )}
-      >
-        <div className="filter-grid standard-filter-grid failure-filter-grid">
-          <div className="date-field access-date-field failure-radio-field" role="group" aria-label="기간">
-            <span>기간</span>
-            <span className="access-date-content">
-              <span className="date-inputs">
-                <input
-                  type="date"
-                  aria-label="조회 시작일"
-                  value={filters.fromDt}
-                  max={filters.toDt || undefined}
-                  onChange={(event) => updateFilter("fromDt", event.target.value)}
-                />
-                <span>~</span>
-                <input
-                  type="date"
-                  aria-label="조회 종료일"
-                  value={filters.toDt}
-                  min={filters.fromDt || undefined}
-                  onChange={(event) => updateFilter("toDt", event.target.value)}
-                />
-              </span>
-              <span className="access-period-options" role="radiogroup" aria-label="기간 빠른 선택">
-                {datePresets.map(([label, days]) => (
-                  <label key={label}>
-                    <input
-                      type="radio"
-                      name="failure-period"
-                      checked={isSelectedPeriod(days)}
-                      onChange={() => selectPeriod(days)}
-                    />
-                    <span>{label}</span>
-                  </label>
-                ))}
-              </span>
-            </span>
-          </div>
-          <div className="failure-event-type-field failure-radio-field" role="group" aria-label="장애유형">
-            <span>장애유형</span>
-            <span className="radio-options failure-event-type-options" role="radiogroup" aria-label="장애유형">
-              {[{ value: "", label: "전체" }, ...faultTypeOptions].map((option) => (
-                <RadioOption
-                  key={option.value || "all"}
-                  name="failure-fault-type"
-                  value={option.value}
-                  checked={filters.faultTypeCd === option.value}
-                  onChange={() => updateFilter("faultTypeCd", option.value)}
-                >
-                  {option.label}
-                </RadioOption>
-              ))}
-            </span>
-          </div>
-          <div className="failure-device-type-field failure-radio-field" role="group" aria-label="장비구분">
-            <span>장비구분</span>
-            <span className="radio-options failure-device-type-options" role="radiogroup" aria-label="장비구분">
-              {[{ value: "", label: "전체" }, { value: "AI CCTV", label: "AI CCTV" }, { value: "센서", label: "센서" }, { value: "PLC", label: "PLC" }].map((option) => (
-                <RadioOption
-                  key={option.value || "all"}
-                  name="failure-device-type"
-                  value={option.value}
-                  checked={filters.deviceType === option.value}
-                  onChange={() => setFilters((current) => ({
-                    ...current,
-                    deviceType: option.value,
-                    deviceId: "",
-                  }))}
-                >
-                  {option.label}
-                </RadioOption>
-              ))}
-            </span>
-          </div>
-          <label>
-            <span>장비 ID</span>
-            <Select
-              value={filters.deviceId}
-              onChange={(event) => updateFilter("deviceId", event.target.value)}
-            >
-              <option value="">{filters.deviceType && filters.deviceType !== "AI CCTV" && deviceError ? "장비 목록 조회 실패" : "전체"}</option>
-              {deviceOptions.map((option) => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </Select>
-          </label>
-          <label>
-            <span>처리상태</span>
-            <Select value={filters.statusCd} onChange={(event) => updateFilter("statusCd", event.target.value)}>
-              <option value="">전체</option>
-              {statusOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-            </Select>
-          </label>
-        </div>
-      </SearchFilterPanel>
+      <SearchConditions className="standard-filter-panel failure-filter-panel" onReset={resetFilters}>
+        <SearchConditions.Row columns={1} className="failure-filter-grid">
+          <DateCondition
+            label="기간"
+            startDate={filters.fromDt}
+            endDate={filters.toDt}
+            period={datePresets.find(([, days]) => isSelectedPeriod(days))?.[1]?.toString() || ""}
+            periods={datePresets.map(([label, days]) => ({ label, value: String(days) }))}
+            onStartDateChange={(fromDt) => updateFilter("fromDt", fromDt)}
+            onEndDateChange={(toDt) => updateFilter("toDt", toDt)}
+            onPeriodChange={(days) => selectPeriod(Number(days))}
+            className="access-date-field"
+          />
+        </SearchConditions.Row>
+        <SearchConditions.Row columns={1} className="failure-filter-grid">
+          <RadioCondition
+            label="장애유형"
+            name="failure-fault-type"
+            value={filters.faultTypeCd}
+            onChange={(faultTypeCd) => updateFilter("faultTypeCd", faultTypeCd)}
+            options={[{ value: "", label: "전체" }, ...faultTypeOptions]}
+            className="failure-event-type-field"
+          />
+        </SearchConditions.Row>
+        <SearchConditions.Row columns={3} className="failure-filter-grid">
+          <RadioCondition
+            label="장비구분"
+            name="failure-device-type"
+            value={filters.deviceType}
+            onChange={(deviceType) => setFilters((current) => ({ ...current, deviceType, deviceId: "" }))}
+            options={[{ value: "", label: "전체" }, { value: "AI CCTV", label: "AI CCTV" }, { value: "센서", label: "센서" }, { value: "PLC", label: "PLC" }]}
+            className="failure-device-type-field"
+          />
+          <DropCondition
+            label="장비 ID"
+            value={filters.deviceId}
+            onChange={(deviceId) => updateFilter("deviceId", deviceId)}
+            placeholder={filters.deviceType && filters.deviceType !== "AI CCTV" && deviceError ? "장비 목록 조회 실패" : "전체"}
+            options={deviceOptions}
+          />
+          <DropCondition
+            label="처리상태"
+            value={filters.statusCd}
+            onChange={(statusCd) => updateFilter("statusCd", statusCd)}
+            placeholder="전체"
+            options={statusOptions}
+          />
+        </SearchConditions.Row>
+      </SearchConditions>
 
       <div className="list-actions" aria-label="장애 목록 작업">
         <span className="table-result-count" role="status">총 {visibleRows.length}건</span>

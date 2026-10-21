@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { EyeIcon, EyeOffIcon } from "../components/ui/Icon";
+import { EyeIcon, EyeOffIcon } from "../components/atoms/Icon/Icon";
 import { login } from "../services/authService";
 import "../styles/login.css";
 

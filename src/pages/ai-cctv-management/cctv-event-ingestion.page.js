@@ -1,6 +1,9 @@
+import CctvEventIngestionPage from "./cctv-event-ingestion.component";
+
 export default {
   id: "MES-TD3-018",
   title: "AI CCTV 이벤트 수집",
+  Component: CctvEventIngestionPage,
   config: {
     actions: { save: true, export: true, create: true, createLabel: "추가" },
     summary: ["오늘 수신", "확인 대기", "스냅샷"],

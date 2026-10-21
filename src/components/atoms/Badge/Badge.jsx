@@ -1,4 +1,4 @@
-import "./badge.css";
+import "./Badge.css";
 
 const badgeSizes = new Set(["xsmall", "small", "medium", "large"]);
 const badgeVariants = new Set(["fill", "weak"]);

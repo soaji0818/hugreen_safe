@@ -1,15 +1,15 @@
 /* oxlint-disable react/only-export-components -- Page metadata and its dedicated component intentionally share this module. */
 import { useEffect, useMemo, useRef, useState } from "react";
-import DataTable from "../../components/data-table/DataTable";
-import SearchFilterPanel from "../../components/filters/SearchFilterPanel";
-import Badge from "../../components/ui/badge/badge";
-import Button from "../../components/ui/button/button";
-import ConfirmDialog from "../../components/ui/dialog/ConfirmDialog";
-import CrudModal from "../../components/ui/CrudModal";
-import { FileIcon, PlusIcon, ResetIcon, SearchIcon, TrashIcon } from "../../components/ui/Icon";
-import RadioOption from "../../components/ui/RadioOption";
-import Select from "../../components/ui/Select";
-import Toast, { TOAST_MESSAGES } from "../../components/ui/Toast";
+import DataTable from "../../components/organisms/DataTable/DataTable";
+import SearchConditions from "../../components/organisms/SearchConditions/SearchConditions";
+import Badge from "../../components/atoms/Badge/Badge";
+import Button from "../../components/atoms/Button/Button";
+import ConfirmDialog from "../../components/molecules/ConfirmDialog/ConfirmDialog";
+import CrudModal from "../../components/organisms/CrudModal/CrudModal";
+import { FileIcon, PlusIcon, ResetIcon, SearchIcon, TrashIcon } from "../../components/atoms/Icon/Icon";
+import RadioOption from "../../components/atoms/RadioOption/RadioOption";
+import Select from "../../components/atoms/Select/Select";
+import Toast, { TOAST_MESSAGES } from "../../components/molecules/Toast/Toast";
 import useCameraList from "../../hooks/useCameraList";
 import useCommonCodes from "../../hooks/useCommonCodes";
 import useZoneList from "../../hooks/useZoneList";
@@ -485,7 +485,7 @@ export function CctvMasterPage({
       className={`work-panel screen-format-list-detail cctv-master-page${detailPresentation === "shrink-panel" && detailOpen ? " is-shrink-panel-open" : ""}`}
       aria-label="AI CCTV 기준정보 관리 업무 영역"
     >
-      <SearchFilterPanel
+      <SearchConditions
         className="standard-filter-panel"
         ariaLabel="AI CCTV 기준정보 관리 조회 조건"
         onReset={resetFilters}
@@ -493,10 +493,9 @@ export function CctvMasterPage({
         showReset={false}
         startAction={<span className="cctv-filter-heading">조회조건</span>}
         endAction={(
-          <button type="button" className="text-btn" onClick={resetFilters}>
-            <ResetIcon size={15} aria-hidden="true" />
+          <Button type="button" variant="text" size="small" className="text-btn" icon={ResetIcon} iconSize={15} onClick={resetFilters}>
             초기화
-          </button>
+          </Button>
         )}
       >
         <div className="filter-grid standard-filter-grid cctv-master-filter-grid" data-count="3" style={{ "--filter-columns": 3 }}>
@@ -547,7 +546,7 @@ export function CctvMasterPage({
             </span>
           </label>
         </div>
-      </SearchFilterPanel>
+      </SearchConditions>
 
       <div className="list-actions" aria-label="목록 작업">
         <span className="table-result-count" role="status">총 {filteredRows.length}건</span>
