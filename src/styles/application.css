@@ -176,42 +176,6 @@ input:hover, select:hover, textarea:hover { border-color: #adb5bd; }
 input::placeholder, textarea::placeholder { color: #a2aab3; }
 textarea { min-height: 76px; resize: vertical; line-height: 1.55; }
 
-@supports (appearance: base-select) {
-  .ui-select,
-  .ui-select::picker(select) { appearance: base-select; }
-
-  .ui-select { align-items: center; gap: 10px; }
-  .ui-select::picker-icon { margin-left: auto; color: #8b95a1; transition: rotate .18s ease; }
-  .ui-select:open::picker-icon { rotate: 180deg; }
-
-  .ui-select::picker(select) {
-    min-width: 160px;
-    max-height: calc(var(--select-visible-options, 6) * 34px + 12px);
-    margin-block-start: 6px;
-    padding: 6px;
-    overflow-y: auto;
-    border: 0;
-    border-radius: 14px;
-    background: #fff;
-    box-shadow: 0 12px 30px rgba(25, 31, 40, .13);
-  }
-
-  .ui-select option {
-    min-height: 34px;
-    padding: 6px 10px;
-    border: 0;
-    border-radius: 8px;
-    color: #4e5968;
-    font-size: 13px;
-    line-height: 19.5px;
-    font-weight: 500;
-  }
-
-  .ui-select option::checkmark { display: none; }
-  .ui-select option:hover,
-  .ui-select option:focus-visible { background: #f7f8f9; color: #333d4b; }
-  .ui-select option:checked { background: #f2f4f6; color: #4e5968; font-weight: 650; }
-}
 .date-inputs { min-height: 34px; display: flex; align-items: center; gap: 5px; padding: 1px 8px; background: white; }
 .date-inputs span { padding: 0; background: transparent; color: #a2aab3; }
 .date-inputs input:not([type="radio"]) { min-height: 30px; padding: 3px 6px; border: 0; border-radius: 6px; font-size: 12px; }
@@ -252,13 +216,9 @@ textarea { min-height: 76px; resize: vertical; line-height: 1.55; }
 .cctv-master-filter-grid { grid-template-columns: minmax(0,.8fr) repeat(2,minmax(0,1.1fr)); }
 .filter-grid.cctv-master-filter-grid > label { grid-template-columns: 140px minmax(0,1fr); }
 .cctv-master-filter-grid > label > span:first-child { white-space: nowrap; }
-.cctv-master-filter-grid .ui-select { width: 100%; justify-self: stretch; padding-right: 10px; }
-.cctv-master-filter-grid .ui-select::picker-icon { margin-right: auto; margin-left: 4px; }
 .cctv-monitoring-filter-grid { grid-template-columns: minmax(0,1fr); }
 .filter-grid.cctv-monitoring-filter-grid > label { grid-template-columns: 140px minmax(0,1fr); }
 .cctv-monitoring-filter-grid > label > span:first-child { white-space: nowrap; }
-.cctv-monitoring-filter-grid .ui-select { width: 100%; justify-self: stretch; padding-right: 10px; }
-.cctv-monitoring-filter-grid .ui-select::picker-icon { margin-right: auto; margin-left: 4px; }
 .cctv-master-page .standard-filter-panel,
 .cctv-monitoring-page .standard-filter-panel { padding-top: 0; }
 .cctv-master-page .filter-actions.no-keyword,

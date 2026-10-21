@@ -10,7 +10,7 @@ import Button from "../../components/atoms/Button/Button";
 import ConfirmDialog from "../../components/molecules/ConfirmDialog/ConfirmDialog";
 import CrudModal from "../../components/organisms/CrudModal/CrudModal";
 import { PlusIcon, SearchIcon } from "../../components/atoms/Icon/Icon";
-import Select from "../../components/atoms/Select/Select";
+import DropDownMenu from "../../components/atoms/Menu/DropDownMenu";
 import Toast from "../../components/molecules/Toast/Toast";
 import useCommonCodes from "../../hooks/useCommonCodes";
 import useCameraList from "../../hooks/useCameraList";
@@ -643,11 +643,11 @@ function EquipmentFailuresPage({ user, onUnauthorized, onUnsavedChange }) {
               <div>
                 <dt>장비구분</dt>
                 <dd className="is-editing">
-                  <Select value={formValues.deviceKind} onChange={(event) => setFormValues((current) => ({ ...current, deviceKind: event.target.value, deviceId: "" }))}>
+                  <DropDownMenu value={formValues.deviceKind} onChange={(event) => setFormValues((current) => ({ ...current, deviceKind: event.target.value, deviceId: "" }))}>
                     <option value="AI CCTV">AI CCTV</option>
                     <option value="센서">센서</option>
                     <option value="PLC">PLC</option>
-                  </Select>
+                  </DropDownMenu>
                 </dd>
               </div>
               <div>
@@ -661,10 +661,10 @@ function EquipmentFailuresPage({ user, onUnauthorized, onUnsavedChange }) {
                       onChange={(deviceId) => updateForm("deviceId", deviceId)}
                     />
                   ) : (
-                    <Select required value={formValues.deviceId} onChange={(event) => updateForm("deviceId", event.target.value)}>
+                    <DropDownMenu required value={formValues.deviceId} onChange={(event) => updateForm("deviceId", event.target.value)}>
                       <option value="">장비를 선택하세요</option>
                       {registrationDeviceOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                    </Select>
+                    </DropDownMenu>
                   )}
                   {formValues.deviceKind === "AI CCTV" && cameraError ? <small className="has-error">카메라 목록을 불러오지 못했습니다.</small> : null}
                   {formValues.deviceKind !== "AI CCTV" && deviceError ? <small className="has-error">장비 목록을 불러오지 못했습니다.</small> : null}
@@ -673,10 +673,10 @@ function EquipmentFailuresPage({ user, onUnauthorized, onUnsavedChange }) {
               <div>
                 <dt>장애 유형</dt>
                 <dd className="is-editing">
-                  <Select required value={formValues.faultTypeCd} onChange={(event) => updateForm("faultTypeCd", event.target.value)}>
+                  <DropDownMenu required value={formValues.faultTypeCd} onChange={(event) => updateForm("faultTypeCd", event.target.value)}>
                     <option value="">선택</option>
                     {faultTypeOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                  </Select>
+                  </DropDownMenu>
                 </dd>
               </div>
               <div>
@@ -715,9 +715,9 @@ function EquipmentFailuresPage({ user, onUnauthorized, onUnsavedChange }) {
                   <dt>처리 상태</dt>
                   {mode === "edit" ? (
                     <dd className="is-editing">
-                      <Select value={formValues.statusCd} onChange={(event) => updateForm("statusCd", event.target.value)}>
+                      <DropDownMenu value={formValues.statusCd} onChange={(event) => updateForm("statusCd", event.target.value)}>
                         {statusOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                      </Select>
+                      </DropDownMenu>
                     </dd>
                   ) : <dd>{statusName.get(currentRow.statusCd) || currentRow.statusCd || "-"}</dd>}
                 </div>
@@ -730,7 +730,7 @@ function EquipmentFailuresPage({ user, onUnauthorized, onUnsavedChange }) {
                 <div>
                   <dt>원인 구분</dt>
                   {mode === "edit" ? (
-                    <dd className="is-editing"><Select value={formValues.causeTypeCd} onChange={(event) => updateForm("causeTypeCd", event.target.value)}><option value="">선택</option>{causeTypes.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</Select></dd>
+                    <dd className="is-editing"><DropDownMenu value={formValues.causeTypeCd} onChange={(event) => updateForm("causeTypeCd", event.target.value)}><option value="">선택</option>{causeTypes.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</DropDownMenu></dd>
                   ) : <dd>{causeTypes.find((option) => option.value === currentRow.causeTypeCd)?.label || currentRow.causeTypeCd || "-"}</dd>}
                 </div>
                 <div>

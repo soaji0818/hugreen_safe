@@ -266,7 +266,7 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
             value={factoryCd}
             disabled={factoryLoading}
             onChange={setFactoryCd}
-            placeholder="전체 공장"
+            placeholder="전체"
             options={factoryCodes}
           />
         </SearchConditions.Row>

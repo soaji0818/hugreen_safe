@@ -9,7 +9,7 @@ import Button from "../../components/atoms/Button/Button";
 import ConfirmDialog from "../../components/molecules/ConfirmDialog/ConfirmDialog";
 import CrudModal from "../../components/organisms/CrudModal/CrudModal";
 import { FileIcon, PlusIcon, SearchIcon, TrashIcon } from "../../components/atoms/Icon/Icon";
-import Select from "../../components/atoms/Select/Select";
+import DropDownMenu from "../../components/atoms/Menu/DropDownMenu";
 import Toast, { TOAST_MESSAGES } from "../../components/molecules/Toast/Toast";
 import useCameraList from "../../hooks/useCameraList";
 import useCommonCodes from "../../hooks/useCommonCodes";
@@ -512,6 +512,7 @@ export function CctvMasterPage({
             value={filters.factoryCd}
             disabled={factoryLoading}
             onChange={(factoryCd) => updateFilters({ factoryCd })}
+            placeholder="전체"
             options={factoryCodes}
           />
           <RadioCondition
@@ -639,7 +640,7 @@ export function CctvMasterPage({
                     : field.key === "useYn" ? `status-${selectedRow.useYn === "N" ? "off" : "on"}` : undefined}
                   >
                     {!editMode || (field.readOnly && !createMode) ? (selectedRow?.[field.label] ?? "-") : field.type === "factory" ? (
-                      <Select
+                      <DropDownMenu
                         name={field.key}
                         aria-label={field.label}
                         aria-invalid={invalidField === field.key}
@@ -650,9 +651,9 @@ export function CctvMasterPage({
                       >
                         <option value="">공장을 선택하세요</option>
                         {factoryCodes.map((code) => <option key={code.value} value={code.value}>{code.label}</option>)}
-                      </Select>
+                      </DropDownMenu>
                     ) : field.type === "use" ? (
-                      <Select
+                      <DropDownMenu
                         name={field.key}
                         aria-label={field.label}
                         aria-invalid={invalidField === field.key}
@@ -663,7 +664,7 @@ export function CctvMasterPage({
                       >
                         <option value="Y">사용</option>
                         <option value="N">미사용</option>
-                      </Select>
+                      </DropDownMenu>
                     ) : (
                       <input
                         name={field.key}

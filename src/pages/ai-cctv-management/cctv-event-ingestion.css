@@ -13,6 +13,7 @@
   padding-top: 0;
 }
 
-.cctv-event-ingestion-page > .work-panel > .filter-panel {
+.cctv-event-ingestion-page > .work-panel > .filter-panel,
+.cctv-event-ingestion-page > .work-panel > .search-conditions {
   display: none;
 }

@@ -15,7 +15,7 @@ import {
   TrashIcon,
 } from "../atoms/Icon/Icon";
 import RadioOption from "../atoms/RadioOption/RadioOption";
-import Select from "../atoms/Select/Select";
+import DropDownMenu from "../atoms/Menu/DropDownMenu";
 import StateEmoji from "../atoms/StateEmoji/StateEmoji";
 import Toast from "../molecules/Toast/Toast";
 import useNativeDialog from "../../hooks/useNativeDialog";
@@ -404,7 +404,7 @@ function DetailPanel({ nodes, selectedId, activeTab, mode, draft, onTab, onEdit,
       <div className="tree-detail-content">
         <div className="tree-section-title">
           <h3>{meta.label} 상세</h3>
-          {displayedNode.values["사용 여부"] && (mode === "view" ? <span className={`usage-chip ${displayedNode.values["사용 여부"] === "사용" ? "on" : "off"}`}>{displayedNode.values["사용 여부"]}</span> : <Select className="usage-select" value={valueOf("사용 여부")} onChange={(event) => onDraft("사용 여부", event.target.value)}><option>사용</option><option>미사용</option></Select>)}
+          {displayedNode.values["사용 여부"] && (mode === "view" ? <span className={`usage-chip ${displayedNode.values["사용 여부"] === "사용" ? "on" : "off"}`}>{displayedNode.values["사용 여부"]}</span> : <DropDownMenu className="usage-select" value={valueOf("사용 여부")} onChange={(event) => onDraft("사용 여부", event.target.value)}><option>사용</option><option>미사용</option></DropDownMenu>)}
         </div>
         <div className="tree-record-grid">
           {fields.map((field) => {
@@ -414,7 +414,7 @@ function DetailPanel({ nodes, selectedId, activeTab, mode, draft, onTab, onEdit,
               <label key={field} className={wide ? "wide" : ""}>
                 <span>{field}</span>
                 {mode === "view" || locked ? <span className={`tree-record-value${locked ? " is-locked" : ""}`}>{valueOf(field) || "-"}</span> : field === "입력 방식" ? (
-                  <Select value={valueOf(field)} onChange={(event) => onDraft(field, event.target.value)}><option value="">선택</option><option>적합·부적합</option><option>수치</option><option>텍스트</option></Select>
+                  <DropDownMenu value={valueOf(field)} onChange={(event) => onDraft(field, event.target.value)}><option value="">선택</option><option>적합·부적합</option><option>수치</option><option>텍스트</option></DropDownMenu>
                 ) : field === "점검 기준" ? <textarea value={valueOf(field)} onChange={(event) => onDraft(field, event.target.value)} /> : <input type={field === "순서" ? "number" : "text"} value={valueOf(field)} onChange={(event) => onDraft(field, event.target.value)} />}
               </label>
             );
@@ -913,7 +913,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                 {conf.filters.slice(1).map((field) => (
                   <label key={field}>
                     <span>{field}</span>
-                    <Select
+                    <DropDownMenu
                       value={query[field] || ""}
                       onChange={(e) =>
                         applyQuery({ ...query, [field]: e.target.value })
@@ -923,7 +923,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                       {options(field, rows).map((item) => (
                         <option key={item}>{item}</option>
                       ))}
-                    </Select>
+                    </DropDownMenu>
                   </label>
                 ))}
               </div>
@@ -1003,7 +1003,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                       ))}
                     </span>
                   ) : (
-                    <Select
+                    <DropDownMenu
                       value={query[f] || ""}
                       onChange={(e) =>
                         applyQuery({ ...query, [f]: e.target.value })
@@ -1013,7 +1013,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                       {options(f, rows).map((x) => (
                         <option key={x}>{x}</option>
                       ))}
-                    </Select>
+                    </DropDownMenu>
                   )}
                 </label>
               ))}
@@ -1361,7 +1361,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                                 {fieldValue(field) || "-"}
                               </span>
                             ) : choices ? (
-                              <Select
+                              <DropDownMenu
                                 aria-label={field}
                                 value={fieldValue(field)}
                                 onChange={(e) =>
@@ -1372,7 +1372,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                                 {choices.map((choice) => (
                                   <option key={choice}>{choice}</option>
                                 ))}
-                              </Select>
+                              </DropDownMenu>
                             ) : (
                               <input
                                 aria-label={field}
@@ -1469,7 +1469,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                                     {inlineDetail && sensorMode === "view" ? (
                                       <span className="detail-field-value">{fieldValue(f) || "-"}</span>
                                     ) : choices ? (
-                                      <Select
+                                      <DropDownMenu
                                         value={fieldValue(f)}
                                         onChange={(e) =>
                                           setDraft({ ...draft, [f]: e.target.value })
@@ -1478,7 +1478,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                                         {choices.map((choice) => (
                                           <option key={choice}>{choice}</option>
                                         ))}
-                                      </Select>
+                                      </DropDownMenu>
                                     ) : /내용|사유|비고|사항|결과|근거자료/.test(f) ? (
                                       <textarea
                                         placeholder={`${f} 입력`}
@@ -1685,25 +1685,25 @@ export default function StandardPage({ pageDefinition, initialRows }) {
           >
             <label>
               설비
-              <Select
+              <DropDownMenu
                 value={newEquipment}
                 onChange={(e) => setNewEquipment(e.target.value)}
               >
                 {initialRows.map((r) => (
                   <option key={r.equipment}>{r.equipment}</option>
                 ))}
-              </Select>
+              </DropDownMenu>
             </label>
             <label>
               이벤트 유형
-              <Select
+              <DropDownMenu
                 value={newType}
                 onChange={(e) => setNewType(e.target.value)}
               >
                 {initialRows.map((r) => (
                   <option key={r.type}>{r.type}</option>
                 ))}
-              </Select>
+              </DropDownMenu>
             </label>
             <p className="subtle">
               샘플 데이터로 등록되며 새로고침하면 초기화됩니다.

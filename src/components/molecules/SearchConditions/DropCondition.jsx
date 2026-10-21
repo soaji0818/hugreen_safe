@@ -1,4 +1,4 @@
-import Select from "../../atoms/Select/Select";
+import DropDownMenu from "../../atoms/Menu/DropDownMenu";
 import "./SearchConditions.css";
 
 export default function DropCondition({
@@ -14,7 +14,7 @@ export default function DropCondition({
     <label className={`search-condition ${className}`.trim()}>
       <span className="search-condition__label">{label}</span>
       <span className="search-condition__content">
-        <Select
+        <DropDownMenu
           aria-label={label}
           value={value}
           disabled={disabled}
@@ -26,7 +26,7 @@ export default function DropCondition({
               {option.label}
             </option>
           ))}
-        </Select>
+        </DropDownMenu>
       </span>
     </label>
   );
