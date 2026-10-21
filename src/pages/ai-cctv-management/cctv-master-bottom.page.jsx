@@ -593,25 +593,18 @@ export function CctvMasterPage({
         </div>
       </SearchConditions>
 
-      <div className="list-actions" aria-label="목록 작업">
-        <span className="table-result-count" role="status">총 {filteredRows.length}건</span>
-        <Button
-          variant="fill"
-          className="danger-button cctv-toolbar-delete"
-          icon={TrashIcon}
-          disabled={selectedIds.length === 0}
-          onClick={() => openDeleteConfirm(selectedIds)}
-        >
-          삭제
-        </Button>
-        <Button variant="fill" icon={PlusIcon} onClick={openCreate}>추가</Button>
-      </div>
-
       <div className={`cctv-master-content${detailPresentation === "shrink-panel" && detailOpen ? " has-shrink-panel" : ""}${detailPresentation === "bottom-panel" && detailOpen ? " has-bottom-panel" : ""}`}>
         <section className="table-panel screen-format-list-detail cctv-master-table" aria-label="조회 결과">
           <DataTable
           columns={columns}
           rows={filteredRows}
+          totalCount={filteredRows.length}
+          toolbarActions={(
+            <>
+              <Button variant="fill" className="danger-button cctv-toolbar-delete" icon={TrashIcon} disabled={selectedIds.length === 0} onClick={() => openDeleteConfirm(selectedIds)}>삭제</Button>
+              <Button variant="fill" icon={PlusIcon} onClick={openCreate}>추가</Button>
+            </>
+          )}
           selectedId={selectedId}
           selectedIds={selectedIds}
           resizableColumns

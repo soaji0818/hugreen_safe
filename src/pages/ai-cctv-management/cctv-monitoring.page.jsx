@@ -272,23 +272,25 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
         </SearchConditions.Row>
       </SearchConditions>
 
-      <div className="list-actions" aria-label="목록 작업">
-        <span className="table-result-count" role="status">총 {rows.length}건</span>
-        <button
-          type="button"
-          className="text-btn cctv-monitoring-refresh"
-          disabled={loading}
-          onClick={refetch}
-        >
-          <ResetIcon size={15} aria-hidden="true" />
-          새로고침
-        </button>
-      </div>
-
       <section className="table-panel screen-format-list cctv-monitoring-result-table" aria-label="조회 결과">
         <DataTable
           columns={columns}
           rows={rows}
+          totalCount={rows.length}
+          toolbarActions={(
+            <Button
+              type="button"
+              variant="text"
+              size="small"
+              className="cctv-monitoring-refresh"
+              icon={ResetIcon}
+              iconSize={15}
+              disabled={loading}
+              onClick={refetch}
+            >
+              새로고침
+            </Button>
+          )}
           selectable={false}
           selectedId={selectedId}
           verticalScroll

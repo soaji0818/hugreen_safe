@@ -9,7 +9,8 @@ import Badge from "../../components/atoms/Badge/Badge";
 import Button from "../../components/atoms/Button/Button";
 import ConfirmDialog from "../../components/molecules/ConfirmDialog/ConfirmDialog";
 import CrudModal from "../../components/organisms/CrudModal/CrudModal";
-import { PlusIcon, SearchIcon } from "../../components/atoms/Icon/Icon";
+import { PlusIcon } from "../../components/atoms/Icon/Icon";
+import TableEmptyState from "../../components/molecules/EmptyState/TableEmptyState";
 import DropDownMenu from "../../components/atoms/Menu/DropDownMenu";
 import Toast from "../../components/molecules/Toast/Toast";
 import useCommonCodes from "../../hooks/useCommonCodes";
@@ -576,15 +577,12 @@ function EquipmentFailuresPage({ user, onUnauthorized, onUnsavedChange }) {
         </SearchConditions.Row>
       </SearchConditions>
 
-      <div className="list-actions" aria-label="장애 목록 작업">
-        <span className="table-result-count" role="status">총 {visibleRows.length}건</span>
-        <Button variant="fill" icon={PlusIcon} onClick={openCreate}>추가</Button>
-      </div>
-
       <div className="table-panel screen-format-list-detail failure-table-panel">
         <DataTable
           columns={columns}
           rows={visibleRows}
+          totalCount={visibleRows.length}
+          toolbarActions={<Button variant="fill" icon={PlusIcon} onClick={openCreate}>추가</Button>}
           selectable={false}
           selectedId={selectedId}
           onRowClick={openDetail}
@@ -601,12 +599,7 @@ function EquipmentFailuresPage({ user, onUnauthorized, onUnsavedChange }) {
             </tr>
           ) : undefined}
           emptyState={loading ? <></> : (
-            <div className="empty failure-empty-state">
-              <SearchIcon size={48} aria-hidden="true" />
-              <h3>검색 결과가 없습니다</h3>
-              <p>검색 조건을 변경하거나 초기화해 주세요.</p>
-              <Button variant="weak" onClick={resetFilters}>조건 초기화</Button>
-            </div>
+            <TableEmptyState onAction={resetFilters} />
           )}
         />
       </div>

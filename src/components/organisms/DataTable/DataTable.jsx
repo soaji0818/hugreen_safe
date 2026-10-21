@@ -1,17 +1,23 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+// 데이터 테이블 컴포넌트
+// 선택 가능한 행, 정렬, 열 크기 조절, 툴바 액션 등을 지원하는 테이블 컴포넌트
+import { Children, Fragment, cloneElement, isValidElement, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import Button from "../../atoms/Button/Button";
 import Checkbox from "../../atoms/Checkbox/Checkbox";
+import TableEmptyState from "../../molecules/EmptyState/TableEmptyState";
+import useColumnResize from "../../../hooks/useColumnResize";
+import "./DataTable.css";
 
-const MIN_COLUMN_WIDTH = 72;
-
+// TruncatedCellText 컴포넌트는 셀의 텍스트가 잘리는 경우, 마우스 오버 시 전체 텍스트를 보여주는 기능 제공
 function TruncatedCellText({ value, onReveal, onHide }) {
   const textRef = useRef(null);
-  const [truncated, setTruncated] = useState(false);
+  const [truncated, setTruncated] = useState(false);  
 
   useLayoutEffect(() => {
     const text = textRef.current;
     if (!text) return undefined;
 
+    // 잘렸는지 검사
     const updateTruncation = () => {
       setTruncated(text.scrollWidth > text.clientWidth + 1);
     };
@@ -21,6 +27,7 @@ function TruncatedCellText({ value, onReveal, onHide }) {
     return () => resizeObserver.disconnect();
   }, [value]);
 
+  // 마우스 오버, 포커스 시 전체 텍스트를 보여주는 기능
   return (
     <span
       ref={textRef}
@@ -44,10 +51,40 @@ function TruncatedCellText({ value, onReveal, onHide }) {
   );
 }
 
+function normalizeColumn(column) {
+  if (typeof column === "string") {
+    return { key: column, label: column };
+  }
+
+  return {
+    key: column.key ?? column.label,
+    label: column.label ?? column.key,
+    width: column.width,
+  };
+}
+
+// 툴바 버튼 크기 설정 (small)
+function sizeToolbarButtons(actions) {
+  return Children.map(actions, (action) => {
+    if (!isValidElement(action)) return action;
+    if (action.type === Button) {
+      return cloneElement(action, { size: action.props.size ?? "small" });
+    }
+    if (action.type === Fragment) {
+      return cloneElement(action, { children: sizeToolbarButtons(action.props.children) });
+    }
+    return action;
+  });
+}
+
+// 설정값
 export default function DataTable({
   columns,
   rows,
   selectable = true,
+  totalCount = rows.length,
+  toolbarActions,
+  showToolbar = true,
   selectedId,
   selectedIds = [],
   sortColumn,
@@ -60,18 +97,32 @@ export default function DataTable({
   renderCell,
   stateRow,
   emptyState,
-  emptyTitle = "검색 결과가 없습니다",
-  emptyDescription = "검색 조건을 변경하거나 초기화해 주세요.",
-  emptyResetLabel = "조건 초기화",
+  emptyTitle,
+  emptyDescription,
+  emptyResetLabel,
   onEmptyReset,
   resizableColumns = false,
   verticalScroll = false,
   className = "",
 }) {
-  const [columnWidths, setColumnWidths] = useState([]);
-  const [tableWidth, setTableWidth] = useState(null);
+  const tableColumns = columns.map(normalizeColumn);
+  const hasColumnWidths = tableColumns.some((column) => column.width != null);
+  const fixedTableWidth = tableColumns.length > 0 && tableColumns.every((column) => typeof column.width === "number" && column.width > 0)
+    ? tableColumns.reduce((width, column) => width + column.width, selectable ? 42 : 0)
+    : null;
+  // 컬럼 너비 조절 hook
+  const {
+    columnWidths,
+    tableWidth,
+    startResize,
+    moveResize,
+    stopResize,
+    resizeWithKeyboard,
+    resetColumnWidths,
+  } = useColumnResize(tableColumns);
+
+  // 선택된 행 상태 관리
   const [revealedText, setRevealedText] = useState(null);
-  const resizeState = useRef(null);
   const selectAllRef = useRef(null);
   const visibleRowIds = rows.map((row) => row.id);
   const selectedVisibleCount = visibleRowIds.filter((id) => selectedIds.includes(id)).length;
@@ -84,6 +135,7 @@ export default function DataTable({
     }
   }, [someVisibleRowsSelected]);
 
+  // 팝오버 닫기
   useEffect(() => {
     if (!revealedText) return undefined;
     const close = () => setRevealedText(null);
@@ -100,6 +152,7 @@ export default function DataTable({
     };
   }, [revealedText]);
 
+  // 팝오버 열기
   const revealCellText = (text, target) => {
     const rect = target.getBoundingClientRect();
     const maxWidth = Math.min(420, window.innerWidth - 24);
@@ -113,68 +166,7 @@ export default function DataTable({
     });
   };
 
-  const measureColumns = (table) => columns.map((_, index) =>
-    table.querySelector(`th[data-column-index="${index}"]`)?.offsetWidth || MIN_COLUMN_WIDTH,
-  );
-
-  const resizeColumn = (widths, index, delta) => {
-    const currentWidth = widths[index];
-    const nextWidth = Math.max(MIN_COLUMN_WIDTH, currentWidth + delta);
-    const nextWidths = [...widths];
-    nextWidths[index] = nextWidth;
-    return { widths: nextWidths, appliedDelta: nextWidth - currentWidth };
-  };
-
-  const startResize = (event, index) => {
-    if (event.button !== 0) return;
-    const table = event.currentTarget.closest("table");
-    if (!table) return;
-
-    resizeState.current = {
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      index,
-      widths: measureColumns(table),
-      tableWidth: table.offsetWidth,
-      scale: table.getBoundingClientRect().width / table.offsetWidth || 1,
-    };
-    event.currentTarget.setPointerCapture(event.pointerId);
-    event.preventDefault();
-    event.stopPropagation();
-  };
-
-  const moveResize = (event) => {
-    const resize = resizeState.current;
-    if (!resize || resize.pointerId !== event.pointerId) return;
-    const result = resizeColumn(
-      resize.widths,
-      resize.index,
-      (event.clientX - resize.startX) / resize.scale,
-    );
-    setColumnWidths(result.widths);
-    setTableWidth(resize.tableWidth + result.appliedDelta);
-  };
-
-  const stopResize = (event) => {
-    if (resizeState.current?.pointerId !== event.pointerId) return;
-    resizeState.current = null;
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-  };
-
-  const resizeWithKeyboard = (event, index) => {
-    if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
-    const table = event.currentTarget.closest("table");
-    if (!table) return;
-
-    event.preventDefault();
-    const widths = columnWidths.length ? columnWidths : measureColumns(table);
-    const result = resizeColumn(widths, index, event.key === 'ArrowRight' ? 10 : -10);
-    setColumnWidths(result.widths);
-    setTableWidth((current) => (current || table.offsetWidth) + result.appliedDelta);
-  };
-
+  // 전체 선택/해제 토글
   const toggleAllRows = (checked) => {
     if (onToggleAll) {
       onToggleAll(visibleRowIds, checked);
@@ -189,6 +181,7 @@ export default function DataTable({
   const tableClassName = [
     selectable ? "" : "no-row-selection",
     resizableColumns ? "resizable-table" : "",
+    hasColumnWidths ? "has-column-widths" : "",
     columnWidths.length ? "columns-resized" : "",
   ].filter(Boolean).join(" ");
 
@@ -199,22 +192,34 @@ export default function DataTable({
     resizableColumns ? "resizable-table-scroll" : "",
     columnWidths.length ? "columns-resized-scroll" : "",
   ].filter(Boolean).join(" ");
+  const resolvedTableWidth = tableWidth ?? fixedTableWidth;
 
+//데이터 테이블 구현
   return (
-    <div
+    <div className="data-table">
+      {showToolbar && (
+        <div className="list-actions data-table-toolbar" aria-label="목록 작업">
+          <span className="table-result-count" role="status">총 {totalCount}건</span>
+          {toolbarActions && (
+            <div className="data-table-toolbar__actions">{sizeToolbarButtons(toolbarActions)}</div>
+          )}
+        </div>
+      )}
+      <div
       className={scrollClassName}
       tabIndex={0}
       aria-label={verticalScroll ? "결과 표 스크롤" : "결과 표 가로 스크롤"}
     >
       <table
         className={tableClassName || undefined}
-        style={tableWidth ? { width: `${tableWidth}px` } : undefined}
+        style={resolvedTableWidth != null ? { width: `${resolvedTableWidth}px` } : undefined}
       >
         <colgroup>
           {selectable && <col className="selection-column-width" />}
-          {columns.map((column, index) => (
-            <col key={column} style={columnWidths[index] ? { width: `${columnWidths[index]}px` } : undefined} />
-          ))}
+          {tableColumns.map((column, index) => {
+            const width = columnWidths[index] ?? column.width;
+            return <col key={column.key} style={width != null ? { width } : undefined} />;
+          })}
         </colgroup>
         <thead>
           <tr>
@@ -231,25 +236,25 @@ export default function DataTable({
                 />
               </th>
             )}
-            {columns.map((column, columnIndex) => (
+            {tableColumns.map((column, columnIndex) => (
               <th
-                key={column}
+                key={column.key}
                 scope="col"
                 data-column-index={columnIndex}
-                aria-sort={column === sortColumn
+                aria-sort={column.key === sortColumn
                   ? sortAscending ? "ascending" : "descending"
                   : undefined}
               >
-                {column === sortColumn ? (
+                {column.key === sortColumn ? (
                   <button type="button" className="sort-button" onClick={onSort}>
-                    {column} {sortAscending ? "↑" : "↓"}
+                    {column.label} {sortAscending ? "↑" : "↓"}
                   </button>
-                ) : column}
+                ) : column.label}
                 {resizableColumns && (
                   <span
                     className="column-resize-handle"
                     role="separator"
-                    aria-label={`${column} 열 너비 조절`}
+                    aria-label={`${column.label} 열 너비 조절`}
                     aria-orientation="vertical"
                     tabIndex={0}
                     onPointerDown={(event) => startResize(event, columnIndex)}
@@ -257,10 +262,7 @@ export default function DataTable({
                     onPointerUp={stopResize}
                     onPointerCancel={stopResize}
                     onKeyDown={(event) => resizeWithKeyboard(event, columnIndex)}
-                    onDoubleClick={() => {
-                      setColumnWidths([]);
-                      setTableWidth(null);
-                    }}
+                    onDoubleClick={resetColumnWidths}
                   />
                 )}
               </th>
@@ -292,13 +294,13 @@ export default function DataTable({
                     />
                   </td>
                 )}
-                {columns.map((column, columnIndex) => {
-                  const content = renderCell(row, column, rowIndex);
+                {tableColumns.map((column, columnIndex) => {
+                  const content = renderCell ? renderCell(row, column.key, rowIndex) : row[column.key];
                   const isText = typeof content === "string" || typeof content === "number";
                   return (
                     <td
-                      key={column}
-                      className={columnIndex === 0 && /ID|번호/.test(column) ? "identifier" : ""}
+                      key={column.key}
+                      className={columnIndex === 0 && /ID|번호/.test(column.label) ? "identifier" : ""}
                     >
                       {isText ? (
                         <TruncatedCellText
@@ -316,15 +318,12 @@ export default function DataTable({
         </tbody>
       </table>
       {!rows.length && !stateRow && (emptyState || (
-        <div className="empty">
-          <h3>{emptyTitle}</h3>
-          <p>{emptyDescription}</p>
-          {onEmptyReset && (
-            <button type="button" className="secondary" onClick={onEmptyReset}>
-              {emptyResetLabel}
-            </button>
-          )}
-        </div>
+        <TableEmptyState
+          title={emptyTitle}
+          description={emptyDescription}
+          actionLabel={emptyResetLabel}
+          onAction={onEmptyReset}
+        />
       ))}
       {revealedText && createPortal(
         <div
@@ -341,6 +340,7 @@ export default function DataTable({
         </div>,
         document.body,
       )}
+      </div>
     </div>
   );
 }

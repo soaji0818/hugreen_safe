@@ -22,3 +22,21 @@ Search condition building blocks live in `molecules/SearchConditions` and are co
   </SearchConditions.Row>
 </SearchConditions>
 ```
+
+`DataTable`의 `columns`는 기존 문자열 배열과 컬럼 설정 객체를 함께 사용할 수 있습니다. `width`에는 픽셀 숫자 또는 CSS 너비 문자열을 전달합니다.
+
+```jsx
+<DataTable
+  columns={[
+    { key: "cameraId", label: "카메라 ID", width: 140 },
+    { key: "cameraName", label: "카메라명", width: 240 },
+    { key: "status", label: "상태", width: 120 },
+  ]}
+  rows={rows}
+  selectable={false}
+/>
+```
+
+`renderCell`을 사용하면 두 번째 인자로 컬럼의 `key`가 전달됩니다. 헤더 크기 조절을 켠 경우 조절 핸들을 두 번 클릭하면 설정한 너비로 돌아갑니다.
+
+`toolbarActions`에 전달한 `Button`은 크기를 지정하지 않으면 `small`로 표시됩니다. 개별 버튼에 `size`를 지정하면 해당 설정을 사용합니다.

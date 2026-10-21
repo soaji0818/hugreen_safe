@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import DataTable from "../organisms/DataTable/DataTable";
 import Pagination from "../molecules/Pagination/Pagination";
+import TableEmptyState from "../molecules/EmptyState/TableEmptyState";
 import SearchConditions from "../organisms/SearchConditions/SearchConditions";
 import Badge from "../atoms/Badge/Badge";
 import Button from "../atoms/Button/Button";
@@ -1020,50 +1021,6 @@ export default function StandardPage({ pageDefinition, initialRows }) {
               <span className="filter-empty empty-one" aria-hidden="true" />
             </div>
           </SearchConditions>}
-          {conf.layout !== "tree" && (
-            <div className="list-actions" aria-label="목록 작업">
-              <span className="table-result-count" role="status">총 {sorted.length}건</span>
-              {canExport && (
-                <Button variant="weak" className="export-button" icon={DownloadIcon} onClick={exportCsv}>
-                  엑셀 내보내기
-                </Button>
-              )}
-              {conf.download && (
-                <Button
-                  variant="weak"
-                  icon={DownloadIcon}
-                  disabled={!row}
-                  onClick={downloadSnapshot}
-                >
-                  스냅샷 내려받기
-                </Button>
-              )}
-              {supportsDelete && selectedRows.length > 0 && (
-                <Button
-                  variant="fill"
-                  className="danger-button"
-                  icon={TrashIcon}
-                  disabled={!deletableSelectedRows.length}
-                  onClick={() => setModal("delete")}
-                >
-                  삭제
-                </Button>
-              )}
-              {canCreate && selectedRows.length === 0 && (
-                <Button
-                  variant="fill"
-                  icon={PlusIcon}
-                  onClick={() =>
-                    conf.detail === "sensor"
-                      ? beginSensorCreate()
-                      : setModal("add")
-                  }
-                >
-                  {conf.actions.createLabel || "추가"}
-                </Button>
-              )}
-            </div>
-          )}
           {conf.layout === "tree" ? (
             <section className="tree-editor-panel" aria-label="점검 문서 및 목차 편집">
               <TreeView
@@ -1111,6 +1068,31 @@ export default function StandardPage({ pageDefinition, initialRows }) {
             <DataTable
               columns={conf.cols}
               rows={visible}
+              totalCount={sorted.length}
+              toolbarActions={(
+                <>
+                  {canExport && (
+                    <Button variant="weak" className="export-button" icon={DownloadIcon} onClick={exportCsv}>
+                      엑셀 내보내기
+                    </Button>
+                  )}
+                  {conf.download && (
+                    <Button variant="weak" icon={DownloadIcon} disabled={!row} onClick={downloadSnapshot}>
+                      스냅샷 내려받기
+                    </Button>
+                  )}
+                  {supportsDelete && selectedRows.length > 0 && (
+                    <Button variant="fill" className="danger-button" icon={TrashIcon} disabled={!deletableSelectedRows.length} onClick={() => setModal("delete")}>
+                      삭제
+                    </Button>
+                  )}
+                  {canCreate && selectedRows.length === 0 && (
+                    <Button variant="fill" icon={PlusIcon} onClick={() => conf.detail === "sensor" ? beginSensorCreate() : setModal("add")}>
+                      {conf.actions.createLabel || "추가"}
+                    </Button>
+                  )}
+                </>
+              )}
               selectable={showRowSelection}
               selectedId={selected}
               selectedIds={selectedRows}
@@ -1136,23 +1118,14 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                 ) : raw(column, item, index)
               }
               emptyState={(
-                <div className="empty">
-                  <StateEmoji code="u1F50D" size={52} />
-                  <h3>조회 결과가 없습니다</h3>
-                  <p>기간이나 상태 조건을 변경해 보세요.</p>
-                  <button
-                    type="button"
-                    className="secondary"
-                    onClick={() => {
-                      setApplied({});
-                      setQuery({});
-                      setStatus("전체");
-                      setPage(1);
-                    }}
-                  >
-                    조건 초기화
-                  </button>
-                </div>
+                <TableEmptyState
+                  onAction={() => {
+                    setApplied({});
+                    setQuery({});
+                    setStatus("전체");
+                    setPage(1);
+                  }}
+                />
               )}
             />
             {conf.layout === "snapshot" && (
@@ -1195,33 +1168,24 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                   {row && <span>{row.equipment}</span>}
                 </div>
                 <div className="equipment-events-table">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>이벤트ID</th>
-                        <th>발생일시</th>
-                        <th>이벤트 유형</th>
-                        <th>위험 단계</th>
-                        <th>처리 상태</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(row ? initialRows.slice(0, 3) : []).map((item) => (
-                        <tr key={item.id}>
-                          <td>{item.id}</td>
-                          <td><span className="date-line">{formatDateTime(item.time)}</span></td>
-                          <td>{item.type}</td>
-                          <td><StatusBadge value={item.level} /></td>
-                          <td><StatusBadge value={item.status} /></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  {!row && (
-                    <p className="equipment-events-empty">
-                      위 목록에서 장비를 선택해 주세요.
-                    </p>
-                  )}
+                  <DataTable
+                    columns={["이벤트ID", "발생일시", "이벤트 유형", "위험 단계", "처리 상태"]}
+                    rows={row ? initialRows.slice(0, 3) : []}
+                    selectable={false}
+                    showToolbar={false}
+                    renderCell={(item, column) => {
+                      if (column === "이벤트ID") return item.id;
+                      if (column === "발생일시") return <span className="date-line">{formatDateTime(item.time)}</span>;
+                      if (column === "이벤트 유형") return item.type;
+                      if (column === "위험 단계") return <StatusBadge value={item.level} />;
+                      return <StatusBadge value={item.status} />;
+                    }}
+                    emptyState={(
+                      <p className="equipment-events-empty">
+                        {row ? "해당 장비의 이벤트가 없습니다." : "위 목록에서 장비를 선택해 주세요."}
+                      </p>
+                    )}
+                  />
                 </div>
               </section>
             )}
