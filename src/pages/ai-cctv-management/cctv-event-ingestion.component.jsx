@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import DateCondition from "../../components/molecules/SearchConditions/DateCondition";
 import DropCondition from "../../components/molecules/SearchConditions/DropCondition";
 import SearchConditions from "../../components/organisms/SearchConditions/SearchConditions";
+import ContentTable from "../../components/templates/ContentTable/ContentTable";
 import StandardPage from "../../components/page/StandardPage";
 import "./cctv-event-ingestion.css";
 
@@ -65,45 +66,47 @@ export default function CctvEventIngestionPage({ pageDefinition, initialRows = [
 
   return (
     <div className="cctv-event-ingestion-page">
-      <SearchConditions onReset={resetFilters}>
-        <DateCondition
-          startDate={filters.startDate}
-          endDate={filters.endDate}
-          period={filters.period}
-          onStartDateChange={(value) => updateDate("startDate", value)}
-          onEndDateChange={(value) => updateDate("endDate", value)}
-          onPeriodChange={(period) => setFilters((current) => ({
-            ...current,
-            ...getRange(period, current.endDate || current.startDate || dateValue(new Date())),
-          }))}
+      <ContentTable>
+        <SearchConditions onReset={resetFilters}>
+          <DateCondition
+            startDate={filters.startDate}
+            endDate={filters.endDate}
+            period={filters.period}
+            onStartDateChange={(value) => updateDate("startDate", value)}
+            onEndDateChange={(value) => updateDate("endDate", value)}
+            onPeriodChange={(period) => setFilters((current) => ({
+              ...current,
+              ...getRange(period, current.endDate || current.startDate || dateValue(new Date())),
+            }))}
+          />
+          <DropCondition
+            label="카메라"
+            value={filters.camera}
+            placeholder="전체 카메라"
+            options={cameraOptions}
+            onChange={(value) => updateFilter("camera", value)}
+          />
+          <DropCondition
+            label="이벤트 유형"
+            value={filters.eventType}
+            placeholder="전체 이벤트 유형"
+            options={eventTypeOptions}
+            onChange={(value) => updateFilter("eventType", value)}
+          />
+          <DropCondition
+            label="확인 상태"
+            value={filters.status}
+            placeholder="전체 확인 상태"
+            options={STATUS_OPTIONS}
+            onChange={(value) => updateFilter("status", value)}
+          />
+        </SearchConditions>
+        <StandardPage
+          {...pageProps}
+          pageDefinition={pageWithoutBuiltInFilters}
+          initialRows={initialRows}
         />
-        <DropCondition
-          label="카메라"
-          value={filters.camera}
-          placeholder="전체 카메라"
-          options={cameraOptions}
-          onChange={(value) => updateFilter("camera", value)}
-        />
-        <DropCondition
-          label="이벤트 유형"
-          value={filters.eventType}
-          placeholder="전체 이벤트 유형"
-          options={eventTypeOptions}
-          onChange={(value) => updateFilter("eventType", value)}
-        />
-        <DropCondition
-          label="확인 상태"
-          value={filters.status}
-          placeholder="전체 확인 상태"
-          options={STATUS_OPTIONS}
-          onChange={(value) => updateFilter("status", value)}
-        />
-      </SearchConditions>
-      <StandardPage
-        {...pageProps}
-        pageDefinition={pageWithoutBuiltInFilters}
-        initialRows={initialRows}
-      />
+      </ContentTable>
     </div>
   );
 }

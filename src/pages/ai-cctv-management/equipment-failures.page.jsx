@@ -1,6 +1,7 @@
 /* oxlint-disable react/only-export-components -- Page metadata and its component intentionally share this module. */
 import { useEffect, useMemo, useRef, useState } from "react";
 import DataTable from "../../components/organisms/DataTable/DataTable";
+import ContentTable from "../../components/templates/ContentTable/ContentTable";
 import SearchConditions from "../../components/organisms/SearchConditions/SearchConditions";
 import DateCondition from "../../components/molecules/SearchConditions/DateCondition";
 import RadioCondition from "../../components/molecules/SearchConditions/RadioConditioin";
@@ -527,6 +528,7 @@ function EquipmentFailuresPage({ user, onUnauthorized, onUnsavedChange }) {
 
   return (
     <section className="work-panel failure-management-page">
+      <ContentTable>
       <SearchConditions className="standard-filter-panel failure-filter-panel" onReset={resetFilters}>
         <SearchConditions.Row columns={1} className="failure-filter-grid">
           <DateCondition
@@ -603,6 +605,7 @@ function EquipmentFailuresPage({ user, onUnauthorized, onUnsavedChange }) {
           )}
         />
       </div>
+      </ContentTable>
 
       <CrudModal
         ref={detailDialog}

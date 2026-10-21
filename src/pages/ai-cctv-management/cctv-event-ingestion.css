@@ -4,16 +4,7 @@
   flex-direction: column;
 }
 
-.cctv-event-ingestion-page > .search-conditions {
-  flex: none;
-  margin: 20px 24px 16px;
-}
-
-.cctv-event-ingestion-page > .work-panel {
-  padding-top: 0;
-}
-
-.cctv-event-ingestion-page > .work-panel > .filter-panel,
-.cctv-event-ingestion-page > .work-panel > .search-conditions {
+.cctv-event-ingestion-page > .content-table > .work-panel > .filter-panel,
+.cctv-event-ingestion-page > .content-table > .work-panel > .search-conditions {
   display: none;
 }

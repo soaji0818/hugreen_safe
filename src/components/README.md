@@ -8,6 +8,17 @@ The component tree follows Atomic Design boundaries:
 - `templates`: page-level layout composition
 - `page/StandardPage.jsx`: shared page composition retained outside the Atomic Design layers
 
+`templates/ContentTable`은 조회조건과 결과 영역을 한 열·두 행 그리드로 배치하고 공통 바깥 여백을 관리합니다. 첫 번째 자식은 `SearchConditions`, 두 번째 자식은 `DataTable`을 담은 결과 영역으로 둡니다. 조회조건 내부의 열 수는 계속 `SearchConditions.Row`에서 설정합니다.
+
+```jsx
+<ContentTable>
+  <SearchConditions onReset={resetFilters}>...</SearchConditions>
+  <section className="table-panel" aria-label="조회 결과">
+    <DataTable columns={columns} rows={rows} />
+  </section>
+</ContentTable>
+```
+
 Search condition building blocks live in `molecules/SearchConditions` and are composed by `organisms/SearchConditions`. Use `SearchConditions.Row` to control how many condition molecules appear on each line. Direct children still form one automatically sized row when no row wrappers are used.
 
 ```jsx

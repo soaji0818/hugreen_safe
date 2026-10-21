@@ -1,6 +1,7 @@
 /* oxlint-disable react/only-export-components -- Page metadata and its dedicated component intentionally share this module. */
 import { useEffect, useMemo, useRef, useState } from "react";
 import DataTable from "../../components/organisms/DataTable/DataTable";
+import ContentTable from "../../components/templates/ContentTable/ContentTable";
 import SearchConditions from "../../components/organisms/SearchConditions/SearchConditions";
 import Badge from "../../components/atoms/Badge/Badge";
 import Button from "../../components/atoms/Button/Button";
@@ -485,6 +486,7 @@ export function CctvMasterPage({
       className={`work-panel screen-format-list-detail cctv-master-page${detailPresentation === "shrink-panel" && detailOpen ? " is-shrink-panel-open" : ""}`}
       aria-label="AI CCTV 기준정보 관리 업무 영역"
     >
+      <ContentTable>
       <SearchConditions
         className="standard-filter-panel"
         ariaLabel="AI CCTV 기준정보 관리 조회 조건"
@@ -747,6 +749,7 @@ export function CctvMasterPage({
           </CrudModal>
         )}
       </div>
+      </ContentTable>
 
       <ConfirmDialog
         open={leaveConfirmOpen}

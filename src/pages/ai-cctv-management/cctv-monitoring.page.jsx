@@ -1,6 +1,7 @@
 /* oxlint-disable react/only-export-components -- Page metadata and its dedicated component intentionally share this module. */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import DataTable from "../../components/organisms/DataTable/DataTable";
+import ContentTable from "../../components/templates/ContentTable/ContentTable";
 import SearchConditions from "../../components/organisms/SearchConditions/SearchConditions";
 import DropCondition from "../../components/molecules/SearchConditions/DropCondition";
 import Badge from "../../components/atoms/Badge/Badge";
@@ -259,6 +260,7 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
 
   return (
     <section className="work-panel screen-format-list cctv-monitoring-page" aria-label="AI CCTV 상태 모니터링 업무 영역">
+      <ContentTable>
       <SearchConditions className="standard-filter-panel" onReset={resetFilters}>
         <SearchConditions.Row columns={1} className="cctv-monitoring-filter-grid">
           <DropCondition
@@ -332,6 +334,7 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
           ) : undefined}
         />
       </section>
+      </ContentTable>
 
       {selectedRow && (
         <CrudModal
