@@ -1,5 +1,5 @@
 import { useId } from "react";
-import RadioOption from "../../atoms/RadioOption/RadioOption";
+import Checkbox from "../../atoms/Checkbox/Checkbox";
 import "./SearchConditions.css";
 
 const DEFAULT_PERIODS = [
@@ -49,7 +49,7 @@ export default function DateCondition({
         </div>
         <div className="search-condition__periods" role="radiogroup" aria-label={`${label} 빠른 선택`}>
           {periods.map((option) => (
-            <RadioOption
+            <Checkbox inputType="radio" shape="circle"
               key={option.value}
               name={radioName}
               value={option.value}
@@ -58,7 +58,7 @@ export default function DateCondition({
               onChange={() => onPeriodChange?.(option.value)}
             >
               {option.label}
-            </RadioOption>
+            </Checkbox>
           ))}
         </div>
       </div>

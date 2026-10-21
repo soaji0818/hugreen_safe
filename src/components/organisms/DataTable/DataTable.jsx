@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import Checkbox from "../../atoms/Checkbox/Checkbox";
 
 const MIN_COLUMN_WIDTH = 72;
 
@@ -219,9 +220,10 @@ export default function DataTable({
           <tr>
             {selectable && (
               <th className="selection-col" scope="col">
-                <input
+                <Checkbox
                   ref={selectAllRef}
-                  type="checkbox"
+                  inputType="checkbox"
+                  shape="square"
                   aria-label={allVisibleRowsSelected ? "전체 선택 해제" : "전체 선택"}
                   checked={allVisibleRowsSelected}
                   disabled={visibleRowIds.length === 0}
@@ -280,8 +282,9 @@ export default function DataTable({
               >
                 {selectable && (
                   <td className="selection-cell">
-                    <input
-                      type="checkbox"
+                    <Checkbox
+                      inputType="checkbox"
+                      shape="square"
                       aria-label={`${row.id} 선택`}
                       checked={selectedIds.includes(row.id)}
                       onChange={() => onToggleRow?.(row.id)}

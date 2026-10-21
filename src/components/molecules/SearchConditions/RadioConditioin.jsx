@@ -1,5 +1,5 @@
 import { useId } from "react";
-import RadioOption from "../../atoms/RadioOption/RadioOption";
+import Checkbox from "../../atoms/Checkbox/Checkbox";
 import "./SearchConditions.css";
 
 export default function RadioConditioin({
@@ -18,7 +18,7 @@ export default function RadioConditioin({
       <span className="search-condition__label">{label}</span>
       <div className="search-condition__content search-condition__radios" role="radiogroup" aria-label={label}>
         {options.map((option) => (
-          <RadioOption
+          <Checkbox inputType="radio" shape="circle"
             key={option.value}
             name={name || generatedName}
             value={option.value}
@@ -27,7 +27,7 @@ export default function RadioConditioin({
             onChange={() => onChange?.(option.value)}
           >
             {option.label}
-          </RadioOption>
+          </Checkbox>
         ))}
       </div>
     </div>

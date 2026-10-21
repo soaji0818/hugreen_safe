@@ -1,0 +1,45 @@
+.checkbox-option {
+  width: auto;
+  min-height: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-subtle);
+  font-size: var(--type-label-size);
+  font-weight: var(--font-weight-medium, 550);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.checkbox__control.checkbox__control--small {
+  width: 14px;
+  height: 14px;
+}
+
+.checkbox__control.checkbox__control--medium {
+  width: 18px;
+  height: 18px;
+}
+
+.checkbox__control.checkbox__control--large {
+  width: 20px;
+  height: 20px;
+}
+
+.checkbox__control.checkbox__control--circle {
+  border-radius: 50%;
+}
+
+.checkbox__control.checkbox__control--square {
+  border-radius: 5px;
+}
+
+.checkbox-option:has(.checkbox__control:disabled),
+.radio-option:has(.checkbox__control:disabled) {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.checkbox__control:disabled {
+  cursor: not-allowed;
+}

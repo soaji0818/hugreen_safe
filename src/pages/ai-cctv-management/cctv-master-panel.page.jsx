@@ -7,7 +7,7 @@ import Button from "../../components/atoms/Button/Button";
 import ConfirmDialog from "../../components/molecules/ConfirmDialog/ConfirmDialog";
 import CrudModal from "../../components/organisms/CrudModal/CrudModal";
 import { FileIcon, PlusIcon, ResetIcon, SearchIcon, TrashIcon } from "../../components/atoms/Icon/Icon";
-import RadioOption from "../../components/atoms/RadioOption/RadioOption";
+import Checkbox from "../../components/atoms/Checkbox/Checkbox";
 import DropDownMenu from "../../components/atoms/Menu/DropDownMenu";
 import Toast, { TOAST_MESSAGES } from "../../components/molecules/Toast/Toast";
 import useCameraList from "../../hooks/useCameraList";
@@ -517,7 +517,7 @@ export function CctvMasterPage({
             <span>집중감시구역 여부</span>
             <span className="radio-options" role="radiogroup" aria-label="집중감시구역 여부">
               {[{ label: "전체", value: "" }, { label: "집중감시", value: "Y" }, { label: "일반구역", value: "N" }].map((option) => (
-                <RadioOption
+                <Checkbox inputType="radio" shape="circle"
                   key={option.value || "all"}
                   name="cctv-focus"
                   value={option.value}
@@ -525,7 +525,7 @@ export function CctvMasterPage({
                   onChange={() => updateFilters({ focusYn: option.value })}
                 >
                   {option.label}
-                </RadioOption>
+                </Checkbox>
               ))}
             </span>
           </label>
@@ -533,7 +533,7 @@ export function CctvMasterPage({
             <span>사용 여부</span>
             <span className="radio-options" role="radiogroup" aria-label="사용 여부">
               {[{ label: "전체", value: "" }, { label: "사용", value: "Y" }, { label: "미사용", value: "N" }].map((option) => (
-                <RadioOption
+                <Checkbox inputType="radio" shape="circle"
                   key={option.label}
                   name="cctv-use"
                   value={option.value}
@@ -541,7 +541,7 @@ export function CctvMasterPage({
                   onChange={() => updateFilters({ useYn: option.value })}
                 >
                   {option.label}
-                </RadioOption>
+                </Checkbox>
               ))}
             </span>
           </label>

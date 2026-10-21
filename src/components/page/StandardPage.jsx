@@ -14,7 +14,7 @@ import {
   SearchIcon,
   TrashIcon,
 } from "../atoms/Icon/Icon";
-import RadioOption from "../atoms/RadioOption/RadioOption";
+import Checkbox from "../atoms/Checkbox/Checkbox";
 import DropDownMenu from "../atoms/Menu/DropDownMenu";
 import StateEmoji from "../atoms/StateEmoji/StateEmoji";
 import Toast from "../molecules/Toast/Toast";
@@ -991,7 +991,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                   ) : f === "자동 새로고침" ? (
                     <span className="radio-options" role="radiogroup" aria-label={f}>
                       {[true, false].map((enabled) => (
-                        <RadioOption
+                        <Checkbox inputType="radio" shape="circle"
                           key={String(enabled)}
                           name="monitor-auto-refresh"
                           value={String(enabled)}
@@ -999,7 +999,7 @@ export default function StandardPage({ pageDefinition, initialRows }) {
                           onChange={() => setQuery({ ...query, [f]: enabled })}
                         >
                           {enabled ? "사용" : "미사용"}
-                        </RadioOption>
+                        </Checkbox>
                       ))}
                     </span>
                   ) : (
