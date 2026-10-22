@@ -16,6 +16,7 @@ import ContentTable from "../../components/templates/ContentTable/ContentTable";
 import useCameraList from "../../hooks/useCameraList";
 import useCommonCodes from "../../hooks/useCommonCodes";
 import useRawEventList from "../../hooks/useRawEventList";
+import useZoneList from "../../hooks/useZoneList";
 import {
   createRawEvent,
   getRawEventDetail,
@@ -33,7 +34,7 @@ const columns = [
   { key: "eventTypeCd", label: "이벤트 유형", width: 126 },
   { key: "releaseDt", label: "해제일시", width: 160 },
   { key: "snapCnt", label: "스냅샷", width: 88 },
-  { key: "checkStatus", label: "확인 상태", width: 100 },
+  { key: "regType", label: "등록 구분", width: 90 },
 ];
 
 const statusOptions = [
@@ -103,6 +104,12 @@ export default function CctvEventIngestionPage({ user, onUnauthorized, onUnsaved
 
   const { data: cameras, error: cameraError } = useCameraList({ enabled: Boolean(user?.token), token: user?.token, useYn: "Y", onUnauthorized });
   const { data: commonEventTypes, error: eventTypeError } = useCommonCodes({ enabled: Boolean(user?.token), token: user?.token, codeDiv: "EVT_TYPE", onUnauthorized });
+  const { data: zones, loading: zonesLoading, error: zonesError } = useZoneList({
+    enabled: mode === "create" && Boolean(user?.token && form?.cameraId),
+    token: user?.token,
+    cameraId: form?.cameraId || "",
+    onUnauthorized,
+  });
   const eventTypes = useMemo(() => commonEventTypes.filter((item) => !item.cdRule1 || item.cdRule1 === "AI"), [commonEventTypes]);
   const eventTypeNames = useMemo(() => new Map(eventTypes.map((item) => [item.value, item.label])), [eventTypes]);
   const { data: rows, loading, error, refetch } = useRawEventList({
@@ -126,6 +133,13 @@ export default function CctvEventIngestionPage({ user, onUnauthorized, onUnsaved
     value: camera.cameraId,
     label: camera.cameraNm || camera.cameraId,
   })), [cameras]);
+  const zoneOptions = useMemo(() => zones
+    .filter((zone) => zone.cameraId === form?.cameraId && zone.zoneId && zone.useYn !== "N")
+    .map((zone) => ({ value: zone.zoneId, label: zone.zoneNm || zone.zoneId })), [zones, form?.cameraId]);
+  const zonePlaceholder = !form?.cameraId ? "카메라 먼저 선택"
+    : zonesLoading ? "감지구역 불러오는 중"
+      : zonesError ? "감지구역 조회 실패"
+        : zoneOptions.length ? "선택 안 함" : "등록된 감지구역 없음";
   function updateFilter(key, value) {
     setFilters((current) => ({ ...current, [key]: value, ...(key === "fromDt" || key === "toDt" ? { period: "" } : {}) }));
   }
@@ -190,6 +204,10 @@ export default function CctvEventIngestionPage({ user, onUnauthorized, onUnsaved
       setNotice("카메라, 발생일시, 이벤트 유형을 입력해 주세요.");
       return;
     }
+    if (mode === "create" && form.zoneId && !zoneOptions.some((zone) => zone.value === form.zoneId)) {
+      setNotice("선택한 카메라에 등록된 감지구역을 선택해 주세요.");
+      return;
+    }
     setSaving(true);
     try {
       if (mode === "create") {
@@ -236,10 +254,7 @@ export default function CctvEventIngestionPage({ user, onUnauthorized, onUnsaved
     if (key === "zone") return row.zoneId || "-";
     if (key === "eventTypeCd") return eventTypeNames.get(row.eventTypeCd) || row.eventTypeCd || "-";
     if (key === "snapCnt") return row.snapCnt ? `${row.snapCnt}개` : "-";
-    if (key === "checkStatus") {
-      const value = row.checkStatus || "미확인";
-      return <Badge tone={statusTone(value)}>{value}</Badge>;
-    }
+    if (key === "regType") return { AUTO: "자동", MANUAL: "수동" }[row.regType] || row.regType || "-";
     return row[key] ?? "-";
   }
 
@@ -281,8 +296,8 @@ export default function CctvEventIngestionPage({ user, onUnauthorized, onUnsaved
             <p className="raw-event-form-guide">외부 장비에서 수신하지 못한 AI CCTV 이벤트만 수동으로 입력합니다.</p>
             <dl className="cctv-detail-table raw-event-detail-table">
               <div><dt>발생원</dt><dd>AI CCTV</dd></div>
-              <div><dt>카메라</dt><dd className="is-editing"><DropDownMenu required value={form.cameraId} onChange={(event) => setForm((current) => ({ ...current, cameraId: event.target.value }))}><option value="">선택</option>{cameraOptions.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</DropDownMenu></dd></div>
-              <div><dt>감지구역 ID</dt><dd className="is-editing"><input maxLength={20} value={form.zoneId} placeholder="선택 입력" onChange={(event) => setForm((current) => ({ ...current, zoneId: event.target.value }))} /></dd></div>
+              <div><dt>카메라</dt><dd className="is-editing"><DropDownMenu required value={form.cameraId} onChange={(event) => setForm((current) => ({ ...current, cameraId: event.target.value, zoneId: "" }))}><option value="">선택</option>{cameraOptions.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</DropDownMenu></dd></div>
+              <div><dt>감지구역</dt><dd className="is-editing"><DropDownMenu value={form.zoneId} disabled={!form.cameraId || zonesLoading || Boolean(zonesError) || !zoneOptions.length} onChange={(event) => setForm((current) => ({ ...current, zoneId: event.target.value }))}><option value="">{zonePlaceholder}</option>{zoneOptions.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</DropDownMenu></dd></div>
               <div><dt>발생일시</dt><dd className="is-editing"><input required type="datetime-local" value={form.occurDt} onChange={(event) => setForm((current) => ({ ...current, occurDt: event.target.value }))} /></dd></div>
               <div><dt>이벤트 유형</dt><dd className="is-editing"><DropDownMenu required value={form.eventTypeCd} onChange={(event) => setForm((current) => ({ ...current, eventTypeCd: event.target.value }))}><option value="">선택</option>{eventTypes.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</DropDownMenu></dd></div>
               <div className="is-tall"><dt>입력 사유</dt><dd className="is-editing"><textarea maxLength={500} value={form.note} placeholder="수동 입력 사유를 입력하세요." onChange={(event) => setForm((current) => ({ ...current, note: event.target.value }))} /></dd></div>

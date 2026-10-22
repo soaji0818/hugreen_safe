@@ -239,7 +239,7 @@ export default function DataTable({
 
 //데이터 테이블 구현
   return (
-    <div className="data-table">
+    <div className={`data-table${showToolbar ? " has-toolbar" : ""}`}>
       {showToolbar && (
         <div className="list-actions data-table-toolbar" aria-label="목록 작업">
           <span className="table-result-count" role="status">총 {loading ? 0 : totalCount}건</span>
