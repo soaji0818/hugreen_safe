@@ -139,7 +139,7 @@ h2 { color: var(--ink); font-size: var(--type-title-size); line-height: var(--ty
 .table-panel, .detail-panel { margin-bottom: 18px; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .filter-panel { margin: 0 0 16px; padding: 12px 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .work-panel:not(.tree-work-panel) .page-heading,
-.work-panel:not(.tree-work-panel) .list-actions,
+.work-panel:not(.tree-work-panel) .list-actions:not(.data-table-toolbar),
 .work-panel:not(.tree-work-panel) .table-panel { margin-inline: 12px; }
 .work-panel:not(.tree-work-panel) .filter-panel { padding-inline: 12px; }
 .filter-title { display: flex; align-items: center; gap: 8px; min-height: 50px; margin: 0; padding: 0 18px; border-bottom: 1px solid #edf0f2; color: #4e5968; font-size: var(--type-label-size); line-height: var(--type-label-line); }
@@ -154,16 +154,13 @@ h2 { color: var(--ink); font-size: var(--type-title-size); line-height: var(--ty
 .filter-keyword input:not([type="radio"]) { min-height: 32px; padding: 0; border: 0; outline: 0; background: transparent; }
 .filter-grid { width: 100%; display: grid; grid-template-columns: repeat(var(--filter-columns),minmax(0,1fr)); align-items: stretch; gap: 0; margin: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 7px; background: white; }
 .filter-grid label { min-width: 0; min-height: 34px; display: grid; grid-template-columns: 104px minmax(0,1fr); align-items: stretch; gap: 0; overflow: hidden; border: 0; border-right: 1px solid #dfe3e6; border-bottom: 1px solid #dfe3e6; border-radius: 0; background: white; color: #4e5968; font-size: var(--type-caption-size); line-height: var(--type-caption-line); font-weight: 600; }
-.filter-grid > .failure-radio-field { min-width: 0; min-height: 34px; display: grid; grid-template-columns: 104px minmax(0,1fr); align-items: stretch; gap: 0; overflow: hidden; border: 0; border-right: 1px solid #dfe3e6; border-bottom: 1px solid #dfe3e6; border-radius: 0; background: white; color: #4e5968; font-size: var(--type-caption-size); line-height: var(--type-caption-line); font-weight: 600; }
 .filter-grid label > span:first-child { display: flex; align-items: center; padding: 0 10px; background: #f7f8f9; }
-.filter-grid > .failure-radio-field > span:first-child { display: flex; align-items: center; padding: 0 10px; background: #f2f4f6; color: #4e5968; font-size: var(--type-label-size); line-height: var(--type-label-line); font-weight: 650; }
 .filter-grid label.date-field, .filter-grid label.wide-field, .filter-grid label.toggle-field { grid-template-columns: 104px minmax(0,1fr); }
 .filter-empty { min-height: 34px; display: none; border-right: 1px solid #dfe3e6; border-bottom: 1px solid #dfe3e6; background: #fbfcfc; }
 .filter-grid[data-count="5"] .empty-one { display: block; }
 .toggle-control { display: flex; align-items: center; gap: 7px; padding: 0 11px; background: white; color: #4e5968; font-weight: 500; }
 .toggle-control input { width: 15px; height: 15px; margin: 0; accent-color: var(--green); }
 .filter-grid label > select { height: 34px; min-height: 34px; padding-top: 5px; padding-bottom: 5px; border: 0; border-radius: 0; }
-.list-actions .cctv-monitoring-refresh { transform: translateY(6px); }
 .export-button, .ui-button.export-button { border-color: transparent; background: var(--neutral-button); }
 .export-button:hover:enabled, .ui-button.export-button:hover:enabled { border-color: transparent; background: var(--neutral-button-hover); }
 input:not([type="radio"]), select, textarea { width: 100%; min-height: 38px; padding: 8px 10px; border: 1px solid var(--line-strong); border-radius: 8px; background: white; color: var(--text); font-size: var(--type-label-size); line-height: var(--type-label-line); }
@@ -184,8 +181,6 @@ textarea { min-height: 76px; resize: vertical; line-height: 1.55; }
 .standard-filter-panel .filter-actions.no-keyword .text-btn { margin-left: 0; padding-left: 0; transform: none; }
 .filter-actions-end { display: flex; align-items: center; gap: 8px; margin-left: auto; }
 .filter-actions-end .ui-button { min-width: 72px; min-height: 34px; padding: 6px 11px; font-size: 12px; }
-.list-actions .cctv-toolbar-delete { border: 0; background: var(--surface-danger-subtle); color: var(--text-danger); }
-.list-actions .cctv-toolbar-delete:hover:enabled { background: #fbdde2; color: #c91f30; }
 .standard-filter-grid { border-right: 0; border-bottom: 0; border-left: 0; border-radius: 0; }
 .standard-filter-grid > label > span:first-child { background: #f2f4f6; color: #4e5968; font-size: var(--type-label-size); line-height: var(--type-label-line); font-weight: 650; }
 .standard-filter-grid select,
@@ -209,17 +204,6 @@ textarea { min-height: 76px; resize: vertical; line-height: 1.55; }
 .single-row-filter-grid > label > span:first-child { background: #f2f4f6; color: #4e5968; font-size: 12px; font-weight: 650; }
 .single-row-filter-grid select { color: #8b95a1; font-size: 12px; font-weight: 500; }
 .single-row-filter-grid > label:last-of-type { border-right: 0; }
-.cctv-master-filter-grid { grid-template-columns: minmax(0,.8fr) repeat(2,minmax(0,1.1fr)); }
-.filter-grid.cctv-master-filter-grid > label { grid-template-columns: 140px minmax(0,1fr); }
-.cctv-master-filter-grid > label > span:first-child { white-space: nowrap; }
-.cctv-monitoring-filter-grid { grid-template-columns: minmax(0,1fr); }
-.filter-grid.cctv-monitoring-filter-grid > label { grid-template-columns: 140px minmax(0,1fr); }
-.cctv-monitoring-filter-grid > label > span:first-child { white-space: nowrap; }
-.cctv-master-page .standard-filter-panel,
-.cctv-monitoring-page .standard-filter-panel { padding-top: 0; }
-.cctv-master-page .filter-actions.no-keyword,
-.cctv-monitoring-page .filter-actions.no-keyword { margin-bottom: 0; }
-.cctv-filter-heading { min-width: 140px; min-height: 34px; display: flex; flex: none; align-items: center; padding: 0 10px 0 0; background: transparent; color: #4a4f55; font-size: 16px; line-height: var(--type-label-line); font-weight: 700; white-space: nowrap; }
 .radio-options { min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; padding: 6px 12px; background: var(--white); }
 .filter-grid .radio-option { width: auto; min-height: 22px; display: inline-flex; grid-template-columns: none; align-items: center; gap: 7px; overflow: visible; border: 0; background: transparent; color: #6b7684; font-size: 12px; font-weight: 500; white-space: nowrap; cursor: pointer; }
 .radio-option input { width: 18px; height: 18px; }
@@ -244,66 +228,7 @@ textarea { min-height: 76px; resize: vertical; line-height: 1.55; }
 .status-tabs button { min-height: 34px; display: flex; align-items: center; gap: 5px; padding: 5px 0; border: 0; border-bottom: 2px solid transparent; background: transparent; color: #8b95a1; font-size: var(--type-caption-size); line-height: var(--type-caption-line); white-space: nowrap; }
 .status-tabs button.active { border-bottom-color: var(--green); color: #06735d; font-weight: 700; }
 .status-tabs button > span { padding: 2px 5px; border-radius: 6px; background: #f1f3f5; color: #8b95a1; font-size: var(--type-caption-size); line-height: var(--type-caption-line); }
-.cctv-monitoring-table table { min-width: 1220px; table-layout: fixed; }
-.cctv-monitoring-table col:nth-child(1) { width: 110px; }
-.cctv-monitoring-table col:nth-child(2) { width: 150px; }
-.cctv-monitoring-table col:nth-child(3) { width: 90px; }
-.cctv-monitoring-table col:nth-child(4),
-.cctv-monitoring-table col:nth-child(5) { width: 175px; }
-.cctv-monitoring-table col:nth-child(n+6):nth-child(-n+9) { width: 90px; }
-.cctv-monitoring-table col:nth-child(10) { width: 160px; }
-.cctv-monitoring-result-table { position: relative; }
-.cctv-monitoring-result-table::after { position: absolute; top: 42px; right: 0; z-index: 4; width: 8px; height: 34px; border-bottom: 1px solid var(--line); background: #f2f4f6; content: ""; }
-.cctv-monitoring-result-table .table-scroll { background: linear-gradient(to bottom,#f2f4f6 0 34px,transparent 34px); scrollbar-color: #b8c0c8 transparent; }
-.cctv-monitoring-result-table .table-scroll::-webkit-scrollbar { width: 8px; height: 8px; background: transparent; }
-.cctv-monitoring-result-table .table-scroll::-webkit-scrollbar-track:vertical { margin-top: 34px; background: transparent; }
-.cctv-monitoring-result-table .table-scroll::-webkit-scrollbar-thumb { border: 2px solid transparent; border-radius: 999px; background: #b8c0c8; background-clip: padding-box; }
-.cctv-monitoring-result-table .table-scroll::-webkit-scrollbar-corner { background: transparent; }
-.cctv-master-table { position: relative; }
-.cctv-master-table::after { position: absolute; top: 42px; right: 0; z-index: 4; width: 8px; height: 34px; border-bottom: 1px solid var(--line); background: #f2f4f6; content: ""; }
-.cctv-master-table .table-scroll { width: 100%; height: 100%; min-height: 0; overflow: auto; scrollbar-gutter: stable; overscroll-behavior: contain; background: linear-gradient(to bottom,#f2f4f6 0 34px,transparent 34px); scrollbar-color: #b8c0c8 transparent; }
-.cctv-master-table .table-scroll::-webkit-scrollbar { width: 8px; height: 8px; background: transparent; }
-.cctv-master-table .table-scroll::-webkit-scrollbar-track:vertical { margin-top: 34px; background: transparent; }
-.cctv-master-table .table-scroll::-webkit-scrollbar-thumb { border: 2px solid transparent; border-radius: 999px; background: #b8c0c8; background-clip: padding-box; }
-.cctv-master-table .table-scroll::-webkit-scrollbar-corner { background: transparent; }
-.cctv-master-table .resizable-table-scroll:not(.columns-resized-scroll) { overflow-x: auto; }
-.cctv-master-table .resizable-table:not(.columns-resized) { width: 100%; min-width: 0; table-layout: fixed; }
-.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(2) { width: 110px; }
-.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(3) { width: 150px; }
-.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(4) { width: 90px; }
-.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(5),
-.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(6) { width: 175px; }
-.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(7) { width: 160px; }
-.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(8) { width: 200px; }
-.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(9) { width: 110px; }
-.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(10) { width: 90px; }
-.cctv-master-table .resizable-table td:nth-child(9) { text-align: right; font-variant-numeric: tabular-nums; }
-.cctv-master-table .resizable-table th { position: sticky; top: 0; z-index: 3; }
-.cctv-master-table .resizable-table th.selection-col { padding: 0; text-align: center; vertical-align: middle; }
-.cctv-master-table .resizable-table th.selection-col input[type="checkbox"] { margin: auto; }
-.cctv-master-content { min-height: 180px; display: flex; flex: 1; overflow: hidden; }
-.cctv-master-content > .cctv-master-table { min-width: 0; flex: 1; }
-.cctv-master-content.has-bottom-panel { flex-direction: column; }
-section.cctv-master-page.is-shrink-panel-open { padding-right: 424px; }
 main.has-page-scroll-detail { overflow: visible; }
-section.cctv-master-page.is-bottom-panel-page { height: auto; min-height: calc(var(--scaled-viewport-height) - 145px); flex: none; overflow: visible; }
-section.cctv-master-page.is-bottom-panel-page .cctv-master-content { min-height: 0; display: block; flex: none; overflow: visible; }
-section.cctv-master-page.is-bottom-panel-page .cctv-master-table { min-height: 0; display: block; overflow: visible; }
-section.cctv-master-page.is-bottom-panel-page .cctv-master-table .table-scroll { height: auto; max-height: 394px; overflow: auto; }
-section.cctv-master-page.is-bottom-panel-page .cctv-master-table { margin-bottom: 0; }
-section.crud-dialog--bottom-panel.cctv-detail-dialog { position: static; width: auto; max-width: none; min-height: 0; display: block; margin: 0 24px 24px; padding: 0; overflow: visible; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; box-shadow: none; animation: cctv-bottom-detail-in .18s cubic-bezier(.2,.75,.25,1) both; scroll-margin-top: 72px; }
-@keyframes cctv-bottom-detail-in {
-  from { opacity: 0; transform: translateY(7px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-section.crud-dialog--bottom-panel.cctv-detail-dialog .detail-header { position: static; min-height: 50px; display: flex; justify-content: space-between; padding: 8px 0; border: 0; background: transparent; }
-section.crud-dialog--bottom-panel.cctv-detail-dialog .cctv-bottom-detail-title { margin: 0; color: #4a4f55; font-size: 16px; line-height: var(--type-label-line); font-weight: 700; }
-section.crud-dialog--bottom-panel.cctv-detail-dialog .cctv-bottom-detail-actions { display: flex; align-items: center; gap: 8px; }
-section.crud-dialog--bottom-panel.cctv-detail-dialog .cctv-bottom-detail-actions .ui-button { min-width: 58px; min-height: 34px; padding: 6px 12px; font-size: 12px; line-height: var(--type-label-line); font-weight: 600; }
-section.crud-dialog--bottom-panel.cctv-detail-dialog .cctv-bottom-detail-actions .ui-button--weak { border-color: transparent; background: var(--neutral-button); color: #4e5968; }
-section.crud-dialog--bottom-panel.cctv-detail-dialog .cctv-bottom-detail-actions .danger-button { background: var(--surface-danger-subtle); color: var(--text-danger); }
-section.crud-dialog--bottom-panel.cctv-detail-dialog .cctv-bottom-detail-actions .danger-button:hover:enabled { background: #fbdde2; color: #c91f30; }
-section.crud-dialog--bottom-panel.cctv-detail-dialog .detail-body { min-height: 0; display: block; flex: none; gap: 0; overflow: visible; padding: 0 0 20px; }
 table { width: 100%; border-collapse: collapse; color: var(--text); font-size: var(--type-label-size); line-height: var(--type-label-line); white-space: nowrap; }
 th { height: 34px; padding: 5px 10px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: #f2f4f6; color: #4e5968; font-size: var(--type-label-size); line-height: var(--type-label-line); font-weight: 650; text-align: left; }
 td { height: 36px; padding: 3px 10px; border-right: 1px solid #edf0f2; border-bottom: 1px solid #edf0f2; color: #333d4b; line-height: var(--type-label-line); }
@@ -338,47 +263,6 @@ td small { display: block; margin-top: 0; color: #8b95a1; font-size: var(--type-
 .snapshot-facts div { padding: 8px 4px; border-bottom: 1px solid #edf0f2; }
 .snapshot-facts dt { color: #8b95a1; font-size: var(--type-caption-size); line-height: var(--type-caption-line); }
 .snapshot-facts dd { margin: 3px 0 0; color: #333d4b; font-size: var(--type-label-size); line-height: var(--type-label-line); }
-.equipment-events-detail { min-height: 180px; display: flex; flex: 1; flex-direction: column; overflow: hidden; border-top: 1px solid var(--line); background: var(--white); }
-.equipment-events-heading { min-height: 46px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 10px; }
-.equipment-events-heading h2 { font-size: 15px; line-height: 22.5px; }
-.equipment-events-heading span { color: #8b95a1; font-size: var(--type-caption-size); line-height: var(--type-caption-line); }
-.equipment-events-table { min-height: 0; flex: 1; overflow: auto; }
-.equipment-events-empty { padding: 28px 12px; color: #8b95a1; font-size: var(--type-label-size); line-height: var(--type-label-line); text-align: center; }
-.failure-management-page { min-height: 0; }
-.failure-filter-panel { padding-top: 0; }
-.failure-management-page .filter-actions.no-keyword { margin-bottom: 0; }
-.failure-filter-grid { --filter-columns: 3; border-right: 0; border-bottom: 0; border-left: 0; border-radius: 0; }
-.failure-filter-grid > .access-date-field,
-.failure-filter-grid > .failure-event-type-field { grid-column: 1/-1; border-right: 0; }
-.failure-filter-grid > :nth-child(5) { border-right: 0; }
-.failure-event-type-options { flex-wrap: nowrap; gap: 6px 16px; overflow-x: auto; }
-.failure-table-panel, .failure-table-panel .table-scroll { min-height: 260px; }
-.failure-error-state { display: inline-flex; align-items: center; gap: 10px; }
-dialog.failure-detail-dialog { width: 440px; max-width: calc(100vw - 32px); }
-dialog.failure-detail-dialog.is-record-view { width: 920px; max-width: calc(100vw - 32px); }
-.failure-detail-dialog .detail-body { display: block; }
-.failure-record-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 16px; }
-.failure-record-grid > .failure-detail-section { min-width: 0; }
-.failure-detail-section h3 { min-height: 40px; display: flex; align-items: center; margin: 0; padding: 0 12px; border: 1px solid #e5e8eb; border-bottom: 0; background: #fbfcfc; font-size: 13px; }
-.failure-detail-table { margin: 0; overflow: visible; border-radius: 0 0 6px 6px; }
-.failure-detail-table dd.is-multiline { min-height: 60px; align-items: flex-start; overflow: auto; line-height: 1.5; text-overflow: clip; white-space: pre-wrap; overflow-wrap: anywhere; }
-.failure-detail-table dd.is-editing textarea { width: 100%; height: 54px; min-height: 54px; max-height: 130px; padding: 7px 10px; border: 0; border-radius: 0; background: #fff; color: #273548; font: inherit; font-size: 13px; font-weight: 600; line-height: 20px; resize: vertical; }
-.failure-detail-table dd.is-editing textarea:focus { position: relative; z-index: 1; outline: 2px solid rgba(0,128,102,.24); outline-offset: -2px; }
-@media (max-width: 760px) {
-  dialog.failure-detail-dialog.is-record-view { width: calc(100vw - 32px); }
-  .failure-record-grid { grid-template-columns: minmax(0, 1fr); }
-}
-.event-camera-search { position: relative; z-index: 2; width: 100%; min-width: 0; }
-.event-camera-search > input { width: 100%; max-width: none; height: 35px; min-height: 35px; padding: 6px 10px; border: 0; border-radius: 0; background: #fff; color: #273548; font-size: 13px; font-weight: 600; }
-.event-camera-search > input:focus { position: relative; z-index: 1; outline: 2px solid rgba(0,128,102,.24); outline-offset: -2px; }
-.event-camera-options { position: absolute; z-index: 20; top: calc(100% + 3px); right: 0; left: 0; max-height: 220px; overflow: auto; border: 1px solid #d9dee3; border-radius: 6px; background: #fff; box-shadow: 0 8px 20px rgba(24,39,52,.16); }
-.event-camera-options button { width: 100%; min-height: 38px; display: flex; align-items: center; gap: 10px; padding: 7px 10px; border: 0; border-bottom: 1px solid #edf0f2; background: #fff; color: #273548; font-size: 12px; text-align: left; }
-.event-camera-options button:hover, .event-camera-options button:focus-visible { outline: 0; background: #f2f8f6; }
-.event-camera-options button strong { flex: none; font-weight: 700; }
-.event-camera-options button span { min-width: 0; overflow: hidden; color: #7c8794; text-overflow: ellipsis; white-space: nowrap; }
-.event-camera-options p { margin: 0; padding: 12px; color: #8b95a1; font-size: 12px; font-weight: 500; }
-.event-camera-options p.has-error { color: var(--text-danger); }
-.failure-inline-error { margin: 10px 0 0; color: var(--text-danger); font-size: var(--type-caption-size); }
 .tree-editor-panel { min-height: 0; display: grid; grid-template-columns: 320px minmax(0,1fr); flex: 1; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--white); box-shadow: none; }
 .tree-editor-panel .pane-heading { min-height: 56px; padding: 0 16px; border-bottom: 1px solid var(--line); }
 .tree-editor-panel .pane-heading h2 { font-size: 15px; }
@@ -528,13 +412,6 @@ dialog.failure-detail-dialog.is-record-view { width: 920px; max-width: calc(100v
 .page-footer { display: flex; justify-content: space-between; padding: 3px 2px 10px; color: #a2aab3; font-size: 10px; }
 .empty { padding: 46px 20px; color: #8b95a1; text-align: center; }
 .api-state-row td { height: 160px; color: var(--text-muted); text-align: center; vertical-align: middle; }
-.cctv-master-table .api-state-row { background: transparent; }
-.cctv-master-table .api-state-row td { height: 360px; border-right: 0; border-bottom: 0; background: transparent; }
-.cctv-empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; }
-.cctv-empty-icon { width: 58px; height: 58px; display: grid; place-items: center; margin-bottom: 15px; color: #c8cdd3; }
-.cctv-empty-state h3 { margin: 0; color: #333d4b; font-size: 20px; line-height: 29px; font-weight: 700; }
-.cctv-empty-state p { margin: 5px 0 18px; color: #6b7684; font-size: 14px; line-height: 21px; }
-.cctv-empty-state .primary, .cctv-empty-state .ui-button--fill { min-height: 42px; padding-inline: 18px; }
 .empty > svg, .empty > .state-emoji { margin: 0 auto 10px; }
 .empty h3 { color: #4e5968; font-size: var(--type-title-size); line-height: var(--type-title-line); }
 .empty p { margin: 7px 0 17px; font-size: var(--type-body-size); line-height: var(--type-body-line); }
@@ -585,124 +462,12 @@ dialog.inline-detail-panel.screen-format-list-detail { border-radius: 0; }
 dialog p { margin: 14px 0; color: var(--muted); font-size: 13px; }
 dialog form label { margin-bottom: 14px; }
 dialog form > .primary, dialog form > .ui-button--fill { width: 100%; }
-dialog.cctv-detail-dialog { width: 440px; max-width: calc(100vw - 32px); max-height: calc(100vh - 32px); padding: 0; overflow: hidden; border: 1px solid #e5e8eb; border-radius: 14px; background: var(--white); box-shadow: 0 24px 72px rgba(25,31,40,.32); -webkit-font-smoothing: auto; text-rendering: auto; }
-dialog.cctv-detail-dialog::backdrop { backdrop-filter: none; }
-.cctv-detail-dialog[open] { display: flex; flex-direction: column; }
-dialog.cctv-detail-dialog[open] { animation: cctv-modal-in .18s cubic-bezier(.2,.75,.25,1) both; }
-dialog.cctv-detail-dialog[open]::backdrop { animation: cctv-modal-backdrop-in .16s ease-out both; }
-@keyframes cctv-modal-in {
-  from { opacity: 0; transform: translateY(7px) scale(.985); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-@keyframes cctv-modal-backdrop-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-aside.crud-dialog--side-panel.cctv-detail-dialog { position: fixed; top: 56px; right: 0; bottom: 0; z-index: 39; width: 440px; max-width: calc(100vw - 24px); display: flex; flex-direction: column; padding: 0; overflow: hidden; border: 0; border-left: 1px solid #dfe3e6; border-radius: 0; background: var(--white); box-shadow: -16px 0 36px rgba(25,31,40,.14); animation: cctv-side-panel-in .32s cubic-bezier(.2,.8,.2,1) both; -webkit-font-smoothing: auto; text-rendering: auto; }
-aside.crud-dialog--side-panel.cctv-detail-dialog .detail-header { flex: none; }
-aside.crud-dialog--side-panel.cctv-detail-dialog .detail-footer { flex: none; border-top: 1px solid #edf0f2; }
-aside.crud-dialog--shrink-panel.cctv-detail-dialog { position: fixed; top: 56px; right: 0; bottom: 0; z-index: 39; width: 440px; max-width: calc(100vw - 24px); display: flex; flex-direction: column; padding: 0; overflow: hidden; border: 0; border-left: 1px solid #dfe3e6; border-radius: 0; background: var(--white); box-shadow: -16px 0 36px rgba(25,31,40,.14); animation: cctv-side-panel-in .32s cubic-bezier(.2,.8,.2,1) both; -webkit-font-smoothing: auto; text-rendering: auto; }
-aside.crud-dialog--shrink-panel.cctv-detail-dialog .detail-header { flex: none; }
-aside.crud-dialog--shrink-panel.cctv-detail-dialog .detail-footer { flex: none; border-top: 1px solid #edf0f2; }
-@keyframes cctv-side-panel-in {
-  from { opacity: 0; transform: translateX(18px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-.cctv-detail-dialog .detail-header { position: relative; min-height: 56px; padding: 10px 20px; border-bottom: 1px solid #e5e8eb; background: var(--white); }
-.cctv-detail-heading { min-width: 0; }
-.cctv-detail-heading h2 { margin: 0; font-size: 16px; line-height: 24px; font-weight: 750; }
-.cctv-dialog-drag-handle { position: absolute; top: 0; left: 50%; z-index: 8; width: 120px; height: 40px; padding: 0; border: 0; background: transparent; touch-action: none; cursor: move; user-select: none; transform: translateX(-50%); }
-.cctv-dialog-drag-handle::after { position: absolute; top: 5px; left: 50%; width: 34px; height: 3px; border-radius: 999px; background: #b8c0c8; content: ""; transform: translateX(-50%); }
-.cctv-dialog-drag-handle:hover::after { background: #8b95a1; }
-.cctv-dialog-drag-handle:active { cursor: grabbing; }
-.cctv-dialog-drag-handle:focus-visible { outline: 2px solid rgba(0,128,102,.24); outline-offset: -2px; }
-.cctv-dialog-resize-handle { position: absolute; z-index: 6; display: block; touch-action: none; }
-.cctv-dialog-resize-handle.is-n-left,
-.cctv-dialog-resize-handle.is-n-right { top: 0; width: calc(50% - 72px); height: 6px; cursor: ns-resize; }
-.cctv-dialog-resize-handle.is-n-left { left: 12px; }
-.cctv-dialog-resize-handle.is-n-right { right: 12px; }
-.cctv-dialog-resize-handle.is-e { top: 12px; right: 0; bottom: 12px; width: 6px; cursor: ew-resize; }
-.cctv-dialog-resize-handle.is-s { right: 12px; bottom: 0; left: 12px; height: 6px; cursor: ns-resize; }
-.cctv-dialog-resize-handle.is-w { top: 12px; bottom: 12px; left: 0; width: 6px; cursor: ew-resize; }
-.cctv-dialog-resize-handle.is-ne,
-.cctv-dialog-resize-handle.is-se,
-.cctv-dialog-resize-handle.is-sw,
-.cctv-dialog-resize-handle.is-nw { width: 12px; height: 12px; }
-.cctv-dialog-resize-handle.is-ne { top: 0; right: 0; cursor: nesw-resize; }
-.cctv-dialog-resize-handle.is-se { right: 0; bottom: 0; cursor: nwse-resize; }
-.cctv-dialog-resize-handle.is-sw { bottom: 0; left: 0; cursor: nesw-resize; }
-.cctv-dialog-resize-handle.is-nw { top: 0; left: 0; cursor: nwse-resize; }
-.cctv-detail-close { width: 36px; height: 36px; display: grid; place-items: center; flex: none; padding: 0; border: 0; border-radius: 9px; background: transparent; color: var(--muted); }
-.cctv-detail-close:hover { background: var(--neutral-button); color: var(--text); }
-.cctv-detail-close:focus-visible { outline: 2px solid rgba(0,128,102,.24); outline-offset: 2px; }
-.cctv-detail-dialog .detail-body { min-height: 0; display: block; flex: 1; overflow-y: auto; padding: 14px 20px; }
-.cctv-detail-table { margin: 0; overflow: hidden; border: 1px solid #e5e8eb; border-radius: 6px; }
-.cctv-detail-table > div { min-height: 36px; display: grid; grid-template-columns: 118px minmax(0,1fr); border-bottom: 1px solid #e5e8eb; }
-.cctv-detail-table > div:last-child { border-bottom: 0; }
-.cctv-detail-table dt,
-.cctv-detail-table dd { min-width: 0; display: flex; align-items: center; margin: 0; padding: 7px 10px; font-size: 13px; line-height: 20px; }
-.cctv-detail-table dt { background: #f2f4f6; color: #4e5968; font-weight: 700; }
-.cctv-required-mark { margin-left: 3px; color: var(--danger); font-weight: 800; }
-.cctv-detail-table dd { overflow: hidden; background: var(--white); color: #273548; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
-.cctv-detail-table dd.is-editing { padding: 0; overflow: visible; }
-.cctv-detail-table dd.is-editing.is-readonly { padding: 7px 10px; background: #f2f4f6; color: #6b7684; }
-.cctv-detail-table dd.is-editing input,
-.cctv-detail-table dd.is-editing select { width: 100%; max-width: none; height: 35px; min-height: 35px; padding: 6px 10px; border: 0; border-radius: 0; background: #fff; color: #273548; font-size: 13px; font-weight: 600; }
-.cctv-detail-table dd.is-editing input:focus,
-.cctv-detail-table dd.is-editing select:focus { position: relative; z-index: 1; outline: 2px solid rgba(0,128,102,.24); outline-offset: -2px; }
-.cctv-detail-table dd.is-editing.is-invalid input,
-.cctv-detail-table dd.is-editing.is-invalid select,
-.cctv-detail-table dd.is-editing.is-invalid input:focus,
-.cctv-detail-table dd.is-editing.is-invalid select:focus { position: relative; z-index: 1; background: #fff8f7; outline: 2px solid #f04438; outline-offset: -2px; }
-.cctv-required-message { margin: 6px 0 0; padding: 0 2px; color: #d92d20; font-size: 12px; line-height: 20px; font-weight: 650; }
-.cctv-detail-table dd.is-editing input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
-.cctv-detail-table dd.is-editing input[type="number"]::-webkit-inner-spin-button,
-.cctv-detail-table dd.is-editing input[type="number"]::-webkit-outer-spin-button { margin: 0; appearance: none; -webkit-appearance: none; }
-@supports (appearance: base-select) {
-  .cctv-detail-table select::picker(select) {
-    position-area: block-end span-inline-end;
-    position-try-fallbacks: none;
-    margin-block-start: 4px;
-  }
-}
-.cctv-detail-table dd.status-on,
-.cctv-detail-table dd.status-off { align-self: center; justify-self: start; min-height: 22px; margin-left: 10px; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
-.cctv-detail-table dd.status-on { background: #dcfce7; color: #16803c; }
-.cctv-detail-table dd.status-off { background: #f2f4f6; color: #667085; }
-.cctv-zone-section { margin-top: 16px; }
-.cctv-zone-heading { min-height: 32px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.cctv-zone-heading h3 { margin: 0; color: #273548; font-size: 14px; line-height: 20px; font-weight: 750; }
-.cctv-zone-count { color: #8b95a1; font-size: 12px; line-height: 18px; }
-.cctv-zone-heading + #cctv-zone-content { margin-top: 6px; }
-.cctv-zone-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
-.cctv-zone-list.is-scrollable { max-height: 116px; padding-right: 4px; overflow-y: auto; overscroll-behavior: contain; }
-.cctv-zone-list > li { padding: 11px 12px; border: 1px solid #e5e8eb; border-radius: 8px; background: #fff; }
-.cctv-zone-list > li.is-inactive { background: #f8f9fa; }
-.cctv-zone-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.cctv-zone-summary strong { min-width: 0; overflow: hidden; color: #273548; font-size: 13px; line-height: 20px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
-.cctv-zone-status { flex: none; }
-.cctv-zone-events { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 8px; }
-.cctv-zone-events-label { width: 100%; color: #8b95a1; font-size: 11px; line-height: 16px; }
-.cctv-zone-event-tag { padding: 2px 7px; border-radius: 5px; background: #f2f4f6; color: #4e5968; font-size: 11px; line-height: 17px; font-weight: 650; }
-.cctv-zone-event-empty { color: #8b95a1; font-size: 12px; line-height: 20px; }
-.cctv-zone-state { display: grid; min-height: 72px; place-items: center; margin: 0; padding: 12px; border: 1px solid #e5e8eb; border-radius: 8px; color: #8b95a1; font-size: 12px; text-align: center; }
-.cctv-zone-state.is-error { gap: 8px; }
-.cctv-zone-state.is-error p { margin: 0; }
-.cctv-zone-state.is-error button { min-height: 32px; padding: 5px 10px; }
-.cctv-zone-code-error { margin: 7px 0 0; color: #8b95a1; font-size: 11px; line-height: 17px; }
-.cctv-detail-dialog .detail-footer { position: static; min-height: 60px; padding: 10px 20px 14px; border-top: 0; background: var(--white); }
-.cctv-detail-dialog .detail-footer > div { display: flex; gap: 8px; }
-.cctv-detail-dialog .detail-footer button { min-width: 58px; min-height: 34px; padding: 6px 12px; font-size: var(--type-label-size); line-height: var(--type-label-line); font-weight: 650; }
-.cctv-detail-dialog .detail-footer .danger-button { background: var(--surface-danger-subtle); color: var(--text-danger); }
-.cctv-detail-dialog .detail-footer .danger-button:hover:enabled { background: #fbdde2; color: #c91f30; }
 
 @media (min-width: 801px) {
   .workspace { min-height: var(--scaled-viewport-height); height: auto; display: flex; flex-direction: column; overflow: visible; }
   main { min-height: calc(var(--scaled-viewport-height) - 145px); display: block; flex: 1 0 auto; overflow: hidden; padding-bottom: 0; }
   main.has-inline-detail { overflow: hidden; }
   .work-panel { flex: none; }
-  .cctv-master-page { height: calc(var(--scaled-viewport-height) - 145px); }
-  .cctv-master-page .cctv-master-table { min-height: 180px; display: flex; flex: 1; }
   .has-inline-detail .work-panel { flex: none; }
   .page-heading, .filter-panel, .list-actions { flex: none; }
   .table-panel { min-height: 0; display: block; margin-bottom: 0; }
@@ -736,14 +501,6 @@ aside.crud-dialog--shrink-panel.cctv-detail-dialog .detail-footer { flex: none; 
   .evidence > button { aspect-ratio: 21/9; }
   .detail-form { min-width: 100%; }
   .detail-dialog.screen-format-list-detail:not(.sensor-detail-panel) .fields { grid-template-columns: repeat(2,minmax(0,1fr)); }
-  .failure-filter-grid > label,
-  .failure-filter-grid > .failure-radio-field { border-right: 1px solid #dfe3e6; }
-  .failure-filter-grid > .access-date-field,
-  .failure-filter-grid > .failure-event-type-field,
-  .failure-filter-grid > :nth-child(4),
-  .failure-filter-grid > :nth-child(5) { border-right: 0; }
-  .failure-filter-grid > :nth-child(3) { border-right: 1px solid #dfe3e6; }
-  .failure-filter-grid > :nth-child(5) { grid-column: 1/-1; }
   .crumb > strong { display: none; }
   .access-filter-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .access-date-content { align-items: flex-start; flex-direction: column; gap: 8px; padding: 7px 10px; }
@@ -779,14 +536,12 @@ aside.crud-dialog--shrink-panel.cctv-detail-dialog .detail-footer { flex: none; 
   .filter-panel.access-filter-panel,
   .filter-panel.standard-filter-panel,
   .filter-panel.single-row-filter-panel { padding-inline: 10px; }
-  .work-panel:not(.tree-work-panel) .list-actions,
+  .work-panel:not(.tree-work-panel) .list-actions:not(.data-table-toolbar),
   .work-panel:not(.tree-work-panel) .table-panel { margin-inline: 10px; }
   .filter-keyword { width: auto; flex: 1; }
   .filter-grid { display: grid; grid-template-columns: 1fr; margin: 0; }
   .single-row-filter-grid { grid-template-columns: 1fr; }
   .filter-grid label, .filter-grid label.date-field, .filter-grid label.wide-field, .filter-grid label.toggle-field { width: 100%; grid-template-columns: 104px minmax(0,1fr); }
-  .failure-filter-grid > label,
-  .failure-filter-grid > .failure-radio-field { width: 100%; border-right: 0; }
   .filter-grid[data-count] .filter-empty { display: none; }
   .access-filter-grid { grid-template-columns: 1fr; }
   .filter-grid label.access-date-field { grid-template-columns: 104px minmax(0,1fr); }
@@ -820,19 +575,11 @@ aside.crud-dialog--shrink-panel.cctv-detail-dialog .detail-footer { flex: none; 
   .fields .wide { grid-column: auto; }
   .sensor-detail-grid { grid-template-columns: 1fr; }
   .sensor-detail-field.full-row { grid-column: auto; }
-  dialog.cctv-detail-dialog { width: calc(100vw - 24px); max-height: calc(100vh - 24px); border-radius: 14px; }
-  .cctv-detail-dialog .detail-header { min-height: 54px; align-items: center; padding: 9px 14px; }
-  .cctv-detail-dialog .detail-body { padding: 14px; }
-  .cctv-detail-dialog .detail-footer { flex-wrap: nowrap; padding: 12px 14px; }
-  .cctv-detail-dialog .detail-footer > div { width: auto; overflow: visible; }
-  .cctv-detail-dialog .detail-footer > div button { flex: none; }
   .document-tree { width: 100%; padding: 0 0 14px; border: 0; border-bottom: 1px solid var(--line); }
   .top-toast { width: max-content; min-width: 0; max-width: calc(100% - 32px); padding: 9px 14px; font-size: 13px; line-height: 20px; white-space: normal; }
   .date-inputs input { width: 44%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  section.crud-dialog--bottom-panel.cctv-detail-dialog { animation: none; }
-  dialog.cctv-detail-dialog[open], dialog.cctv-detail-dialog[open]::backdrop { animation: none; }
   .top-toast.is-open, .top-toast.is-closing { animation: none; transform: translateX(-50%); }
 }

@@ -1,0 +1,130 @@
+.cctv-master-page .standard-filter-panel,
+.cctv-monitoring-page .standard-filter-panel { padding-top: 0; }
+.cctv-master-page .filter-actions.no-keyword,
+.cctv-monitoring-page .filter-actions.no-keyword { margin-bottom: 0; }
+.cctv-filter-heading { min-width: 140px; min-height: 34px; display: flex; flex: none; align-items: center; padding: 0 10px 0 0; background: transparent; color: #4a4f55; font-size: 16px; line-height: var(--type-label-line); font-weight: 700; white-space: nowrap; }
+
+section.crud-dialog--bottom-panel.cctv-detail-dialog { position: static; width: auto; max-width: none; min-height: 0; display: block; margin: 0 24px 24px; padding: 0; overflow: visible; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; box-shadow: none; animation: cctv-bottom-detail-in .18s cubic-bezier(.2,.75,.25,1) both; scroll-margin-top: 72px; }
+@keyframes cctv-bottom-detail-in {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+section.crud-dialog--bottom-panel.cctv-detail-dialog .detail-header { position: static; min-height: 50px; display: flex; justify-content: space-between; padding: 8px 0; border: 0; background: transparent; }
+section.crud-dialog--bottom-panel.cctv-detail-dialog .cctv-bottom-detail-title { margin: 0; color: #4a4f55; font-size: 16px; line-height: var(--type-label-line); font-weight: 700; }
+section.crud-dialog--bottom-panel.cctv-detail-dialog .cctv-bottom-detail-actions { display: flex; align-items: center; gap: 8px; }
+section.crud-dialog--bottom-panel.cctv-detail-dialog .cctv-bottom-detail-actions .ui-button { min-width: 58px; min-height: 34px; padding: 6px 12px; font-size: 12px; line-height: var(--type-label-line); font-weight: 600; }
+section.crud-dialog--bottom-panel.cctv-detail-dialog .cctv-bottom-detail-actions .ui-button--weak { border-color: transparent; background: var(--neutral-button); color: #4e5968; }
+section.crud-dialog--bottom-panel.cctv-detail-dialog .cctv-bottom-detail-actions .danger-button { background: var(--surface-danger-subtle); color: var(--text-danger); }
+section.crud-dialog--bottom-panel.cctv-detail-dialog .cctv-bottom-detail-actions .danger-button:hover:enabled { background: #fbdde2; color: #c91f30; }
+section.crud-dialog--bottom-panel.cctv-detail-dialog .detail-body { min-height: 0; display: block; flex: none; gap: 0; overflow: visible; padding: 0 0 20px; }
+
+.cctv-empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; }
+.cctv-empty-icon { width: 58px; height: 58px; display: grid; place-items: center; margin-bottom: 15px; color: #c8cdd3; }
+.cctv-empty-state h3 { margin: 0; color: #333d4b; font-size: 20px; line-height: 29px; font-weight: 700; }
+.cctv-empty-state p { margin: 5px 0 18px; color: #6b7684; font-size: 14px; line-height: 21px; }
+.cctv-empty-state .primary, .cctv-empty-state .ui-button--fill { min-height: 42px; padding-inline: 18px; }
+
+dialog.cctv-detail-dialog { width: 440px; max-width: calc(100vw - 32px); max-height: calc(100vh - 32px); padding: 0; overflow: hidden; border: 1px solid #e5e8eb; border-radius: 14px; background: var(--white); box-shadow: 0 24px 72px rgba(25,31,40,.32); -webkit-font-smoothing: auto; text-rendering: auto; }
+dialog.cctv-detail-dialog::backdrop { backdrop-filter: none; }
+.cctv-detail-dialog[open] { display: flex; flex-direction: column; }
+dialog.cctv-detail-dialog[open] { animation: cctv-modal-in .18s cubic-bezier(.2,.75,.25,1) both; }
+dialog.cctv-detail-dialog[open]::backdrop { animation: cctv-modal-backdrop-in .16s ease-out both; }
+@keyframes cctv-modal-in {
+  from { opacity: 0; transform: translateY(7px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes cctv-modal-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+aside.crud-dialog--side-panel.cctv-detail-dialog { position: fixed; top: 56px; right: 0; bottom: 0; z-index: 39; width: 440px; max-width: calc(100vw - 24px); display: flex; flex-direction: column; padding: 0; overflow: hidden; border: 0; border-left: 1px solid #dfe3e6; border-radius: 0; background: var(--white); box-shadow: -16px 0 36px rgba(25,31,40,.14); animation: cctv-side-panel-in .32s cubic-bezier(.2,.8,.2,1) both; -webkit-font-smoothing: auto; text-rendering: auto; }
+aside.crud-dialog--side-panel.cctv-detail-dialog .detail-header { flex: none; }
+aside.crud-dialog--side-panel.cctv-detail-dialog .detail-footer { flex: none; border-top: 1px solid #edf0f2; }
+aside.crud-dialog--shrink-panel.cctv-detail-dialog { position: fixed; top: 56px; right: 0; bottom: 0; z-index: 39; width: 440px; max-width: calc(100vw - 24px); display: flex; flex-direction: column; padding: 0; overflow: hidden; border: 0; border-left: 1px solid #dfe3e6; border-radius: 0; background: var(--white); box-shadow: -16px 0 36px rgba(25,31,40,.14); animation: cctv-side-panel-in .32s cubic-bezier(.2,.8,.2,1) both; -webkit-font-smoothing: auto; text-rendering: auto; }
+aside.crud-dialog--shrink-panel.cctv-detail-dialog .detail-header { flex: none; }
+aside.crud-dialog--shrink-panel.cctv-detail-dialog .detail-footer { flex: none; border-top: 1px solid #edf0f2; }
+@keyframes cctv-side-panel-in {
+  from { opacity: 0; transform: translateX(18px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.cctv-detail-dialog .detail-header { position: relative; min-height: 56px; padding: 10px 20px; border-bottom: 1px solid #e5e8eb; background: var(--white); }
+.cctv-detail-heading { min-width: 0; }
+.cctv-detail-heading h2 { margin: 0; font-size: 16px; line-height: 24px; font-weight: 750; }
+.cctv-dialog-drag-handle { position: absolute; top: 0; left: 50%; z-index: 8; width: 120px; height: 40px; padding: 0; border: 0; background: transparent; touch-action: none; cursor: move; user-select: none; transform: translateX(-50%); }
+.cctv-dialog-drag-handle::after { position: absolute; top: 5px; left: 50%; width: 34px; height: 3px; border-radius: 999px; background: #b8c0c8; content: ""; transform: translateX(-50%); }
+.cctv-dialog-drag-handle:hover::after { background: #8b95a1; }
+.cctv-dialog-drag-handle:active { cursor: grabbing; }
+.cctv-dialog-drag-handle:focus-visible { outline: 2px solid rgba(0,128,102,.24); outline-offset: -2px; }
+.cctv-dialog-resize-handle { position: absolute; z-index: 6; display: block; touch-action: none; }
+.cctv-dialog-resize-handle.is-n-left,
+.cctv-dialog-resize-handle.is-n-right { top: 0; width: calc(50% - 72px); height: 6px; cursor: ns-resize; }
+.cctv-dialog-resize-handle.is-n-left { left: 12px; }
+.cctv-dialog-resize-handle.is-n-right { right: 12px; }
+.cctv-dialog-resize-handle.is-e { top: 12px; right: 0; bottom: 12px; width: 6px; cursor: ew-resize; }
+.cctv-dialog-resize-handle.is-s { right: 12px; bottom: 0; left: 12px; height: 6px; cursor: ns-resize; }
+.cctv-dialog-resize-handle.is-w { top: 12px; bottom: 12px; left: 0; width: 6px; cursor: ew-resize; }
+.cctv-dialog-resize-handle.is-ne,
+.cctv-dialog-resize-handle.is-se,
+.cctv-dialog-resize-handle.is-sw,
+.cctv-dialog-resize-handle.is-nw { width: 12px; height: 12px; }
+.cctv-dialog-resize-handle.is-ne { top: 0; right: 0; cursor: nesw-resize; }
+.cctv-dialog-resize-handle.is-se { right: 0; bottom: 0; cursor: nwse-resize; }
+.cctv-dialog-resize-handle.is-sw { bottom: 0; left: 0; cursor: nesw-resize; }
+.cctv-dialog-resize-handle.is-nw { top: 0; left: 0; cursor: nwse-resize; }
+.cctv-detail-close { width: 36px; height: 36px; display: grid; place-items: center; flex: none; padding: 0; border: 0; border-radius: 9px; background: transparent; color: var(--muted); }
+.cctv-detail-close:hover { background: var(--neutral-button); color: var(--text); }
+.cctv-detail-close:focus-visible { outline: 2px solid rgba(0,128,102,.24); outline-offset: 2px; }
+.cctv-detail-dialog .detail-body { min-height: 0; display: block; flex: 1; overflow-y: auto; padding: 14px 20px; }
+.cctv-detail-table { margin: 0; overflow: hidden; border: 1px solid #e5e8eb; border-radius: 6px; }
+.cctv-detail-table > div { min-height: 36px; display: grid; grid-template-columns: 118px minmax(0,1fr); border-bottom: 1px solid #e5e8eb; }
+.cctv-detail-table > div:last-child { border-bottom: 0; }
+.cctv-detail-table dt,
+.cctv-detail-table dd { min-width: 0; display: flex; align-items: center; margin: 0; padding: 7px 10px; font-size: 13px; line-height: 20px; }
+.cctv-detail-table dt { background: #f2f4f6; color: #4e5968; font-weight: 700; }
+.cctv-required-mark { margin-left: 3px; color: var(--danger); font-weight: 800; }
+.cctv-detail-table dd { overflow: hidden; background: var(--white); color: #273548; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.cctv-detail-table dd.is-editing { padding: 0; overflow: visible; }
+.cctv-detail-table dd.is-editing.is-readonly { padding: 7px 10px; background: #f2f4f6; color: #6b7684; }
+.cctv-detail-table dd.is-editing input,
+.cctv-detail-table dd.is-editing select { width: 100%; max-width: none; height: 35px; min-height: 35px; padding: 6px 10px; border: 0; border-radius: 0; background: #fff; color: #273548; font-size: 13px; font-weight: 600; }
+.cctv-detail-table dd.is-editing input:focus,
+.cctv-detail-table dd.is-editing select:focus { position: relative; z-index: 1; outline: 2px solid rgba(0,128,102,.24); outline-offset: -2px; }
+.cctv-detail-table dd.is-editing.is-invalid input,
+.cctv-detail-table dd.is-editing.is-invalid select,
+.cctv-detail-table dd.is-editing.is-invalid input:focus,
+.cctv-detail-table dd.is-editing.is-invalid select:focus { position: relative; z-index: 1; background: #fff8f7; outline: 2px solid #f04438; outline-offset: -2px; }
+.cctv-required-message { margin: 6px 0 0; padding: 0 2px; color: #d92d20; font-size: 12px; line-height: 20px; font-weight: 650; }
+.cctv-detail-table dd.is-editing input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
+.cctv-detail-table dd.is-editing input[type="number"]::-webkit-inner-spin-button,
+.cctv-detail-table dd.is-editing input[type="number"]::-webkit-outer-spin-button { margin: 0; appearance: none; -webkit-appearance: none; }
+@supports (appearance: base-select) {
+  .cctv-detail-table select::picker(select) {
+    position-area: block-end span-inline-end;
+    position-try-fallbacks: none;
+    margin-block-start: 4px;
+  }
+}
+.cctv-detail-table dd.status-on,
+.cctv-detail-table dd.status-off { align-self: center; justify-self: start; min-height: 22px; margin-left: 10px; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.cctv-detail-table dd.status-on { background: #dcfce7; color: #16803c; }
+.cctv-detail-table dd.status-off { background: #f2f4f6; color: #667085; }
+
+.cctv-detail-dialog .detail-footer { position: static; min-height: 60px; padding: 10px 20px 14px; border-top: 0; background: var(--white); }
+.cctv-detail-dialog .detail-footer > div { display: flex; gap: 8px; }
+.cctv-detail-dialog .detail-footer button { min-width: 58px; min-height: 34px; padding: 6px 12px; font-size: var(--type-label-size); line-height: var(--type-label-line); font-weight: 650; }
+.cctv-detail-dialog .detail-footer .danger-button { background: var(--surface-danger-subtle); color: var(--text-danger); }
+.cctv-detail-dialog .detail-footer .danger-button:hover:enabled { background: #fbdde2; color: #c91f30; }
+
+@media (max-width: 800px) {
+  dialog.cctv-detail-dialog { width: calc(100vw - 24px); max-height: calc(100vh - 24px); border-radius: 14px; }
+  .cctv-detail-dialog .detail-header { min-height: 54px; align-items: center; padding: 9px 14px; }
+  .cctv-detail-dialog .detail-body { padding: 14px; }
+  .cctv-detail-dialog .detail-footer { flex-wrap: nowrap; padding: 12px 14px; }
+  .cctv-detail-dialog .detail-footer > div { width: auto; overflow: visible; }
+  .cctv-detail-dialog .detail-footer > div button { flex: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  section.crud-dialog--bottom-panel.cctv-detail-dialog { animation: none; }
+  dialog.cctv-detail-dialog[open], dialog.cctv-detail-dialog[open]::backdrop { animation: none; }
+}

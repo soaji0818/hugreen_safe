@@ -1,0 +1,21 @@
+.list-actions .cctv-monitoring-refresh { transform: translateY(6px); }
+
+.cctv-monitoring-filter-grid { grid-template-columns: minmax(0,1fr); }
+.filter-grid.cctv-monitoring-filter-grid > label { grid-template-columns: 140px minmax(0,1fr); }
+.cctv-monitoring-filter-grid > label > span:first-child { white-space: nowrap; }
+
+.cctv-monitoring-table table { min-width: 1220px; table-layout: fixed; }
+.cctv-monitoring-table col:nth-child(1) { width: 110px; }
+.cctv-monitoring-table col:nth-child(2) { width: 150px; }
+.cctv-monitoring-table col:nth-child(3) { width: 90px; }
+.cctv-monitoring-table col:nth-child(4),
+.cctv-monitoring-table col:nth-child(5) { width: 175px; }
+.cctv-monitoring-table col:nth-child(n+6):nth-child(-n+9) { width: 90px; }
+.cctv-monitoring-table col:nth-child(10) { width: 160px; }
+.cctv-monitoring-result-table { position: relative; }
+.cctv-monitoring-result-table::after { position: absolute; top: 42px; right: 0; z-index: 4; width: 8px; height: 34px; border-bottom: 1px solid var(--line); background: #f2f4f6; content: ""; }
+.cctv-monitoring-result-table .table-scroll { background: linear-gradient(to bottom,#f2f4f6 0 34px,transparent 34px); scrollbar-color: #b8c0c8 transparent; }
+.cctv-monitoring-result-table .table-scroll::-webkit-scrollbar { width: 8px; height: 8px; background: transparent; }
+.cctv-monitoring-result-table .table-scroll::-webkit-scrollbar-track:vertical { margin-top: 34px; background: transparent; }
+.cctv-monitoring-result-table .table-scroll::-webkit-scrollbar-thumb { border: 2px solid transparent; border-radius: 999px; background: #b8c0c8; background-clip: padding-box; }
+.cctv-monitoring-result-table .table-scroll::-webkit-scrollbar-corner { background: transparent; }

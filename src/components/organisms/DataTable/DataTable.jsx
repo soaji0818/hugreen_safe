@@ -97,8 +97,6 @@ export default function DataTable({
   renderCell,
   stateRow,
   emptyState,
-  emptyTitle,
-  emptyDescription,
   emptyResetLabel,
   onEmptyReset,
   resizableColumns = false,
@@ -322,8 +320,6 @@ export default function DataTable({
       </table>
       {!rows.length && !stateRow && (emptyState || (
         <TableEmptyState
-          title={emptyTitle}
-          description={emptyDescription}
           actionLabel={emptyResetLabel}
           onAction={onEmptyReset}
         />

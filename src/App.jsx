@@ -6,6 +6,10 @@ import LoginPage from "./pages/LoginPage";
 import { clearAuth, getStoredAuth, saveAuth } from "./services/authService";
 import { groups, pages } from "./pages";
 import "./styles/application.css";
+import "./pages/ai-cctv-management/styles/cctv-shared.css";
+import "./pages/ai-cctv-management/styles/cctv-master.css";
+import "./pages/ai-cctv-management/styles/cctv-monitoring.css";
+import "./pages/ai-cctv-management/styles/equipment-failures.css";
 
 export default function App() {
   const [auth, setAuth] = useState(getStoredAuth);

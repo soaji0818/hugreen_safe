@@ -1,21 +1,20 @@
 /* oxlint-disable react/only-export-components -- Page metadata and its dedicated component intentionally share this module. */
 import { useEffect, useMemo, useRef, useState } from "react";
-import DataTable from "../../components/organisms/DataTable/DataTable";
-import ContentTable from "../../components/templates/ContentTable/ContentTable";
-import SearchConditions from "../../components/organisms/SearchConditions/SearchConditions";
-import DropCondition from "../../components/molecules/SearchConditions/DropCondition";
-import RadioCondition from "../../components/molecules/SearchConditions/RadioConditioin";
-import Badge from "../../components/atoms/Badge/Badge";
-import Button from "../../components/atoms/Button/Button";
-import ConfirmDialog from "../../components/molecules/ConfirmDialog/ConfirmDialog";
-import CrudModal from "../../components/organisms/CrudModal/CrudModal";
-import { FileIcon, PlusIcon, SearchIcon, TrashIcon } from "../../components/atoms/Icon/Icon";
-import DropDownMenu from "../../components/atoms/Menu/DropDownMenu";
-import Toast, { TOAST_MESSAGES } from "../../components/molecules/Toast/Toast";
-import useCameraList from "../../hooks/useCameraList";
-import useCommonCodes from "../../hooks/useCommonCodes";
-import useZoneList from "../../hooks/useZoneList";
-import { removeCamera, updateCamera } from "../../services/cameraService";
+import DataTable from "../../../components/organisms/DataTable/DataTable";
+import ContentTable from "../../../components/templates/ContentTable/ContentTable";
+import SearchConditions from "../../../components/organisms/SearchConditions/SearchConditions";
+import Badge from "../../../components/atoms/Badge/Badge";
+import Button from "../../../components/atoms/Button/Button";
+import ConfirmDialog from "../../../components/molecules/ConfirmDialog/ConfirmDialog";
+import CrudModal from "../../../components/organisms/CrudModal/CrudModal";
+import { FileIcon, PlusIcon, ResetIcon, SearchIcon, TrashIcon } from "../../../components/atoms/Icon/Icon";
+import Checkbox from "../../../components/atoms/Checkbox/Checkbox";
+import DropDownMenu from "../../../components/atoms/Menu/DropDownMenu";
+import Toast, { TOAST_MESSAGES } from "../../../components/molecules/Toast/Toast";
+import useCameraList from "../../../hooks/useCameraList";
+import useCommonCodes from "../../../hooks/useCommonCodes";
+import useZoneList from "../../../hooks/useZoneList";
+import { removeCamera, updateCamera } from "../../../services/cameraService";
 
 const EMPTY_ROWS = [];
 const columns = [
@@ -52,14 +51,13 @@ export function CctvMasterPage({
   user,
   onUnauthorized,
   onUnsavedChange,
-  detailPresentation = "modal",
+  detailPresentation = "shrink-panel",
 }) {
   const [filters, setFilters] = useState({ factoryCd: "", focusYn: "", useYn: "", keyword: "" });
   const [localRows, setLocalRows] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
-  const [detailDataReady, setDetailDataReady] = useState(true);
   const [createMode, setCreateMode] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editValues, setEditValues] = useState(null);
@@ -77,7 +75,6 @@ export function CctvMasterPage({
   const dialogInteraction = useRef(null);
   const saveController = useRef(null);
   const detailCameraAfterRefetch = useRef("");
-  const detailRequestsStarted = useRef(false);
 
   const { data: serverRows, loading, error, refetch } = useCameraList({
     enabled: true,
@@ -106,8 +103,6 @@ export function CctvMasterPage({
     setSelectedId(detailRow?.id || serverRows[0]?.id || null);
     setCreateMode(false);
     setDetailOpen(Boolean(detailRow));
-    setDetailDataReady(!detailRow);
-    detailRequestsStarted.current = false;
     detailCameraAfterRefetch.current = "";
   }, [serverRows]);
 
@@ -146,18 +141,6 @@ export function CctvMasterPage({
     () => new Map(eventTypeCodes.map((code) => [code.value, code.label])),
     [eventTypeCodes],
   );
-  useEffect(() => {
-    if (!detailOpen || editMode || !selectedCameraId) {
-      detailRequestsStarted.current = false;
-      setDetailDataReady(true);
-      return;
-    }
-    if (zonesLoading || eventTypesLoading) {
-      detailRequestsStarted.current = true;
-      return;
-    }
-    if (detailRequestsStarted.current) setDetailDataReady(true);
-  }, [detailOpen, editMode, selectedCameraId, zonesLoading, eventTypesLoading]);
   const hasUnsavedChanges = editMode
     && (savePending || haveEditValuesChanged(editValues, editBaseline));
 
@@ -271,8 +254,6 @@ export function CctvMasterPage({
     setEditMode(false);
     setEditValues(null);
     setDetailOpen(true);
-    setDetailDataReady(false);
-    detailRequestsStarted.current = false;
   };
   const openCreate = () => {
     const initialValues = {
@@ -294,7 +275,6 @@ export function CctvMasterPage({
     setEditValues(initialValues);
     setEditMode(true);
     setDetailOpen(true);
-    setDetailDataReady(true);
   };
   const discardAndCloseDetail = () => {
     saveController.current?.abort();
@@ -507,31 +487,67 @@ export function CctvMasterPage({
       aria-label="AI CCTV 기준정보 관리 업무 영역"
     >
       <ContentTable>
-      <SearchConditions className="standard-filter-panel" onReset={resetFilters}>
-        <SearchConditions.Row columns={3} className="cctv-master-filter-grid">
-          <DropCondition
-            label="공장"
-            value={filters.factoryCd}
-            disabled={factoryLoading}
-            onChange={(factoryCd) => updateFilters({ factoryCd })}
-            placeholder="전체"
-            options={factoryCodes}
-          />
-          <RadioCondition
-            label="집중감시구역 여부"
-            name="cctv-focus"
-            value={filters.focusYn}
-            onChange={(focusYn) => updateFilters({ focusYn })}
-            options={[{ label: "전체", value: "" }, { label: "집중감시", value: "Y" }, { label: "일반구역", value: "N" }]}
-          />
-          <RadioCondition
-            label="사용 여부"
-            name="cctv-use"
-            value={filters.useYn}
-            onChange={(useYn) => updateFilters({ useYn })}
-            options={[{ label: "전체", value: "" }, { label: "사용", value: "Y" }, { label: "미사용", value: "N" }]}
-          />
-        </SearchConditions.Row>
+      <SearchConditions
+        className="standard-filter-panel"
+        ariaLabel="AI CCTV 기준정보 관리 조회 조건"
+        onReset={resetFilters}
+        showKeyword={false}
+        showReset={false}
+        startAction={<span className="cctv-filter-heading">조회조건</span>}
+        endAction={(
+          <Button type="button" variant="text" size="small" className="text-btn" icon={ResetIcon} iconSize={15} onClick={resetFilters}>
+            초기화
+          </Button>
+        )}
+      >
+        <div className="filter-grid standard-filter-grid cctv-master-filter-grid" data-count="3" style={{ "--filter-columns": 3 }}>
+          <label>
+            <span>공장</span>
+            <DropDownMenu
+              aria-label="공장"
+              value={filters.factoryCd}
+              disabled={factoryLoading}
+              onChange={(event) => updateFilters({ factoryCd: event.target.value })}
+            >
+              <option value="">전체</option>
+              {factoryCodes.map((code) => (
+                <option key={code.value} value={code.value}>{code.label}</option>
+              ))}
+            </DropDownMenu>
+          </label>
+          <label>
+            <span>집중감시구역 여부</span>
+            <span className="radio-options" role="radiogroup" aria-label="집중감시구역 여부">
+              {[{ label: "전체", value: "" }, { label: "집중감시", value: "Y" }, { label: "일반구역", value: "N" }].map((option) => (
+                <Checkbox inputType="radio" shape="circle"
+                  key={option.value || "all"}
+                  name="cctv-focus"
+                  value={option.value}
+                  checked={filters.focusYn === option.value}
+                  onChange={() => updateFilters({ focusYn: option.value })}
+                >
+                  {option.label}
+                </Checkbox>
+              ))}
+            </span>
+          </label>
+          <label>
+            <span>사용 여부</span>
+            <span className="radio-options" role="radiogroup" aria-label="사용 여부">
+              {[{ label: "전체", value: "" }, { label: "사용", value: "Y" }, { label: "미사용", value: "N" }].map((option) => (
+                <Checkbox inputType="radio" shape="circle"
+                  key={option.label}
+                  name="cctv-use"
+                  value={option.value}
+                  checked={filters.useYn === option.value}
+                  onChange={() => updateFilters({ useYn: option.value })}
+                >
+                  {option.label}
+                </Checkbox>
+              ))}
+            </span>
+          </label>
+        </div>
       </SearchConditions>
 
       <div className={`cctv-master-content${detailPresentation === "shrink-panel" && detailOpen ? " has-shrink-panel" : ""}`}>
@@ -600,7 +616,7 @@ export function CctvMasterPage({
         {(selectedRow || createMode) && (
           <CrudModal
           ref={detailDialog}
-          open={detailPresentation === "modal" ? detailOpen && detailDataReady : detailOpen}
+          open={detailOpen}
           presentation={detailPresentation}
           mode={createMode ? "create" : editMode ? "edit" : "detail"}
           titles={{
@@ -768,12 +784,14 @@ export function CctvMasterPage({
 }
 
 export default {
-  id: "MES-TD3-016",
+  id: "MES-TD3-016-SHRINK-PANEL",
   title: "AI CCTV 기준정보 관리",
   Component: CctvMasterPage,
+  hiddenFromMenu: true,
+  menuId: "MES-TD3-016",
   viewGroup: "cctv-master",
-  viewLabel: "모달형",
-  viewOrder: 1,
+  viewLabel: "축소패널",
+  viewOrder: 3,
   config: {
     actions: { save: true, export: false, create: true, delete: true, createLabel: "추가" },
     filters: ["공장", "집중감시구역 여부", "사용 여부"],
@@ -786,6 +804,6 @@ export default {
       "사용 여부",
     ],
     detail: "camera",
-    detailPresentation: "modal",
+    detailPresentation: "shrink-panel",
   },
 };

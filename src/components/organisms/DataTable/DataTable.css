@@ -6,10 +6,6 @@
   min-height: 0;
 }
 
-.work-panel:not(.tree-work-panel) .table-panel .data-table-toolbar {
-  margin-inline: 0;
-}
-
 .data-table-toolbar {
   min-height: 38px;
   display: flex;
@@ -28,7 +24,7 @@
 .data-table-toolbar .table-result-count {
   align-self: center;
   margin-right: auto;
-  transform: translateY(11px);
+  transform: translate(-8px, 8px);
   color: #8b95a1;
   font-size: var(--type-caption-size);
   line-height: var(--type-caption-line);
@@ -358,6 +354,10 @@ section.cctv-master-page.is-bottom-panel-page .cctv-master-table > .data-table {
 @media (max-width: 520px) {
   .data-table-toolbar {
     margin-inline: 0;
+  }
+
+  .data-table-toolbar .table-result-count {
+    transform: translateY(8px);
   }
 
   .data-table-toolbar__actions {

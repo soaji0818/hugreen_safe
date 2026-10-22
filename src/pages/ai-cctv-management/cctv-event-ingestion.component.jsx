@@ -266,7 +266,7 @@ export default function CctvEventIngestionPage({ user, onUnauthorized, onUnsaved
             verticalScroll
             toolbarActions={<Button icon={PlusIcon} onClick={openCreate}>추가</Button>}
             stateRow={loading || error ? <tr className="api-state-row"><td colSpan={columns.length}>{loading ? "원천 이벤트를 불러오는 중입니다." : <span className="raw-event-error">{error}<Button size="small" variant="weak" onClick={refetch}>다시 시도</Button></span>}</td></tr> : undefined}
-            emptyState={!loading && !error ? <TableEmptyState title="조회된 원천 이벤트가 없습니다." description="조회기간이나 조건을 변경해 다시 조회해 주세요." onAction={resetFilters} /> : <></>}
+            emptyState={!loading && !error ? <TableEmptyState onAction={resetFilters} /> : <></>}
           />
         </div>
       </ContentTable>

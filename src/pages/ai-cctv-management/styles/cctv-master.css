@@ -1,0 +1,69 @@
+.list-actions .cctv-toolbar-delete { border: 0; background: var(--surface-danger-subtle); color: var(--text-danger); }
+.list-actions .cctv-toolbar-delete:hover:enabled { background: #fbdde2; color: #c91f30; }
+
+.cctv-master-filter-grid { grid-template-columns: minmax(0,.8fr) repeat(2,minmax(0,1.1fr)); }
+.filter-grid.cctv-master-filter-grid > label { grid-template-columns: 140px minmax(0,1fr); }
+.cctv-master-filter-grid > label > span:first-child { white-space: nowrap; }
+
+.cctv-master-table { position: relative; }
+.cctv-master-table::after { position: absolute; top: 42px; right: 0; z-index: 4; width: 8px; height: 34px; border-bottom: 1px solid var(--line); background: #f2f4f6; content: ""; }
+.cctv-master-table .table-scroll { width: 100%; height: 100%; min-height: 0; overflow: auto; scrollbar-gutter: stable; overscroll-behavior: contain; background: linear-gradient(to bottom,#f2f4f6 0 34px,transparent 34px); scrollbar-color: #b8c0c8 transparent; }
+.cctv-master-table .table-scroll::-webkit-scrollbar { width: 8px; height: 8px; background: transparent; }
+.cctv-master-table .table-scroll::-webkit-scrollbar-track:vertical { margin-top: 34px; background: transparent; }
+.cctv-master-table .table-scroll::-webkit-scrollbar-thumb { border: 2px solid transparent; border-radius: 999px; background: #b8c0c8; background-clip: padding-box; }
+.cctv-master-table .table-scroll::-webkit-scrollbar-corner { background: transparent; }
+.cctv-master-table .resizable-table-scroll:not(.columns-resized-scroll) { overflow-x: auto; }
+.cctv-master-table .resizable-table:not(.columns-resized) { width: 100%; min-width: 0; table-layout: fixed; }
+.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(2) { width: 110px; }
+.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(3) { width: 150px; }
+.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(4) { width: 90px; }
+.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(5),
+.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(6) { width: 175px; }
+.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(7) { width: 160px; }
+.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(8) { width: 200px; }
+.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(9) { width: 110px; }
+.cctv-master-table .resizable-table:not(.columns-resized) col:nth-child(10) { width: 90px; }
+.cctv-master-table .resizable-table td:nth-child(9) { text-align: right; font-variant-numeric: tabular-nums; }
+.cctv-master-table .resizable-table th { position: sticky; top: 0; z-index: 3; }
+.cctv-master-table .resizable-table th.selection-col { padding: 0; text-align: center; vertical-align: middle; }
+.cctv-master-table .resizable-table th.selection-col input[type="checkbox"] { margin: auto; }
+.cctv-master-content { min-height: 180px; display: flex; flex: 1; overflow: hidden; }
+section.cctv-master-page .cctv-master-content > .cctv-master-table { min-width: 0; flex: 1; margin-inline: 0; }
+.cctv-master-content.has-bottom-panel { flex-direction: column; }
+section.cctv-master-page.is-shrink-panel-open { padding-right: 424px; }
+
+section.cctv-master-page.is-bottom-panel-page { height: auto; min-height: calc(var(--scaled-viewport-height) - 145px); flex: none; overflow: visible; }
+section.cctv-master-page.is-bottom-panel-page .cctv-master-content { min-height: 0; display: block; flex: none; overflow: visible; }
+section.cctv-master-page.is-bottom-panel-page .cctv-master-table { min-height: 0; display: block; overflow: visible; }
+section.cctv-master-page.is-bottom-panel-page .cctv-master-table .table-scroll { height: auto; max-height: 394px; overflow: auto; }
+section.cctv-master-page.is-bottom-panel-page .cctv-master-table { margin-bottom: 0; }
+
+.cctv-master-table .api-state-row { background: transparent; }
+.cctv-master-table .api-state-row td { height: 360px; border-right: 0; border-bottom: 0; background: transparent; }
+
+.cctv-zone-section { margin-top: 16px; }
+.cctv-zone-heading { min-height: 32px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.cctv-zone-heading h3 { margin: 0; color: #273548; font-size: 14px; line-height: 20px; font-weight: 750; }
+.cctv-zone-count { color: #8b95a1; font-size: 12px; line-height: 18px; }
+.cctv-zone-heading + #cctv-zone-content { margin-top: 6px; }
+.cctv-zone-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.cctv-zone-list.is-scrollable { max-height: 116px; padding-right: 4px; overflow-y: auto; overscroll-behavior: contain; }
+.cctv-zone-list > li { padding: 11px 12px; border: 1px solid #e5e8eb; border-radius: 8px; background: #fff; }
+.cctv-zone-list > li.is-inactive { background: #f8f9fa; }
+.cctv-zone-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.cctv-zone-summary strong { min-width: 0; overflow: hidden; color: #273548; font-size: 13px; line-height: 20px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.cctv-zone-status { flex: none; }
+.cctv-zone-events { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 8px; }
+.cctv-zone-events-label { width: 100%; color: #8b95a1; font-size: 11px; line-height: 16px; }
+.cctv-zone-event-tag { padding: 2px 7px; border-radius: 5px; background: #f2f4f6; color: #4e5968; font-size: 11px; line-height: 17px; font-weight: 650; }
+.cctv-zone-event-empty { color: #8b95a1; font-size: 12px; line-height: 20px; }
+.cctv-zone-state { display: grid; min-height: 72px; place-items: center; margin: 0; padding: 12px; border: 1px solid #e5e8eb; border-radius: 8px; color: #8b95a1; font-size: 12px; text-align: center; }
+.cctv-zone-state.is-error { gap: 8px; }
+.cctv-zone-state.is-error p { margin: 0; }
+.cctv-zone-state.is-error button { min-height: 32px; padding: 5px 10px; }
+.cctv-zone-code-error { margin: 7px 0 0; color: #8b95a1; font-size: 11px; line-height: 17px; }
+
+@media (min-width: 801px) {
+  .cctv-master-page { height: calc(var(--scaled-viewport-height) - 145px); }
+  .cctv-master-page .cctv-master-table { min-height: 180px; display: flex; flex: 1; }
+}

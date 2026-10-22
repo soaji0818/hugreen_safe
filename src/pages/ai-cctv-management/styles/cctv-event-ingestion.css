@@ -9,7 +9,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  margin: 0 !important;
+  margin-bottom: 0 !important;
   border: 1px solid #e5e8eb;
   border-radius: 8px;
   background: #fff;
