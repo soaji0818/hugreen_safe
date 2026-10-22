@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Badge from "../../components/atoms/Badge/Badge";
 import Button from "../../components/atoms/Button/Button";
+import Loader from "../../components/atoms/Loader/Loader";
 import { CameraIcon, EyeIcon, PlusIcon } from "../../components/atoms/Icon/Icon";
 import DropDownMenu from "../../components/atoms/Menu/DropDownMenu";
 import TableEmptyState from "../../components/molecules/EmptyState/TableEmptyState";
@@ -264,8 +265,11 @@ export default function CctvEventIngestionPage({ user, onUnauthorized, onUnsaved
             renderCell={renderCell}
             resizableColumns
             verticalScroll
+            virtualizeRows
+            loading={loading}
+            loadingLabel="원천 이벤트 불러오는 중"
             toolbarActions={<Button icon={PlusIcon} onClick={openCreate}>추가</Button>}
-            stateRow={loading || error ? <tr className="api-state-row"><td colSpan={columns.length}>{loading ? "원천 이벤트를 불러오는 중입니다." : <span className="raw-event-error">{error}<Button size="small" variant="weak" onClick={refetch}>다시 시도</Button></span>}</td></tr> : undefined}
+            stateRow={error ? <tr className="api-state-row"><td colSpan={columns.length}><span className="raw-event-error">{error}<Button size="small" variant="weak" onClick={refetch}>다시 시도</Button></span></td></tr> : undefined}
             emptyState={!loading && !error ? <TableEmptyState onAction={resetFilters} /> : <></>}
           />
         </div>
@@ -284,7 +288,7 @@ export default function CctvEventIngestionPage({ user, onUnauthorized, onUnsaved
               <div className="is-tall"><dt>입력 사유</dt><dd className="is-editing"><textarea maxLength={500} value={form.note} placeholder="수동 입력 사유를 입력하세요." onChange={(event) => setForm((current) => ({ ...current, note: event.target.value }))} /></dd></div>
             </dl>
           </section>
-        ) : detailLoading ? <div className="raw-event-detail-state">상세 정보를 불러오는 중입니다.</div> : detailError ? <div className="raw-event-detail-state is-error">{detailError}</div> : detail ? (
+        ) : detailLoading ? <div className="raw-event-detail-state"><Loader label="이벤트 상세 불러오는 중" /></div> : detailError ? <div className="raw-event-detail-state is-error">{detailError}</div> : detail ? (
           <div className="raw-event-detail-content">
             <section className="raw-event-form-section"><h3>수신 정보</h3><dl className="cctv-detail-table raw-event-detail-table">
               <div><dt>수신번호</dt><dd>{detail.rawNo}</dd></div><div><dt>수신일시</dt><dd>{formatDateTime(detail.recvDt)}</dd></div><div><dt>발생일시</dt><dd>{formatDateTime(detail.occurDt)}</dd></div><div><dt>외부 이벤트ID</dt><dd>{detail.extEventId || "-"}</dd></div><div><dt>카메라</dt><dd>{[detail.cameraId, detail.cameraNm].filter(Boolean).join(" · ") || "-"}</dd></div><div><dt>감지구역</dt><dd>{[detail.zoneId, detail.zoneNm].filter(Boolean).join(" · ") || "-"}</dd></div><div><dt>이벤트 유형</dt><dd>{eventTypeNames.get(detail.eventTypeCd) || detail.eventTypeCd || "-"}</dd></div><div><dt>AI 신뢰도</dt><dd>{detail.confidence == null ? "-" : `${(detail.confidence <= 1 ? detail.confidence * 100 : detail.confidence).toFixed(1)}%`}</dd></div><div><dt>등록 구분</dt><dd>{detail.regType === "MANUAL" ? "수동" : "자동"}</dd></div><div><dt>안전 이벤트</dt><dd>{detail.eventNo || "미등록"}</dd></div>

@@ -4,9 +4,14 @@ import { Children, Fragment, cloneElement, isValidElement, useEffect, useLayoutE
 import { createPortal } from "react-dom";
 import Button from "../../atoms/Button/Button";
 import Checkbox from "../../atoms/Checkbox/Checkbox";
+import Loader from "../../atoms/Loader/Loader";
 import TableEmptyState from "../../molecules/EmptyState/TableEmptyState";
 import useColumnResize from "../../../hooks/useColumnResize";
 import "./DataTable.css";
+
+const VIRTUAL_ROW_HEIGHT = 40;
+const VIRTUAL_HEADER_HEIGHT = 34;
+const VIRTUAL_OVERSCAN = 8;
 
 // TruncatedCellText 컴포넌트는 셀의 텍스트가 잘리는 경우, 마우스 오버 시 전체 텍스트를 보여주는 기능 제공
 function TruncatedCellText({ value, onReveal, onHide }) {
@@ -97,12 +102,27 @@ export default function DataTable({
   renderCell,
   stateRow,
   emptyState,
+  loading = false,
+  loadingLabel = "목록 불러오는 중",
   emptyResetLabel,
   onEmptyReset,
   resizableColumns = false,
   verticalScroll = false,
+  virtualizeRows = false,
   className = "",
 }) {
+  const displayRows = loading ? [] : rows;
+  const scrollRef = useRef(null);
+  const [virtualViewport, setVirtualViewport] = useState({ firstRow: 0, height: 600 });
+  const isVirtualized = virtualizeRows && verticalScroll && !loading && !stateRow && displayRows.length > 0;
+  const firstVisibleRow = isVirtualized ? Math.min(displayRows.length - 1, virtualViewport.firstRow) : 0;
+  const virtualStart = isVirtualized ? Math.max(0, firstVisibleRow - VIRTUAL_OVERSCAN) : 0;
+  const virtualEnd = isVirtualized
+    ? Math.min(displayRows.length, firstVisibleRow + Math.ceil(virtualViewport.height / VIRTUAL_ROW_HEIGHT) + VIRTUAL_OVERSCAN)
+    : displayRows.length;
+  const renderedRows = isVirtualized ? displayRows.slice(virtualStart, virtualEnd) : displayRows;
+  const virtualTopHeight = virtualStart * VIRTUAL_ROW_HEIGHT;
+  const virtualBottomHeight = (displayRows.length - virtualEnd) * VIRTUAL_ROW_HEIGHT;
   const tableColumns = columns.map(normalizeColumn);
   const hasColumnWidths = tableColumns.some((column) => column.width != null);
   const fixedTableWidth = tableColumns.length > 0 && tableColumns.every((column) => typeof column.width === "number" && column.width > 0)
@@ -122,7 +142,30 @@ export default function DataTable({
   // 선택된 행 상태 관리
   const [revealedText, setRevealedText] = useState(null);
   const selectAllRef = useRef(null);
-  const visibleRowIds = rows.map((row) => row.id);
+  useEffect(() => {
+    if (!virtualizeRows || !verticalScroll || !scrollRef.current) return undefined;
+    const scrollElement = scrollRef.current;
+    const updateViewport = () => {
+      const firstRow = Math.floor(Math.max(0, scrollElement.scrollTop - VIRTUAL_HEADER_HEIGHT) / VIRTUAL_ROW_HEIGHT);
+      const height = scrollElement.clientHeight;
+      setVirtualViewport((current) => current.firstRow === firstRow && current.height === height
+        ? current
+        : { firstRow, height });
+    };
+    const observer = new ResizeObserver(updateViewport);
+    observer.observe(scrollElement);
+    const frame = requestAnimationFrame(updateViewport);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [virtualizeRows, verticalScroll]);
+
+  useEffect(() => {
+    if (virtualizeRows && scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, [rows, virtualizeRows]);
+
+  const visibleRowIds = displayRows.map((row) => row.id);
   const selectedVisibleCount = visibleRowIds.filter((id) => selectedIds.includes(id)).length;
   const allVisibleRowsSelected = visibleRowIds.length > 0 && selectedVisibleCount === visibleRowIds.length;
   const someVisibleRowsSelected = selectedVisibleCount > 0 && !allVisibleRowsSelected;
@@ -181,12 +224,14 @@ export default function DataTable({
     resizableColumns ? "resizable-table" : "",
     hasColumnWidths ? "has-column-widths" : "",
     columnWidths.length ? "columns-resized" : "",
+    isVirtualized ? "is-virtualized" : "",
   ].filter(Boolean).join(" ");
 
   const scrollClassName = [
     "table-scroll",
     className,
     verticalScroll ? "data-table-vertical-scroll" : "",
+    loading ? "is-loading" : "",
     resizableColumns ? "resizable-table-scroll" : "",
     columnWidths.length ? "columns-resized-scroll" : "",
   ].filter(Boolean).join(" ");
@@ -197,19 +242,26 @@ export default function DataTable({
     <div className="data-table">
       {showToolbar && (
         <div className="list-actions data-table-toolbar" aria-label="목록 작업">
-          <span className="table-result-count" role="status">총 {totalCount}건</span>
+          <span className="table-result-count" role="status">총 {loading ? 0 : totalCount}건</span>
           {toolbarActions && (
             <div className="data-table-toolbar__actions">{sizeToolbarButtons(toolbarActions)}</div>
           )}
         </div>
       )}
       <div
+      ref={scrollRef}
       className={scrollClassName}
       tabIndex={0}
+      aria-busy={loading}
       aria-label={verticalScroll ? "결과 표 스크롤" : "결과 표 가로 스크롤"}
+      onScroll={isVirtualized ? (event) => {
+        const firstRow = Math.floor(Math.max(0, event.currentTarget.scrollTop - VIRTUAL_HEADER_HEIGHT) / VIRTUAL_ROW_HEIGHT);
+        setVirtualViewport((current) => current.firstRow === firstRow ? current : { ...current, firstRow });
+      } : undefined}
     >
       <table
         className={tableClassName || undefined}
+        aria-rowcount={isVirtualized ? displayRows.length + 1 : undefined}
         style={resolvedTableWidth != null ? {
           width: `${resolvedTableWidth}px`,
           minWidth: "100%",
@@ -271,8 +323,10 @@ export default function DataTable({
           </tr>
         </thead>
         <tbody>
-          {stateRow}
-          {rows.map((row, rowIndex) => {
+          {!loading && stateRow}
+          {isVirtualized && virtualTopHeight > 0 && <tr className="data-table-spacer-row" aria-hidden="true"><td colSpan={tableColumns.length + (selectable ? 1 : 0)} style={{ height: virtualTopHeight }} /></tr>}
+          {renderedRows.map((row, visibleIndex) => {
+            const rowIndex = virtualStart + visibleIndex;
             const isSelected = selectable
               ? selectedIds.includes(row.id)
               : row.id === selectedId;
@@ -280,6 +334,7 @@ export default function DataTable({
               <tr
                 key={row.id}
                 className={isSelected ? "selected" : ""}
+                aria-rowindex={isVirtualized ? rowIndex + 2 : undefined}
                 onClick={() => onRowClick?.(row.id)}
                 onDoubleClick={() => onRowDoubleClick?.(row.id)}
               >
@@ -316,9 +371,10 @@ export default function DataTable({
               </tr>
             );
           })}
+          {isVirtualized && virtualBottomHeight > 0 && <tr className="data-table-spacer-row" aria-hidden="true"><td colSpan={tableColumns.length + (selectable ? 1 : 0)} style={{ height: virtualBottomHeight }} /></tr>}
         </tbody>
       </table>
-      {!rows.length && !stateRow && (emptyState || (
+      {loading ? <div className="data-table-loading"><Loader label={loadingLabel} /></div> : !displayRows.length && !stateRow && (emptyState || (
         <TableEmptyState
           actionLabel={emptyResetLabel}
           onAction={onEmptyReset}

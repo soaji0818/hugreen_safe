@@ -565,17 +565,18 @@ export function CctvMasterPage({
           selectedId={selectedId}
           selectedIds={selectedIds}
           resizableColumns
+          loading={loading}
+          loadingLabel="카메라 목록 불러오는 중"
           onRowClick={setSelectedId}
           onRowDoubleClick={openDetail}
           onToggleRow={toggleRow}
           onToggleAll={toggleAllRows}
-          emptyState={loading ? <></> : undefined}
           renderCell={(row, column) => column === "사용 여부" ? (
             <Badge size="small" variant="weak" tone={row.useYn === "N" ? "gray" : "green"}>
               {row[column]}
             </Badge>
           ) : row[column]}
-          stateRow={(error || (!loading && filteredRows.length === 0)) ? (
+          stateRow={(error || filteredRows.length === 0) ? (
             <tr className="api-state-row">
               <td colSpan={columns.length + 1}>
                 {error ? (

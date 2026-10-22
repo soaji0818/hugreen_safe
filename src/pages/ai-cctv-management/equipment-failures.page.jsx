@@ -590,6 +590,8 @@ function EquipmentFailuresPage({ user, onUnauthorized, onUnsavedChange }) {
           onRowClick={openDetail}
           renderCell={renderCell}
           resizableColumns
+          loading={loading}
+          loadingLabel="장비 장애 이력 불러오는 중"
           stateRow={error ? (
             <tr className="api-state-row">
               <td colSpan={columns.length}>

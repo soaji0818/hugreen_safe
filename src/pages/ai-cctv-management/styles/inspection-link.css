@@ -69,9 +69,10 @@ dialog.inspection-link-dialog {
 }
 
 .inspection-link-loading {
-  margin: 20px;
-  color: #657384;
-  font-size: 13px;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .inspection-link-form-content h3 {

@@ -296,6 +296,8 @@ function CctvMonitoringPage({ user, onUnauthorized }) {
           selectable={false}
           selectedId={selectedId}
           verticalScroll
+          loading={loading}
+          loadingLabel="카메라 상태 불러오는 중"
           className="cctv-monitoring-table"
           onRowClick={setSelectedId}
           onRowDoubleClick={openDetail}

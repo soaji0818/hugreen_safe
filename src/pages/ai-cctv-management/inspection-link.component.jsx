@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import Badge from "../../components/atoms/Badge/Badge";
+import Loader from "../../components/atoms/Loader/Loader";
 import DataTable from "../../components/organisms/DataTable/DataTable";
 import CrudModal from "../../components/organisms/CrudModal/CrudModal";
 import SearchConditions from "../../components/organisms/SearchConditions/SearchConditions";
@@ -331,12 +332,12 @@ export default function InspectionLinkPage({ user, onUnauthorized, onUnsavedChan
           <DropCondition label="이벤트 유형" value={filters.eventTypeCd} placeholder={typeError ? "유형 조회 실패" : "전체"} options={eventTypes} onChange={(value) => changeFilters({ eventTypeCd: value })} />
         </SearchConditions>
         <div className="inspection-link-results">
-          <DataTable columns={columns} rows={rows} selectable={false} onRowClick={openCreate} renderCell={renderCell} verticalScroll stateRow={loading || error ? <tr className="api-state-row"><td colSpan={columns.length}>{loading ? "연결할 이벤트를 불러오는 중입니다." : error}</td></tr> : undefined} emptyState={<TableEmptyState onAction={() => setFilters(initialFilters())} />} />
+          <DataTable columns={columns} rows={rows} selectable={false} onRowClick={openCreate} renderCell={renderCell} verticalScroll loading={loading} loadingLabel="연결할 이벤트 불러오는 중" stateRow={error ? <tr className="api-state-row"><td colSpan={columns.length}>{error}</td></tr> : undefined} emptyState={<TableEmptyState onAction={() => setFilters(initialFilters())} />} />
         </div>
       </ContentTable>
 
       <CrudModal open={Boolean(selected)} mode="create" titles={{ create: selected?.chkNo ? "안전점검일지 수정" : "안전점검일지 등록" }} formId="inspection-link-form" className="inspection-link-dialog cctv-detail-dialog" saving={saving} saveLabel={selected?.chkNo ? "점검일지 수정" : "안전점검일지 등록"} savingLabel="저장 중..." onClose={closeCreate} onSubmit={submitCheck}>
-        {selected && detailLoading && <p className="inspection-link-loading">점검일지를 불러오는 중입니다.</p>}
+        {selected && detailLoading && <div className="inspection-link-loading"><Loader label="점검일지 불러오는 중" /></div>}
         {selected && !detailLoading && !form && formError && <p className="inspection-link-error inspection-link-loading" role="alert">{formError}</p>}
         {selected && form && <div className="inspection-link-form-content">
           <section className="inspection-link-context" aria-label="선택한 이벤트">
@@ -369,14 +370,14 @@ export default function InspectionLinkPage({ user, onUnauthorized, onUnsavedChan
               </label>
             </div>
             {documentError && <p className="inspection-link-error">{documentError}</p>}
-            {!selected.chkNo && documentsLoading && <p className="inspection-link-help">점검 문서를 불러오는 중입니다.</p>}
+            {!selected.chkNo && documentsLoading && <div className="inspection-link-loading"><Loader size={24} label="점검 문서 불러오는 중" /></div>}
             {!selected.chkNo && !documentsLoading && !documentError && !documents.length && <p className="inspection-link-help">선택한 설비에 사용 가능한 점검 문서가 없습니다.</p>}
           </section>
 
           <section className="inspection-link-form-section">
             <h3>항목별 점검 결과</h3>
             <p className="inspection-link-help">기존 문서 항목에 맞춰 점검 결과를 입력해 주세요. 이벤트 정보는 위에서 확인할 수 있습니다.</p>
-            {itemsLoading && <p className="inspection-link-help">점검 항목을 불러오는 중입니다.</p>}
+            {itemsLoading && <div className="inspection-link-loading"><Loader size={24} label="점검 항목 불러오는 중" /></div>}
             {itemsError && <p className="inspection-link-error">{itemsError}</p>}
             {!itemsLoading && form.docCd && !itemsError && !items.length && <p className="inspection-link-help">사용 가능한 점검 항목이 없습니다.</p>}
             {items.length > 0 && <div className="inspection-link-items">

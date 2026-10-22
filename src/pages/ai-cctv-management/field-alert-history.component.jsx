@@ -200,7 +200,9 @@ export default function FieldAlertHistoryPage({ user, onUnauthorized, onUnsavedC
             renderCell={renderCell}
             resizableColumns
             verticalScroll
-            stateRow={loading || error ? <tr className="api-state-row"><td colSpan={columns.length}>{loading ? "경보 이력을 불러오는 중입니다." : <span className="field-alert-error">{error}<Button size="small" variant="weak" onClick={refetch}>다시 시도</Button></span>}</td></tr> : undefined}
+            loading={loading}
+            loadingLabel="경보 이력 불러오는 중"
+            stateRow={error ? <tr className="api-state-row"><td colSpan={columns.length}><span className="field-alert-error">{error}<Button size="small" variant="weak" onClick={refetch}>다시 시도</Button></span></td></tr> : undefined}
             emptyState={!loading && !error ? <TableEmptyState onAction={() => setFilters(initialFilters())} /> : <></>}
           />
         </div>

@@ -45,11 +45,6 @@ function formatDateTime(value) {
   return value ? String(value).replace("T", " ").slice(0, 19) : "-";
 }
 
-function requestState(error, loading, colSpan, label) {
-  if (!error && !loading) return undefined;
-  return <tr className="api-state-row"><td colSpan={colSpan} role="status">{loading ? `${label} 불러오는 중입니다.` : error}</td></tr>;
-}
-
 function exportEventRows(rows, eventTypeNames, riskNames, statusNames) {
   const escape = (value) => `"${String(value ?? "").replaceAll('"', '""')}"`;
   const lines = [
@@ -148,7 +143,7 @@ export default function EquipmentEventsPage({ user, onUnauthorized }) {
           <DropCondition label="처리 상태" value={filters.statusCd} placeholder={statusError ? "상태 조회 실패" : "전체"} options={statuses} onChange={(value) => changeFilters({ statusCd: value })} />
         </SearchConditions>
         <div className="equipment-events-list-panel">
-          <DataTable columns={eventColumns} rows={eventRows} selectable={false} renderCell={renderEventCell} verticalScroll toolbarActions={<Button variant="weak" className="export-button" icon={DownloadIcon} disabled={!eventRows.length || eventLoading} onClick={() => exportEventRows(eventRows, eventTypeNames, riskNames, statusNames)}>엑셀 내보내기</Button>} stateRow={requestState(eventError, eventLoading, eventColumns.length, "AI CCTV 이벤트를")} emptyState={<TableEmptyState onAction={() => changeFilters(initialFilters())} />} />
+          <DataTable columns={eventColumns} rows={eventRows} selectable={false} renderCell={renderEventCell} verticalScroll loading={eventLoading} loadingLabel="AI CCTV 이벤트 불러오는 중" toolbarActions={<Button variant="weak" className="export-button" icon={DownloadIcon} disabled={!eventRows.length || eventLoading} onClick={() => exportEventRows(eventRows, eventTypeNames, riskNames, statusNames)}>엑셀 내보내기</Button>} stateRow={eventError ? <tr className="api-state-row"><td colSpan={eventColumns.length}>{eventError}</td></tr> : undefined} emptyState={<TableEmptyState onAction={() => changeFilters(initialFilters())} />} />
         </div>
       </ContentTable>
     </section>
