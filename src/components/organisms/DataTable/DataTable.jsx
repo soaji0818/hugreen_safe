@@ -212,7 +212,10 @@ export default function DataTable({
     >
       <table
         className={tableClassName || undefined}
-        style={resolvedTableWidth != null ? { width: `${resolvedTableWidth}px` } : undefined}
+        style={resolvedTableWidth != null ? {
+          width: `${resolvedTableWidth}px`,
+          minWidth: "100%",
+        } : undefined}
       >
         <colgroup>
           {selectable && <col className="selection-column-width" />}

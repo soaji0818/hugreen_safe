@@ -5,5 +5,6 @@ export async function getCommonCodes(params) {
   return (payload?.data || []).map((code) => ({
     value: code.comCode,
     label: code.codeNm || code.comCode,
+    cdRule1: code.cdRule1 || "",
   }));
 }

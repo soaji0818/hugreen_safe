@@ -7,8 +7,8 @@ export default {
   config: {
     actions: { save: true, export: true, create: true, createLabel: "추가" },
     summary: ["오늘 수신", "확인 대기", "스냅샷"],
-    filters: ["기간", "카메라", "이벤트 유형", "확인 상태"],
-    cols: ["수신번호", "수신일시", "발생일시", "외부 이벤트ID", "카메라ID", "이벤트 유형", "스냅샷 수", "확인 상태"],
+    filters: ["수신기간", "이벤트 유형", "카메라", "등록 구분"],
+    cols: ["수신번호", "발생일시", "카메라명", "구역", "이벤트 유형", "해제일시", "스냅샷", "확인 상태"],
     detail: "receive",
   },
 };
