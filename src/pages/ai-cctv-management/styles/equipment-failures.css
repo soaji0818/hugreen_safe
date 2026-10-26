@@ -11,17 +11,24 @@
 .failure-event-type-options { flex-wrap: nowrap; gap: 6px 16px; overflow-x: auto; }
 .failure-table-panel, .failure-table-panel .table-scroll { min-height: 260px; }
 .failure-error-state { display: inline-flex; align-items: center; gap: 10px; }
-.failure-process-complete.ui-button--weak { background: #f2f4f6; color: #4e5968; }
-.failure-process-complete.ui-button--weak:hover:enabled { background: #e5e8eb; }
-.failure-record-grid { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; }
-.failure-record-grid > .failure-detail-section { min-width: 0; }
 .failure-detail-table { margin: 0; overflow: visible; border-radius: 6px; }
 .failure-detail-table dd.is-multiline { min-height: 60px; align-items: flex-start; overflow: auto; line-height: 1.5; text-overflow: clip; white-space: pre-wrap; overflow-wrap: anywhere; }
 .failure-detail-table dd.is-editing textarea { width: 100%; height: 54px; min-height: 54px; max-height: 130px; padding: 7px 10px; border: 0; border-radius: 0; background: #fff; color: #273548; font: inherit; font-size: 13px; font-weight: 600; line-height: 20px; resize: vertical; }
 .failure-detail-table dd.is-editing textarea:focus { position: relative; z-index: 1; outline: 2px solid rgba(0,128,102,.24); outline-offset: -2px; }
-@media (max-width: 760px) {
-  .failure-record-grid { grid-template-columns: minmax(0, 1fr); }
-}
+dialog.failure-record-dialog.cctv-detail-dialog[open] { width: min(440px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); }
+.failure-process-content { display: grid; gap: 28px; width: 100%; }
+.failure-process-content .failure-detail-section { min-width: 0; margin: 0; padding: 0; border: 0; }
+.failure-process-content .failure-detail-section + .failure-detail-section { margin: 0; padding: 0; border: 0; }
+.failure-process-content .failure-process-section-title { display: flex; align-items: center; justify-content: space-between; margin: 0 0 10px; color: #192b3e; font-size: 13px; line-height: 20px; font-weight: 700; }
+.failure-process-content .failure-detail-section--process .failure-process-section-title { color: #06735d; }
+.failure-process-content .failure-detail-table { margin: 0; overflow: hidden; border: 1px solid #e5e8eb; border-radius: 8px; }
+.failure-process-content .failure-detail-table > div { grid-template-columns: 114px minmax(0, 1fr); }
+.failure-process-content .failure-detail-table dd:not(.is-editing) { white-space: normal; overflow-wrap: anywhere; }
+.failure-record-dialog .failure-detail-table dd.is-multiline { min-height: 36px; }
+.failure-process-content .failure-detail-section--fault.is-readonly .failure-detail-table { border-color: #d9dfe3; background: #f5f6f7; }
+.failure-process-content .failure-detail-section--fault.is-readonly .failure-detail-table > div { border-bottom-color: #dfe3e6; }
+.failure-process-content .failure-detail-section--fault.is-readonly .failure-detail-table dt { background: #e9ecef; }
+.failure-process-content .failure-detail-section--fault.is-readonly .failure-detail-table dd { background: #f5f6f7; color: #596574; }
 .event-camera-search { position: relative; z-index: 2; width: 100%; min-width: 0; }
 .event-camera-search > input { width: 100%; max-width: none; height: 35px; min-height: 35px; padding: 6px 10px; border: 0; border-radius: 0; background: #fff; color: #273548; font-size: 13px; font-weight: 600; }
 .event-camera-search > input:focus { position: relative; z-index: 1; outline: 2px solid rgba(0,128,102,.24); outline-offset: -2px; }

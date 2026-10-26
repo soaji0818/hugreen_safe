@@ -40,8 +40,9 @@
   gap: 10px;
 }
 
-dialog.field-alert-dialog {
-  width: min(820px, calc(100vw - 32px));
+dialog.field-alert-dialog.cctv-detail-dialog[open] {
+  width: min(600px, calc(100vw - 32px));
+  max-height: min(680px, calc(100dvh - 32px));
 }
 
 .field-alert-dialog .detail-body {
@@ -58,6 +59,11 @@ dialog.field-alert-dialog {
   color: #273548;
   font-size: 13px;
 }
+
+.field-alert-detail-section--alarm.is-readonly .field-alert-detail-table { border-color: #d9dfe3; background: #f5f6f7; }
+.field-alert-detail-section--alarm.is-readonly .field-alert-detail-table > div { border-color: #dfe3e6; }
+.field-alert-detail-section--alarm.is-readonly .field-alert-detail-table dt { background: #e9ecef; }
+.field-alert-detail-section--alarm.is-readonly .field-alert-detail-table dd { background: #f5f6f7; color: #596574; }
 
 .field-alert-detail-table {
   display: grid;
@@ -108,23 +114,6 @@ dialog.field-alert-dialog {
 .field-alert-detail-table dd.is-editing textarea:focus {
   outline: 2px solid rgba(0, 128, 102, .3);
   outline-offset: -2px;
-}
-
-.field-alert-detail-table dd.field-alert-date-input {
-  display: flex;
-  align-items: stretch;
-}
-
-.field-alert-date-input input {
-  min-width: 0;
-  flex: 1 1 auto;
-}
-
-.field-alert-date-input .ui-button {
-  flex: none;
-  margin: 3px;
-  padding-inline: 7px;
-  white-space: nowrap;
 }
 
 .field-alert-clear-release {

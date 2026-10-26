@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Badge from "../../components/atoms/Badge/Badge";
 import Button from "../../components/atoms/Button/Button";
+import ConfirmDialog from "../../components/molecules/ConfirmDialog/ConfirmDialog";
 import TableEmptyState from "../../components/molecules/EmptyState/TableEmptyState";
 import DateCondition from "../../components/molecules/SearchConditions/DateCondition";
 import DropCondition from "../../components/molecules/SearchConditions/DropCondition";
@@ -24,7 +25,6 @@ const columns = [
   { key: "equipCd", label: "설비", width: 115 },
   { key: "riskLvCd", label: "경보 유형", width: 104 },
   { key: "runResult", label: "작동 결과", width: 104 },
-  { key: "senderType", label: "발송 주체", width: 114 },
   { key: "sendResult", label: "발송 결과", width: 104 },
   { key: "releaseStatus", label: "해제 상태", width: 104 },
 ];
@@ -68,17 +68,38 @@ function nowForInput() {
 }
 
 function releaseValues(row) {
-  return { releaseDt: toDateTimeInput(row.releaseDt), releaseReason: row.releaseReason || "", memo: row.memo || "" };
+  return { releaseDt: row.releaseDt ? toDateTimeInput(row.releaseDt) : nowForInput(), releaseMemberId: row.releaseMemberId || "", releaseReason: row.releaseReason || "", memo: row.memo || "" };
 }
 
 export default function FieldAlertHistoryPage({ user, onUnauthorized, onUnsavedChange }) {
   const [filters, setFilters] = useState(initialFilters);
   const [selected, setSelected] = useState(null);
+  const [highlightedRowId, setHighlightedRowId] = useState(null);
   const [mode, setMode] = useState(null);
   const [form, setForm] = useState(null);
   const [baseline, setBaseline] = useState(null);
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState("");
+  const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
+  const [devAlarm, setDevAlarm] = useState(() => import.meta.env.DEV ? {
+    id: "AL-DEV-0001",
+    alarmNo: "AL-DEV-0001",
+    occurDt: `${nowForInput()}:00`,
+    eventNo: "EV-DEV-0001",
+    cameraId: "AIB2-CH05",
+    targetNm: "AIB2 CH05 경광등",
+    equipCd: "DEV-EQUIP",
+    riskLvCd: "CAUTION",
+    runResult: "성공",
+    senderType: "MES",
+    sendResult: "성공",
+    sendNo: 990001,
+    respSec: 1.2,
+    releaseDt: null,
+    releaseMemberId: null,
+    releaseReason: null,
+    memo: "모달 확인용 임시 데이터",
+  } : null);
 
   const { data: rows, loading, error, refetch } = useAlarmHistory({
     token: user?.token,
@@ -93,6 +114,17 @@ export default function FieldAlertHistoryPage({ user, onUnauthorized, onUnsavedC
   const { data: cameras, error: cameraError } = useCameraList({ enabled: Boolean(user?.token), token: user?.token, onUnauthorized });
   const { data: riskLevels, error: riskError } = useCommonCodes({ enabled: Boolean(user?.token), token: user?.token, codeDiv: "RISK_LV", onUnauthorized });
 
+  const visibleRows = useMemo(() => {
+    if (!devAlarm) return rows;
+    const occurDate = devAlarm.occurDt.slice(0, 10);
+    const matches = (!filters.fromDt || occurDate >= filters.fromDt)
+      && (!filters.toDt || occurDate <= filters.toDt)
+      && (!filters.cameraId || devAlarm.cameraId === filters.cameraId)
+      && (!filters.equipCd || devAlarm.equipCd === filters.equipCd)
+      && (!filters.riskLvCd || devAlarm.riskLvCd === filters.riskLvCd)
+      && (!filters.releaseYn || (devAlarm.releaseDt ? "Y" : "N") === filters.releaseYn);
+    return matches ? [devAlarm, ...rows] : rows;
+  }, [devAlarm, filters, rows]);
   const riskNames = useMemo(() => new Map(riskLevels.map((item) => [item.value, item.label])), [riskLevels]);
   const cameraOptions = useMemo(() => cameras.filter((camera) => camera.cameraId).map((camera) => ({
     value: camera.cameraId,
@@ -100,8 +132,8 @@ export default function FieldAlertHistoryPage({ user, onUnauthorized, onUnsavedC
   })), [cameras]);
   // The Swagger API has no EquipmentM list endpoint. Only offer equipment codes
   // actually returned by the current alarm query until the master API is available.
-  const equipmentOptions = useMemo(() => [...new Set([...rows.map((row) => row.equipCd), filters.equipCd]
-    .filter(Boolean))].sort().map((equipCd) => ({ value: equipCd, label: equipCd })), [rows, filters.equipCd]);
+  const equipmentOptions = useMemo(() => [...new Set([...visibleRows.map((row) => row.equipCd), filters.equipCd]
+    .filter(Boolean))].sort().map((equipCd) => ({ value: equipCd, label: equipCd })), [visibleRows, filters.equipCd]);
   const dirty = mode === "edit" && JSON.stringify(form) !== JSON.stringify(baseline);
 
   useEffect(() => {
@@ -114,29 +146,40 @@ export default function FieldAlertHistoryPage({ user, onUnauthorized, onUnsavedC
   }
 
   function openDetail(id) {
-    const row = rows.find((item) => item.id === id);
+    const row = visibleRows.find((item) => item.id === id);
     if (!row) return;
+    setHighlightedRowId(id);
     setSelected(row);
     setMode("detail");
     setForm(null);
     setBaseline(null);
   }
 
-  function openEdit() {
-    if (!selected) return;
-    const values = releaseValues(selected);
+  function openRelease(row) {
+    if (!row) return;
+    setSelected(row);
+    const values = releaseValues(row);
     setForm(values);
     setBaseline(values);
     setMode("edit");
   }
 
-  function closeDetail() {
-    if (saving) return;
-    if (dirty && !window.confirm("저장하지 않은 내용이 있습니다. 닫으시겠습니까?")) return;
+  function openEdit() {
+    openRelease(selected);
+  }
+
+  function finishClose() {
+    setLeaveConfirmOpen(false);
     setMode(null);
     setSelected(null);
     setForm(null);
     setBaseline(null);
+  }
+
+  function closeDetail() {
+    if (saving) return;
+    if (dirty) setLeaveConfirmOpen(true);
+    else finishClose();
   }
 
   async function submitRelease(event) {
@@ -144,19 +187,29 @@ export default function FieldAlertHistoryPage({ user, onUnauthorized, onUnsavedC
     if (!selected || !form || saving) return;
     setSaving(true);
     try {
+      if (devAlarm && selected.alarmNo === devAlarm.alarmNo) {
+        setDevAlarm((current) => ({
+          ...current,
+          releaseDt: form.releaseDt || null,
+          releaseMemberId: form.releaseMemberId.trim() || null,
+          releaseReason: form.releaseReason.trim() || null,
+          memo: form.memo.trim() || null,
+        }));
+        finishClose();
+        setNotice("임시 경보의 해제 정보를 화면에 반영했습니다.");
+        return;
+      }
       await saveAlarmRelease({
         token: user?.token,
         alarmNo: selected.alarmNo,
         data: {
           releaseDt: toApiDateTime(form.releaseDt),
+          releaseMemberId: form.releaseMemberId.trim() || null,
           releaseReason: form.releaseReason.trim() || null,
           memo: form.memo.trim() || null,
         },
       });
-      setMode(null);
-      setSelected(null);
-      setForm(null);
-      setBaseline(null);
+      finishClose();
       setNotice("경보 해제 정보를 저장했습니다.");
       refetch();
     } catch (requestError) {
@@ -191,11 +244,11 @@ export default function FieldAlertHistoryPage({ user, onUnauthorized, onUnsavedC
         <div className="table-panel field-alert-table-panel">
           <DataTable
             columns={columns}
-            rows={rows}
-            totalCount={rows.length}
+            rows={visibleRows}
+            totalCount={visibleRows.length}
             selectable={false}
-            selectedId={selected?.id}
-            onRowClick={openDetail}
+            selectedId={highlightedRowId}
+            onRowClick={setHighlightedRowId}
             onRowDoubleClick={openDetail}
             renderCell={renderCell}
             resizableColumns
@@ -208,9 +261,9 @@ export default function FieldAlertHistoryPage({ user, onUnauthorized, onUnsavedC
         </div>
       </ContentTable>
 
-      <CrudModal open={Boolean(mode)} mode={mode || "detail"} titles={{ detail: "경보 이력 상세", edit: "경보 해제 정보 수정" }} formId="field-alert-release-form" className="field-alert-dialog cctv-detail-dialog" saving={saving} onClose={closeDetail} onSubmit={submitRelease} onEdit={mode === "detail" ? openEdit : undefined}>
+      <CrudModal open={Boolean(mode)} mode={mode || "detail"} titles={{ detail: "경보 이력 상세", edit: "경보 해제 정보 수정" }} formId="field-alert-release-form" className="field-alert-dialog cctv-detail-dialog" saving={saving} saveLabel="저장" savingLabel="저장 중..." onClose={closeDetail} onSubmit={submitRelease} onEdit={mode === "detail" ? openEdit : undefined}>
         {selected && <div className="field-alert-detail-content">
-          <section className="field-alert-detail-section"><h3>경보 정보</h3><dl className="cctv-detail-table field-alert-detail-table">
+          <section className={`field-alert-detail-section field-alert-detail-section--alarm${mode === "edit" ? " is-readonly" : ""}`}><h3>경보 정보</h3><dl className="cctv-detail-table field-alert-detail-table">
             <div><dt>경보번호</dt><dd>{selected.alarmNo || "-"}</dd></div>
             <div><dt>발생일시</dt><dd>{formatDateTime(selected.occurDt)}</dd></div>
             <div><dt>원인 이벤트</dt><dd>{selected.eventNo || "-"}</dd></div>
@@ -225,13 +278,21 @@ export default function FieldAlertHistoryPage({ user, onUnauthorized, onUnsavedC
             <div><dt>응답시간</dt><dd>{selected.respSec == null ? "-" : `${selected.respSec}초`}</dd></div>
           </dl></section>
           <section className="field-alert-detail-section"><h3>해제 이력</h3><dl className="cctv-detail-table field-alert-detail-table">
-            <div><dt>해제 일시</dt>{mode === "edit" ? <dd className="is-editing field-alert-date-input"><input type="datetime-local" value={form.releaseDt} onChange={(event) => setForm((current) => ({ ...current, releaseDt: event.target.value }))} /><Button variant="weak" size="small" onClick={() => setForm((current) => ({ ...current, releaseDt: nowForInput() }))}>현재 시각</Button></dd> : <dd>{formatDateTime(selected.releaseDt)}</dd>}</div>
-            <div><dt>해제자</dt><dd>{selected.releaseMemberId || "-"}</dd></div>
+            <div className="is-wide"><dt>해제 일시</dt>{mode === "edit" ? <dd className="is-editing"><input type="datetime-local" value={form.releaseDt} onChange={(event) => setForm((current) => ({ ...current, releaseDt: event.target.value }))} /></dd> : <dd>{formatDateTime(selected.releaseDt)}</dd>}</div>
+            <div className="is-wide"><dt>해제자</dt>{mode === "edit" ? <dd className="is-editing"><input maxLength={100} value={form.releaseMemberId} onChange={(event) => setForm((current) => ({ ...current, releaseMemberId: event.target.value }))} /></dd> : <dd>{selected.releaseMemberId || "-"}</dd>}</div>
             <div className="is-wide"><dt>해제 사유</dt>{mode === "edit" ? <dd className="is-editing"><input maxLength={200} value={form.releaseReason} onChange={(event) => setForm((current) => ({ ...current, releaseReason: event.target.value }))} /></dd> : <dd>{selected.releaseReason || "-"}</dd>}</div>
             <div className="is-wide is-tall"><dt>비고</dt>{mode === "edit" ? <dd className="is-editing"><textarea maxLength={500} value={form.memo} onChange={(event) => setForm((current) => ({ ...current, memo: event.target.value }))} /></dd> : <dd className="is-multiline">{selected.memo || "-"}</dd>}</div>
-          </dl>{mode === "edit" && selected.releaseDt && <Button className="field-alert-clear-release" variant="text" size="small" onClick={() => setForm((current) => ({ ...current, releaseDt: "", releaseReason: "" }))}>해제 취소</Button>}</section>
+          </dl>{mode === "edit" && selected.releaseDt && <Button className="field-alert-clear-release" variant="text" size="small" onClick={() => setForm((current) => ({ ...current, releaseDt: "", releaseMemberId: "", releaseReason: "" }))}>해제 취소</Button>}</section>
         </div>}
       </CrudModal>
+      <ConfirmDialog
+        open={leaveConfirmOpen}
+        title="저장되지 않은 내용이 있습니다."
+        description="저장하지 않고 나가시겠습니까?"
+        confirmLabel="나가기"
+        onCancel={() => setLeaveConfirmOpen(false)}
+        onConfirm={finishClose}
+      />
       <Toast open={Boolean(notice)} message={notice} onClose={() => setNotice("")} />
     </section>
   );

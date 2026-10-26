@@ -1,0 +1,20 @@
+.counted-input {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  background: #fff;
+}
+
+.counted-input > input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.counted-input__count {
+  flex: 0 0 auto;
+  padding: 0 10px;
+  color: #8b95a1;
+  font-size: 11px;
+  white-space: nowrap;
+}

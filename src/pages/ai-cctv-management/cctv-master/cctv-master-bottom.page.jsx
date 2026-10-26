@@ -674,6 +674,8 @@ export function CctvMasterPage({
           className="cctv-detail-dialog"
           geometry={detailPresentation === "modal" ? dialogGeometry : undefined}
           saving={savePending}
+          saveLabel={createMode ? "저장" : "수정"}
+          savingLabel={createMode ? "저장 중..." : "수정 중..."}
           resizable={detailPresentation === "modal"}
           onClose={closeDetail}
           onSubmit={saveChanges}

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Badge from "../../components/atoms/Badge/Badge";
 import Loader from "../../components/atoms/Loader/Loader";
+import ConfirmDialog from "../../components/molecules/ConfirmDialog/ConfirmDialog";
 import DataTable from "../../components/organisms/DataTable/DataTable";
 import CrudModal from "../../components/organisms/CrudModal/CrudModal";
 import SearchConditions from "../../components/organisms/SearchConditions/SearchConditions";
@@ -25,6 +26,7 @@ import {
   updateInspectionResults,
   updateInspectionAction,
 } from "../../api/inspectionLinkApi";
+import { buildInspectionEventPrefill } from "./inspection-link-prefill";
 import "./styles/inspection-link.css";
 
 const columns = [
@@ -82,19 +84,26 @@ export default function InspectionLinkPage({ user, onUnauthorized, onUnsavedChan
   const [actionSeq, setActionSeq] = useState(null);
   const [form, setForm] = useState(null);
   const [resultValues, setResultValues] = useState({});
+  const [prefilledKeys, setPrefilledKeys] = useState([]);
+  const [approval, setApproval] = useState(null);
+  const [actions, setActions] = useState([]);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
   const [notice, setNotice] = useState("");
+  const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
 
   const { data: factories, error: factoryError } = useCommonCodes({ enabled: Boolean(user?.token), token: user?.token, codeDiv: "FACTORY", onUnauthorized });
   const { data: eventTypes, error: typeError } = useCommonCodes({ enabled: Boolean(user?.token), token: user?.token, codeDiv: "EVT_TYPE", onUnauthorized });
   const { data: riskLevels } = useCommonCodes({ enabled: Boolean(user?.token), token: user?.token, codeDiv: "RISK_LV", onUnauthorized });
+  const { data: approvalStatuses } = useCommonCodes({ enabled: Boolean(user?.token), token: user?.token, codeDiv: "APPR_STATUS", onUnauthorized });
   const { data: cameras, error: cameraError } = useCameraList({ enabled: Boolean(user?.token), token: user?.token, factoryCd: filters.factoryCd, onUnauthorized });
 
   const cameraOptions = useMemo(() => cameras.filter((camera) => camera.cameraId).map((camera) => ({ value: camera.cameraId, label: camera.cameraNm || camera.cameraId })), [cameras]);
   const typeNames = useMemo(() => new Map(eventTypes.map((item) => [item.value, item.label])), [eventTypes]);
   const riskNames = useMemo(() => new Map(riskLevels.map((item) => [item.value, item.label])), [riskLevels]);
+  const factoryNames = useMemo(() => new Map(factories.map((item) => [item.value, item.label])), [factories]);
+  const approvalNames = useMemo(() => new Map(approvalStatuses.map((item) => [item.value, item.label])), [approvalStatuses]);
 
   useEffect(() => {
     onUnsavedChange?.(dirty || saving);
@@ -139,7 +148,13 @@ export default function InspectionLinkPage({ user, onUnauthorized, onUnsavedChan
     setDocumentsLoading(true);
     setDocumentError("");
     fetchInspectionDocuments({ token: user.token, equipCd: selected.equipCd, signal: controller.signal })
-      .then((payload) => setDocuments(payload.data || []))
+      .then((payload) => {
+        const available = payload.data || [];
+        setDocuments(available);
+        if (available.length === 1) {
+          setForm((current) => current && !current.docCd ? { ...current, docCd: available[0].docCd } : current);
+        }
+      })
       .catch((requestError) => {
         if (requestError.name === "AbortError") return;
         if (requestError.status === 401) onUnauthorized?.();
@@ -155,10 +170,21 @@ export default function InspectionLinkPage({ user, onUnauthorized, onUnsavedChan
     // eslint-disable-next-line react/set-state-in-effect
     setItems([]);
     setResultValues({});
+    setPrefilledKeys([]);
     setItemsLoading(true);
     setItemsError("");
     fetchInspectionItems({ token: user.token, docCd: form.docCd, signal: controller.signal })
-      .then((payload) => setItems((payload.data || []).sort((a, b) => Number(a.secSortNo) - Number(b.secSortNo) || Number(a.sortNo) - Number(b.sortNo))))
+      .then((payload) => {
+        const nextItems = (payload.data || []).sort((a, b) => Number(a.secSortNo) - Number(b.secSortNo) || Number(a.sortNo) - Number(b.sortNo));
+        const values = buildInspectionEventPrefill(nextItems, selected, {
+          eventTypeName: selected.eventTypeName,
+          riskName: selected.riskName,
+          factoryName: selected.factoryName,
+        });
+        setItems(nextItems);
+        setResultValues(values);
+        setPrefilledKeys(Object.keys(values));
+      })
       .catch((requestError) => {
         if (requestError.name === "AbortError") return;
         if (requestError.status === 401) onUnauthorized?.();
@@ -166,7 +192,7 @@ export default function InspectionLinkPage({ user, onUnauthorized, onUnsavedChan
       })
       .finally(() => { if (!controller.signal.aborted) setItemsLoading(false); });
     return () => controller.abort();
-  }, [form?.docCd, selected?.chkNo, user?.token, onUnauthorized]);
+  }, [form?.docCd, selected, user?.token, onUnauthorized]);
 
   useEffect(() => {
     if (!selected?.chkNo || !user?.token) return undefined;
@@ -191,6 +217,9 @@ export default function InspectionLinkPage({ user, onUnauthorized, onUnsavedChan
       });
       setItems(resultRows);
       setResultValues(Object.fromEntries(resultRows.map((item) => [itemKey(item), item.result || ""])));
+      setPrefilledKeys([]);
+      setApproval(detail);
+      setActions(actions.data || []);
       setActionSeq(firstAction?.actSeq ?? null);
       setDirty(false);
     }).catch((requestError) => {
@@ -212,7 +241,12 @@ export default function InspectionLinkPage({ user, onUnauthorized, onUnsavedChan
       setNotice("연결된 점검번호가 없어 일지를 열 수 없습니다.");
       return;
     }
-    setSelected(row);
+    setSelected({
+      ...row,
+      eventTypeName: typeNames.get(row.eventTypeCd),
+      riskName: riskNames.get(row.riskLvCd),
+      factoryName: factoryNames.get(row.factoryCd),
+    });
     if (row.chkNo) {
       setForm(null);
     } else {
@@ -227,17 +261,28 @@ export default function InspectionLinkPage({ user, onUnauthorized, onUnsavedChan
     setItemsLoading(false);
     setItemsError("");
     setResultValues({});
+    setPrefilledKeys([]);
+    setApproval(null);
+    setActions([]);
     setActionSeq(null);
     setFormError("");
     setDirty(false);
   }
 
-  function closeCreate() {
-    if (saving) return;
-    if (dirty && !window.confirm("입력 중인 점검일지 내용을 닫으시겠습니까?")) return;
+  function finishClose() {
+    setLeaveConfirmOpen(false);
     setSelected(null);
     setForm(null);
     setDirty(false);
+    setPrefilledKeys([]);
+    setApproval(null);
+    setActions([]);
+  }
+
+  function closeCreate() {
+    if (saving) return;
+    if (dirty) setLeaveConfirmOpen(true);
+    else finishClose();
   }
 
   function updateForm(key, value) {
@@ -263,8 +308,8 @@ export default function InspectionLinkPage({ user, onUnauthorized, onUnsavedChan
       result: resultValues[itemKey(item)]?.trim() || null,
       ...(selected.chkNo ? { photoPath: item.photoPath ?? null } : {}),
     }));
-    if (!results.some((item) => item.result)) {
-      setFormError("점검 결과를 한 항목 이상 입력해 주세요.");
+    if (!results.some((item) => item.result && !prefilledKeys.includes(itemKey(item)))) {
+      setFormError("자동 입력 항목 외에 점검 결과를 한 항목 이상 확인·입력해 주세요.");
       return;
     }
     setSaving(true);
@@ -336,7 +381,7 @@ export default function InspectionLinkPage({ user, onUnauthorized, onUnsavedChan
         </div>
       </ContentTable>
 
-      <CrudModal open={Boolean(selected)} mode="create" titles={{ create: selected?.chkNo ? "안전점검일지 수정" : "안전점검일지 등록" }} formId="inspection-link-form" className="inspection-link-dialog cctv-detail-dialog" saving={saving} saveLabel={selected?.chkNo ? "점검일지 수정" : "안전점검일지 등록"} savingLabel="저장 중..." onClose={closeCreate} onSubmit={submitCheck}>
+      <CrudModal open={Boolean(selected)} mode="create" titles={{ create: selected?.chkNo ? "안전점검일지 수정" : "안전점검일지 등록" }} formId="inspection-link-form" className="inspection-link-dialog cctv-detail-dialog" saving={saving} saveLabel={selected?.chkNo ? "수정" : "저장"} savingLabel={selected?.chkNo ? "수정 중..." : "저장 중..."} onClose={closeCreate} onSubmit={submitCheck}>
         {selected && detailLoading && <div className="inspection-link-loading"><Loader label="점검일지 불러오는 중" /></div>}
         {selected && !detailLoading && !form && formError && <p className="inspection-link-error inspection-link-loading" role="alert">{formError}</p>}
         {selected && form && <div className="inspection-link-form-content">
@@ -346,11 +391,23 @@ export default function InspectionLinkPage({ user, onUnauthorized, onUnsavedChan
               <div><dt>이벤트 ID</dt><dd>{selected.eventNo}</dd></div>
               <div><dt>발생일시</dt><dd>{formatDateTime(selected.occurDt)}</dd></div>
               <div><dt>카메라</dt><dd>{selected.cameraNm || selected.cameraId || "-"}</dd></div>
+              <div><dt>감지구역</dt><dd>{selected.zoneNm || selected.zoneId || "-"}</dd></div>
               <div><dt>설비</dt><dd>{selected.equipCd || "-"}</dd></div>
               <div><dt>위치</dt><dd>{selected.locDesc || selected.zoneNm || selected.zoneId || "-"}</dd></div>
               <div><dt>이벤트 유형</dt><dd>{typeNames.get(selected.eventTypeCd) || selected.eventTypeCd || "-"}</dd></div>
+              <div><dt>위험 단계</dt><dd>{riskNames.get(selected.riskLvCd) || selected.riskLvCd || "-"}</dd></div>
             </dl>
           </section>
+
+          {selected.chkNo && approval && <section className="inspection-link-form-section inspection-link-approval">
+            <h3>승인 상태</h3>
+            <dl>
+              <div><dt>상태</dt><dd>{approvalNames.get(approval.apprStatusCd) || approval.apprStatusCd || "-"}</dd></div>
+              <div><dt>승인자</dt><dd>{approval.apprMemberId || "-"}</dd></div>
+              <div><dt>승인일시</dt><dd>{formatDateTime(approval.apprDt)}</dd></div>
+              {approval.rejectReason && <div><dt>반려 사유</dt><dd>{approval.rejectReason}</dd></div>}
+            </dl>
+          </section>}
 
           <section className="inspection-link-form-section">
             <h3>점검일지 정보</h3>
@@ -371,19 +428,19 @@ export default function InspectionLinkPage({ user, onUnauthorized, onUnsavedChan
             </div>
             {documentError && <p className="inspection-link-error">{documentError}</p>}
             {!selected.chkNo && documentsLoading && <div className="inspection-link-loading"><Loader size={24} label="점검 문서 불러오는 중" /></div>}
-            {!selected.chkNo && !documentsLoading && !documentError && !documents.length && <p className="inspection-link-help">선택한 설비에 사용 가능한 점검 문서가 없습니다.</p>}
+            {!selected.chkNo && !documentsLoading && !documentError && !documents.length && <p className="inspection-link-help">사용 가능한 점검 문서가 없습니다. 점검 문서·목차 관리에서 문서를 등록해 주세요.</p>}
           </section>
 
           <section className="inspection-link-form-section">
             <h3>항목별 점검 결과</h3>
-            <p className="inspection-link-help">기존 문서 항목에 맞춰 점검 결과를 입력해 주세요. 이벤트 정보는 위에서 확인할 수 있습니다.</p>
+            <p className="inspection-link-help">이벤트 정보와 이름이 일치하는 텍스트 항목은 자동 입력됩니다. 각 항목의 결과를 확인해 주세요.</p>
             {itemsLoading && <div className="inspection-link-loading"><Loader size={24} label="점검 항목 불러오는 중" /></div>}
             {itemsError && <p className="inspection-link-error">{itemsError}</p>}
             {!itemsLoading && form.docCd && !itemsError && !items.length && <p className="inspection-link-help">사용 가능한 점검 항목이 없습니다.</p>}
             {items.length > 0 && <div className="inspection-link-items">
               {items.map((item) => <label key={itemKey(item)}>
-                <span><strong>{item.secNm ? `${item.secNm} / ` : ""}{item.itemNm}</strong>{item.criteria && <small>기준: {item.criteria}</small>}</span>
-                <input maxLength={200} value={resultValues[itemKey(item)] || ""} onChange={(event) => { setResultValues((current) => ({ ...current, [itemKey(item)]: event.target.value })); setDirty(true); setFormError(""); }} placeholder="점검 결과 입력" />
+                <span><strong>{item.secNm ? `${item.secNm} / ` : ""}{item.itemNm}{prefilledKeys.includes(itemKey(item)) && <em className="inspection-link-prefilled">이벤트 자동 입력</em>}</strong>{item.criteria && <small>기준: {item.criteria}</small>}</span>
+                <input maxLength={200} value={resultValues[itemKey(item)] || ""} onChange={(event) => { setResultValues((current) => ({ ...current, [itemKey(item)]: event.target.value })); setPrefilledKeys((current) => current.filter((key) => key !== itemKey(item))); setDirty(true); setFormError(""); }} placeholder="점검 결과 입력" />
               </label>)}
             </div>}
           </section>
@@ -392,10 +449,22 @@ export default function InspectionLinkPage({ user, onUnauthorized, onUnsavedChan
             <h3>조치 사항</h3>
             <textarea maxLength={1000} value={form.actionDesc} onChange={(event) => updateForm("actionDesc", event.target.value)} placeholder="필요한 조치 내용을 입력해 주세요." />
             {selected.chkNo && actionSeq != null && <p className="inspection-link-help">기존 조치 사항은 내용을 입력해 수정할 수 있습니다. 빈칸은 기존 내용을 유지합니다.</p>}
+            {actions.length > 0 && <div className="inspection-link-action-history">
+              <h4>등록된 조치</h4>
+              <ul>{actions.map((action) => <li key={action.actSeq}><span>{action.actDt || "날짜 없음"} · {action.actMemberId || "담당자 없음"}</span><p>{action.actionDesc || "-"}</p></li>)}</ul>
+            </div>}
           </section>
           {formError && <p className="inspection-link-error" role="alert">{formError}</p>}
         </div>}
       </CrudModal>
+      <ConfirmDialog
+        open={leaveConfirmOpen}
+        title="저장되지 않은 내용이 있습니다."
+        description="저장하지 않고 나가시겠습니까?"
+        confirmLabel="나가기"
+        onCancel={() => setLeaveConfirmOpen(false)}
+        onConfirm={finishClose}
+      />
       <Toast open={Boolean(notice)} message={notice} onClose={() => setNotice("")} />
     </section>
   );

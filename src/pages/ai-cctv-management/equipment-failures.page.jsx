@@ -32,7 +32,6 @@ const columns = [
   "처리 상태",
   "담당자",
   "복구일시",
-  "처리",
 ];
 
 const datePresets = [
@@ -430,7 +429,6 @@ function EquipmentFailuresPage({ user, onUnauthorized, onUnsavedChange }) {
     setMode("detail");
   };
   const openProcess = (row) => {
-    setDialogGeometry(null);
     setNotice("");
     setSelectedId(row.id);
     setSelectedDetail(row);
@@ -514,24 +512,6 @@ function EquipmentFailuresPage({ user, onUnauthorized, onUnsavedChange }) {
   };
 
   const renderCell = (row, column) => {
-    if (column === "처리") {
-      const completed = ["DONE", "FALSE_POS"].includes(row.statusCd);
-      return (
-        <Button
-          size="small"
-          variant="weak"
-          className={completed ? "failure-process-complete" : ""}
-          aria-label={`${row.faultNo} 처리정보 열기`}
-          onClick={(event) => {
-            event.stopPropagation();
-            openProcess(row);
-          }}
-          onDoubleClick={(event) => event.stopPropagation()}
-        >
-          {completed ? "처리완료" : "처리하기"}
-        </Button>
-      );
-    }
     const values = {
       장애번호: row.faultNo,
       발생일시: formatDateTime(row.occurDt),
@@ -640,18 +620,18 @@ function EquipmentFailuresPage({ user, onUnauthorized, onUnsavedChange }) {
 
       <CrudModal
         ref={detailDialog}
-        open={mode === "create" || mode === "detail"}
-        mode={mode === "create" ? "create" : "detail"}
-        titles={{ create: "장애 수동 등록", detail: "장애 상세" }}
+        open={Boolean(mode)}
+        mode={mode || "detail"}
+        titles={{ create: "장애 수동 등록", detail: "장애 상세", edit: "장애 처리" }}
         formId="equipment-failure-form"
-        className="cctv-detail-dialog"
+        className={`cctv-detail-dialog${mode !== "create" ? " failure-record-dialog" : ""}`}
         geometry={dialogGeometry}
         resizable
         saving={saving}
-        saveLabel={mode === "create" ? "등록" : "저장"}
         savingLabel="저장 중..."
         onClose={requestClose}
         onSubmit={handleSubmit}
+        onEdit={mode === "detail" && currentRow ? () => openProcess(currentRow) : undefined}
         onInteractionStart={startDialogInteraction}
         onInteractionMove={moveDialogInteraction}
         onInteractionEnd={stopDialogInteraction}
@@ -719,55 +699,41 @@ function EquipmentFailuresPage({ user, onUnauthorized, onUnsavedChange }) {
             </dl>
           </section>
         ) : currentRow ? (
-          <div className="failure-record-grid">
-            <section className="field-section failure-detail-section">
+          <div className="failure-process-content">
+            <section className={`field-section failure-detail-section failure-detail-section--fault${mode === "edit" ? " is-readonly" : ""}`}>
+              <h3 className="failure-process-section-title">장애 정보</h3>
               <dl className="cctv-detail-table failure-detail-table">
                 <div><dt>장애번호</dt><dd>{currentRow.faultNo || "-"}</dd></div>
                 <div><dt>발생일시</dt><dd>{formatDateTime(currentRow.occurDt)}</dd></div>
                 <div><dt>등록 구분</dt><dd>{currentRow.regType === "MANUAL" ? "수동" : "자동"}</dd></div>
                 <div><dt>장비구분</dt><dd>{currentRow.deviceKind || "-"}</dd></div>
-                <div><dt>장비 ID</dt><dd>{currentRow.deviceId || "-"}</dd></div>
+                <div><dt>장비</dt><dd>{currentRow.deviceNm || currentRow.deviceId || "-"}</dd></div>
                 <div><dt>위치</dt><dd>{currentRow.locDesc || "-"}</dd></div>
                 <div><dt>장애 유형</dt><dd>{faultTypeName.get(currentRow.faultTypeCd) || currentRow.faultTypeCd || "-"}</dd></div>
                 <div><dt>장애 내용</dt><dd className="is-multiline">{currentRow.faultDesc || "-"}</dd></div>
+              </dl>
+            </section>
+            <section className="field-section failure-detail-section failure-detail-section--process">
+              <h3 className="failure-process-section-title">처리 정보</h3>
+              <dl className="cctv-detail-table failure-detail-table">
+                <div><dt>처리 상태</dt>{mode === "edit" ? <dd className="is-editing"><DropDownMenu value={formValues.statusCd} onChange={(event) => updateForm("statusCd", event.target.value)}>{statusOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</DropDownMenu></dd> : <dd><Badge tone={statusTone(currentRow.statusCd)}>{statusName.get(currentRow.statusCd) || currentRow.statusCd || "-"}</Badge></dd>}</div>
+                <div><dt>확인자</dt>{mode === "edit" ? <dd className="is-editing"><input maxLength={7} value={formValues.checkMemberId} placeholder="사번" onChange={(event) => updateForm("checkMemberId", event.target.value)} /></dd> : <dd>{currentRow.checkMemberId || "-"}</dd>}</div>
+                <div><dt>원인 구분</dt>{mode === "edit" ? <dd className="is-editing"><DropDownMenu value={formValues.causeTypeCd} onChange={(event) => updateForm("causeTypeCd", event.target.value)}><option value="">선택</option>{causeTypes.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</DropDownMenu></dd> : <dd>{causeTypes.find((item) => item.value === currentRow.causeTypeCd)?.label || currentRow.causeTypeCd || "-"}</dd>}</div>
+                <div><dt>원인</dt>{mode === "edit" ? <dd className="is-editing"><textarea maxLength={500} value={formValues.cause} onChange={(event) => updateForm("cause", event.target.value)} /></dd> : <dd className="is-multiline">{currentRow.cause || "-"}</dd>}</div>
+                <div><dt>담당자</dt>{mode === "edit" ? <dd className="is-editing"><input maxLength={7} value={formValues.chargeMemberId} placeholder="사번" onChange={(event) => updateForm("chargeMemberId", event.target.value)} /></dd> : <dd>{currentRow.chargeMemberId || "-"}</dd>}</div>
+                <div><dt>복구일시</dt>{mode === "edit" ? <dd className="is-editing"><input type="datetime-local" value={formValues.recoverDt} onChange={(event) => updateForm("recoverDt", event.target.value)} /></dd> : <dd>{formatDateTime(currentRow.recoverDt)}</dd>}</div>
+                <div><dt>복구 조치 내용</dt>{mode === "edit" ? <dd className="is-editing"><textarea maxLength={1000} value={formValues.recoverAction} onChange={(event) => updateForm("recoverAction", event.target.value)} /></dd> : <dd className="is-multiline">{currentRow.recoverAction || "-"}</dd>}</div>
               </dl>
             </section>
           </div>
         ) : null}
       </CrudModal>
 
-      <CrudModal
-        open={mode === "edit"}
-        mode="edit"
-        titles={{ edit: "장애 처리정보" }}
-        formId="equipment-failure-process-form"
-        className="cctv-detail-dialog"
-        saving={saving}
-        savingLabel="저장 중..."
-        onClose={requestClose}
-        onSubmit={handleSubmit}
-      >
-        {currentRow && formValues ? (
-          <section className="field-section failure-detail-section">
-            <dl className="cctv-detail-table failure-detail-table">
-              <div><dt>처리 상태</dt><dd className="is-editing"><DropDownMenu value={formValues.statusCd} onChange={(event) => updateForm("statusCd", event.target.value)}>{statusOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</DropDownMenu></dd></div>
-              <div><dt>확인자</dt><dd className="is-editing"><input maxLength={7} value={formValues.checkMemberId} placeholder="사번" onChange={(event) => updateForm("checkMemberId", event.target.value)} /></dd></div>
-              <div><dt>원인 구분</dt><dd className="is-editing"><DropDownMenu value={formValues.causeTypeCd} onChange={(event) => updateForm("causeTypeCd", event.target.value)}><option value="">선택</option>{causeTypes.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</DropDownMenu></dd></div>
-              <div><dt>원인</dt><dd className="is-editing"><textarea maxLength={500} value={formValues.cause} onChange={(event) => updateForm("cause", event.target.value)} /></dd></div>
-              <div><dt>담당자</dt><dd className="is-editing"><input maxLength={7} value={formValues.chargeMemberId} placeholder="사번" onChange={(event) => updateForm("chargeMemberId", event.target.value)} /></dd></div>
-              <div><dt>복구일시</dt><dd className="is-editing"><input type="datetime-local" value={formValues.recoverDt} onChange={(event) => updateForm("recoverDt", event.target.value)} /></dd></div>
-              <div><dt>복구 조치 내용</dt><dd className="is-editing"><textarea maxLength={1000} value={formValues.recoverAction} onChange={(event) => updateForm("recoverAction", event.target.value)} /></dd></div>
-            </dl>
-          </section>
-        ) : null}
-      </CrudModal>
-
       <ConfirmDialog
         open={closeConfirmOpen}
-        title="작성 중인 내용이 있습니다."
-        description="저장하지 않고 닫으시겠습니까?"
-        cancelLabel="계속 작성"
-        confirmLabel="닫기"
+        title="저장되지 않은 내용이 있습니다."
+        description="저장하지 않고 나가시겠습니까?"
+        confirmLabel="나가기"
         onCancel={() => setCloseConfirmOpen(false)}
         onConfirm={finishClose}
       />

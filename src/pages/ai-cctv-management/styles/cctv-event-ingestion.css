@@ -40,18 +40,28 @@
   gap: 10px;
 }
 
-dialog.raw-event-dialog {
-  width: min(780px, calc(100vw - 32px));
-}
-
 .raw-event-dialog .detail-body {
   padding: 16px 20px 20px;
 }
 
+dialog.raw-event-dialog--detail[open] {
+  width: min(560px, calc(100vw - 32px));
+  max-height: min(var(--raw-event-payload-max-height, 100dvh), calc(100dvh - 32px));
+}
+
+.raw-event-dialog--detail .detail-body {
+  min-height: 0;
+  overflow-y: auto;
+}
+
 .raw-event-detail-content {
   display: grid;
-  gap: 18px;
+  gap: 28px;
 }
+
+.raw-event-dialog--editing .raw-event-detail-content > .raw-event-form-section:first-child .raw-event-detail-table { border-color: #d9dfe3; }
+.raw-event-dialog--editing .raw-event-detail-content > .raw-event-form-section:first-child .raw-event-detail-table dt { background: #e9ecef; }
+.raw-event-dialog--editing .raw-event-detail-content > .raw-event-form-section:first-child .raw-event-detail-table dd { background: #f5f6f7; color: #596574; }
 
 .raw-event-form-section h3 {
   display: flex;
@@ -67,39 +77,60 @@ dialog.raw-event-dialog {
   font-size: 11px;
 }
 
-.raw-event-form-guide {
-  margin: 0 0 12px;
-  padding: 10px 12px;
-  border-left: 3px solid #58a999;
-  background: #f4faf8;
-  color: #52615d;
-  font-size: 12px;
-  line-height: 1.55;
-}
-
 .raw-event-detail-table {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
 }
 
-.raw-event-detail-table > div {
+.cctv-detail-table.raw-event-detail-table > div {
   min-width: 0;
-  border-right: 1px solid #e5e8eb;
+  grid-template-columns: 120px minmax(0, 1fr);
 }
 
-.raw-event-detail-table > div:nth-child(2n) {
-  border-right: 0;
+.cctv-detail-table.raw-event-detail-table > div.is-paired {
+  grid-template-columns: 120px minmax(0, 1fr) 120px minmax(0, 1fr);
 }
 
-.raw-event-detail-table > div:nth-last-child(-n + 2) {
-  border-bottom: 0;
+.raw-event-detail-table > div.is-paired > :nth-child(3) {
+  border-left: 1px solid #e5e8eb;
+}
+
+.raw-event-detail-table > div.is-paired dt,
+.raw-event-detail-table > div.is-paired dd {
+  padding-right: 8px;
+  padding-left: 8px;
+}
+
+.raw-event-detail-table > div.is-paired dd {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+
+@media (max-width: 480px) {
+  .cctv-detail-table.raw-event-detail-table > div.is-paired {
+    grid-template-columns: 120px minmax(0, 1fr);
+  }
+
+  .raw-event-detail-table > div.is-paired > :nth-child(3),
+  .raw-event-detail-table > div.is-paired > :nth-child(4) {
+    border-top: 1px solid #e5e8eb;
+  }
+
+  .raw-event-detail-table > div.is-paired > :nth-child(3) {
+    border-left: 0;
+  }
+}
+
+.cctv-detail-table.raw-event-detail-table dd.is-long-value {
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  overflow-wrap: normal;
 }
 
 .raw-event-detail-table > div.is-tall {
-  grid-column: 1 / -1;
   min-height: 78px;
-  border-right: 0;
-  border-top: 1px solid #e5e8eb;
 }
 
 .raw-event-detail-table dd.is-multiline {
@@ -122,6 +153,17 @@ dialog.raw-event-dialog {
   outline-offset: -2px;
 }
 
+.cctv-detail-table.raw-event-detail-table dd.is-editing.is-disabled,
+.cctv-detail-table.raw-event-detail-table dd.is-editing.is-disabled select {
+  background: #eef0f2;
+  color: #98a2ad;
+  cursor: not-allowed;
+}
+
+.raw-event-detail-table dd.is-disabled select::picker-icon {
+  color: #aeb6bf;
+}
+
 .raw-event-detail-state {
   min-height: 220px;
   display: grid;
@@ -138,6 +180,12 @@ dialog.raw-event-dialog {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
+}
+
+@media (max-width: 360px) {
+  .raw-event-snapshot-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .raw-event-snapshot-list button {
@@ -209,48 +257,107 @@ dialog.raw-event-dialog {
   text-align: center;
 }
 
+dialog.raw-event-preview-dialog {
+  width: min(900px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #e5e8eb;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 24px 72px rgba(25, 31, 40, .32);
+}
+
+dialog.raw-event-preview-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.raw-event-preview-dialog::backdrop {
+  background: rgba(25, 31, 40, .45);
+}
+
+.raw-event-preview-header {
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  border-bottom: 1px solid #e5e8eb;
+}
+
+.raw-event-preview-header button {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #6b7684;
+  cursor: pointer;
+}
+
+.raw-event-preview-header button:hover {
+  background: #f2f4f6;
+}
+
+.raw-event-preview-body {
+  min-height: 120px;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  padding: 16px;
+}
+
+.raw-event-preview-body img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100vh - 136px);
+  object-fit: contain;
+}
+
+.raw-event-preview-video {
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+
+.raw-event-preview-video video {
+  width: 100%;
+  max-height: calc(100vh - 190px);
+  background: #111;
+}
+
+.raw-event-preview-video p {
+  margin: 0;
+  color: #c4323f;
+  font-size: 13px;
+}
+
 .raw-event-payload {
-  border-top: 1px solid #edf0f2;
-  padding-top: 12px;
+  min-width: 0;
 }
 
 .raw-event-payload summary {
-  cursor: pointer;
   color: #52615d;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
+  cursor: pointer;
 }
 
 .raw-event-payload pre {
-  max-height: 210px;
+  max-height: 260px;
   margin: 10px 0 0;
-  overflow: auto;
   padding: 12px;
+  overflow: auto;
+  border: 1px solid #e5e8eb;
   border-radius: 6px;
   background: #f6f8f8;
   color: #44504c;
   font: 11px/1.55 ui-monospace, SFMono-Regular, Consolas, monospace;
   white-space: pre-wrap;
   word-break: break-all;
-}
-
-@media (max-width: 720px) {
-  .raw-event-detail-table,
-  .raw-event-snapshot-list {
-    grid-template-columns: 1fr;
-  }
-
-  .raw-event-detail-table > div,
-  .raw-event-detail-table > div:nth-child(2n) {
-    border-right: 0;
-    border-bottom: 1px solid #e5e8eb;
-  }
-
-  .raw-event-detail-table > div:nth-last-child(-n + 2) {
-    border-bottom: 1px solid #e5e8eb;
-  }
-
-  .raw-event-detail-table > div:last-child {
-    border-bottom: 0;
-  }
 }

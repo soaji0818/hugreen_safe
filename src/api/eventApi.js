@@ -10,3 +10,12 @@ export function fetchAiEvents({ token, fromDt, toDt, factoryCd, cameraId, eventT
   });
 }
 
+export function fetchAiEventDetail({ token, eventNo, signal }) {
+  return requestApi(`/api/web/events/${encodeURIComponent(eventNo)}`, {
+    token,
+    signal,
+    networkMessage: "AI CCTV 이벤트 상세 서버에 연결할 수 없습니다.",
+    errorMessage: "AI CCTV 이벤트 상세를 불러오지 못했습니다.",
+  });
+}
+

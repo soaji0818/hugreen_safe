@@ -29,6 +29,91 @@
   min-width: 900px;
 }
 
+.equipment-events-list-panel tbody tr {
+  cursor: pointer;
+}
+
+dialog.equipment-event-dialog.cctv-detail-dialog {
+  width: min(640px, calc(100vw - 32px));
+  max-height: min(680px, calc(100dvh - 32px));
+}
+
+.equipment-event-dialog .detail-body {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px 18px 20px;
+}
+
+.equipment-event-detail-content {
+  display: grid;
+  gap: 16px;
+}
+
+.equipment-event-section h3 {
+  margin: 0 0 10px;
+  color: #273548;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.equipment-event-pair-table {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #e5e8eb;
+  border-radius: 6px;
+}
+
+.equipment-event-pair-table > div {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) 96px minmax(0, 1fr);
+  min-height: 36px;
+  border-bottom: 1px solid #e5e8eb;
+}
+
+.equipment-event-pair-table > div:last-child {
+  border-bottom: 0;
+}
+
+.equipment-event-pair-table > div > :not(:last-child) {
+  border-right: 1px solid #e5e8eb;
+}
+
+.equipment-event-pair-table dt,
+.equipment-event-pair-table dd {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 7px 8px;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.equipment-event-pair-table dt {
+  background: #f2f4f6;
+  color: #4e5968;
+  font-weight: 700;
+}
+
+.equipment-event-pair-table dd {
+  background: #fff;
+  color: #273548;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.equipment-event-detail-state,
+.equipment-event-detail-error {
+  margin: 0 0 12px;
+  font-size: 12px;
+}
+
+.equipment-event-detail-error {
+  color: #c4323f;
+}
+
 @media (max-width: 720px) {
   .work-panel.equipment-events-page {
     height: auto;
@@ -37,6 +122,26 @@
 
   .equipment-events-list-panel {
     min-height: 320px;
+  }
+}
+
+@media (max-width: 560px) {
+  .equipment-event-dialog .detail-body {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  .equipment-event-pair-table > div {
+    grid-template-columns: 96px minmax(0, 1fr);
+  }
+
+  .equipment-event-pair-table > div > :nth-child(n + 3) {
+    border-top: 1px solid #e5e8eb;
+  }
+
+  .equipment-event-pair-table > div > :nth-child(2) {
+    border-right: 0;
   }
 }
 
