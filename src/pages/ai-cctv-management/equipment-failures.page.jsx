@@ -6,7 +6,6 @@ import SearchConditions from "../../components/organisms/SearchConditions/Search
 import DateCondition from "../../components/molecules/SearchConditions/DateCondition";
 import RadioCondition from "../../components/molecules/SearchConditions/RadioConditioin";
 import DropCondition from "../../components/molecules/SearchConditions/DropCondition";
-import Badge from "../../components/atoms/Badge/Badge";
 import Button from "../../components/atoms/Button/Button";
 import ConfirmDialog from "../../components/molecules/ConfirmDialog/ConfirmDialog";
 import CrudModal from "../../components/organisms/CrudModal/CrudModal";
@@ -83,12 +82,6 @@ function toApiDateTime(value) {
 function codeMap(codes, fallback) {
   const source = codes.length ? codes : fallback;
   return new Map(source.map((code) => [code.value, code.label]));
-}
-
-function statusTone(statusCd) {
-  if (["DONE", "FALSE_POS"].includes(statusCd)) return "gray";
-  if (statusCd === "ACTING") return "amber";
-  return "red";
 }
 
 function createFormValues() {
@@ -521,14 +514,10 @@ function EquipmentFailuresPage({ user, onUnauthorized, onUnsavedChange }) {
       복구일시: formatDateTime(row.recoverDt),
     };
     if (column === "장애 유형") {
-      return <Badge tone="red">{faultTypeName.get(row.faultTypeCd) || row.faultTypeCd || "-"}</Badge>;
+      return faultTypeName.get(row.faultTypeCd) || row.faultTypeCd || "-";
     }
     if (column === "처리 상태") {
-      return (
-        <Badge tone={statusTone(row.statusCd)}>
-          {statusName.get(row.statusCd) || row.statusCd || "-"}
-        </Badge>
-      );
+      return statusName.get(row.statusCd) || row.statusCd || "-";
     }
     return values[column] ?? "-";
   };
@@ -716,7 +705,7 @@ function EquipmentFailuresPage({ user, onUnauthorized, onUnsavedChange }) {
             <section className="field-section failure-detail-section failure-detail-section--process">
               <h3 className="failure-process-section-title">처리 정보</h3>
               <dl className="cctv-detail-table failure-detail-table">
-                <div><dt>처리 상태</dt>{mode === "edit" ? <dd className="is-editing"><DropDownMenu value={formValues.statusCd} onChange={(event) => updateForm("statusCd", event.target.value)}>{statusOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</DropDownMenu></dd> : <dd><Badge tone={statusTone(currentRow.statusCd)}>{statusName.get(currentRow.statusCd) || currentRow.statusCd || "-"}</Badge></dd>}</div>
+                <div><dt>처리 상태</dt>{mode === "edit" ? <dd className="is-editing"><DropDownMenu value={formValues.statusCd} onChange={(event) => updateForm("statusCd", event.target.value)}>{statusOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</DropDownMenu></dd> : <dd>{statusName.get(currentRow.statusCd) || currentRow.statusCd || "-"}</dd>}</div>
                 <div><dt>확인자</dt>{mode === "edit" ? <dd className="is-editing"><input maxLength={7} value={formValues.checkMemberId} placeholder="사번" onChange={(event) => updateForm("checkMemberId", event.target.value)} /></dd> : <dd>{currentRow.checkMemberId || "-"}</dd>}</div>
                 <div><dt>원인 구분</dt>{mode === "edit" ? <dd className="is-editing"><DropDownMenu value={formValues.causeTypeCd} onChange={(event) => updateForm("causeTypeCd", event.target.value)}><option value="">선택</option>{causeTypes.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</DropDownMenu></dd> : <dd>{causeTypes.find((item) => item.value === currentRow.causeTypeCd)?.label || currentRow.causeTypeCd || "-"}</dd>}</div>
                 <div><dt>원인</dt>{mode === "edit" ? <dd className="is-editing"><textarea maxLength={500} value={formValues.cause} onChange={(event) => updateForm("cause", event.target.value)} /></dd> : <dd className="is-multiline">{currentRow.cause || "-"}</dd>}</div>

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchAiEventDetail, fetchAiEvents } from "../../api/eventApi";
+import Badge from "../../components/atoms/Badge/Badge";
 import Button from "../../components/atoms/Button/Button";
 import { DownloadIcon } from "../../components/atoms/Icon/Icon";
 import DataTable from "../../components/organisms/DataTable/DataTable";
@@ -54,6 +55,14 @@ function formatConfidence(value) {
     : "-";
 }
 
+function riskTone(value) {
+  const risk = String(value).toUpperCase();
+  if (/DANGER|CRITICAL|HIGH|위험|심각/.test(risk)) return "red";
+  if (/WARNING|CAUTION|MEDIUM|경고|주의|경계/.test(risk)) return "amber";
+  if (/SAFE|NORMAL|LOW|안전|정상|낮음/.test(risk)) return "green";
+  return "gray";
+}
+
 function exportEventRows(rows, eventTypeNames, riskNames, statusNames) {
   const escape = (value) => `"${String(value ?? "").replaceAll('"', '""')}"`;
   const lines = [
@@ -104,6 +113,11 @@ export default function EquipmentEventsPage({ user, onUnauthorized }) {
   const eventTypeNames = useMemo(() => new Map(eventTypes.map((item) => [item.value, item.label])), [eventTypes]);
   const statusNames = useMemo(() => new Map(statuses.map((item) => [item.value, item.label])), [statuses]);
   const riskNames = useMemo(() => new Map(riskLevels.map((item) => [item.value, item.label])), [riskLevels]);
+  function renderRisk(riskCd) {
+    if (!riskCd) return "-";
+    const label = riskNames.get(riskCd) || riskCd;
+    return <Badge tone={riskTone(`${riskCd} ${label}`)}>{label}</Badge>;
+  }
   useEffect(() => {
     if (!user?.token || !filters.fromDt || !filters.toDt) return undefined;
     const controller = new AbortController();
@@ -174,7 +188,7 @@ export default function EquipmentEventsPage({ user, onUnauthorized }) {
     if (key === "cameraNm") return row.cameraNm || row.cameraId || "-";
     if (key === "zoneNm") return row.zoneNm || row.zoneId || "-";
     if (key === "eventTypeCd") return eventTypeNames.get(row.eventTypeCd) || row.eventTypeCd || "-";
-    if (key === "riskLvCd") return riskNames.get(row.riskLvCd) || row.riskLvCd || "-";
+    if (key === "riskLvCd") return renderRisk(row.riskLvCd);
     if (key === "statusCd") return statusNames.get(row.statusCd) || row.statusCd || "-";
     return row[key] || "-";
   }
@@ -204,7 +218,7 @@ export default function EquipmentEventsPage({ user, onUnauthorized }) {
           <section className="equipment-event-section"><h3>이벤트 개요</h3>
             <dl className="equipment-event-pair-table">
               <div><dt>이벤트 ID</dt><dd>{detail.eventNo || "-"}</dd><dt>이벤트 유형</dt><dd>{eventTypeNames.get(detail.eventTypeCd) || detail.eventTypeCd || "-"}</dd></div>
-              <div><dt>발생일시</dt><dd>{formatDateTime(detail.occurDt)}</dd><dt>위험 단계</dt><dd>{riskNames.get(detail.riskLvCd) || detail.riskLvCd || "-"}</dd></div>
+              <div><dt>발생일시</dt><dd>{formatDateTime(detail.occurDt)}</dd><dt>위험 단계</dt><dd>{renderRisk(detail.riskLvCd)}</dd></div>
               <div><dt>AI 신뢰도</dt><dd>{formatConfidence(detail.confidence)}</dd><dt>집중감시</dt><dd>{detail.focusYn === "Y" ? "예" : detail.focusYn === "N" ? "아니요" : "-"}</dd></div>
               <div><dt>발생원</dt><dd>{detail.sourceType || "-"}</dd><dt>등록 구분</dt><dd>{detail.regType === "MANUAL" ? "수동" : detail.regType === "AUTO" ? "자동" : detail.regType || "-"}</dd></div>
               <div><dt>원천 이벤트</dt><dd>{detail.rawNo || "-"}</dd><dt>수집일시</dt><dd>{formatDateTime(detail.collectDt)}</dd></div>
