@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Badge from "../../components/atoms/Badge/Badge";
 import Loader from "../../components/atoms/Loader/Loader";
 import ConfirmDialog from "../../components/molecules/ConfirmDialog/ConfirmDialog";
@@ -92,6 +92,9 @@ export default function InspectionLinkPage({ user, onUnauthorized, onUnsavedChan
   const [formError, setFormError] = useState("");
   const [notice, setNotice] = useState("");
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
+  const [dialogGeometry, setDialogGeometry] = useState(null);
+  const detailDialog = useRef(null);
+  const dialogInteraction = useRef(null);
 
   const { data: factories, error: factoryError } = useCommonCodes({ enabled: Boolean(user?.token), token: user?.token, codeDiv: "FACTORY", onUnauthorized });
   const { data: eventTypes, error: typeError } = useCommonCodes({ enabled: Boolean(user?.token), token: user?.token, codeDiv: "EVT_TYPE", onUnauthorized });
@@ -234,6 +237,83 @@ export default function InspectionLinkPage({ user, onUnauthorized, onUnsavedChan
     setFilters((current) => ({ ...current, ...patch }));
   }
 
+  function startDialogInteraction(event, interactionMode) {
+    if (event.button !== 0) return;
+    const dialog = detailDialog.current;
+    if (!dialog) return;
+
+    const rect = dialog.getBoundingClientRect();
+    const scale = rect.width / dialog.offsetWidth || 1;
+    const geometry = {
+      left: rect.left / scale,
+      top: rect.top / scale,
+      width: rect.width / scale,
+      height: rect.height / scale,
+    };
+    dialogInteraction.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      scale,
+      mode: interactionMode,
+      ...geometry,
+    };
+    setDialogGeometry(geometry);
+    event.currentTarget.setPointerCapture(event.pointerId);
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  function moveDialogInteraction(event) {
+    const interaction = dialogInteraction.current;
+    if (!interaction || interaction.pointerId !== event.pointerId) return;
+
+    const dx = (event.clientX - interaction.startX) / interaction.scale;
+    const dy = (event.clientY - interaction.startY) / interaction.scale;
+    const viewportWidth = window.innerWidth / interaction.scale;
+    const viewportHeight = window.innerHeight / interaction.scale;
+    const minWidth = Math.min(360, viewportWidth - 16);
+    const minHeight = Math.min(280, viewportHeight - 16);
+    let { left, top, width, height } = interaction;
+
+    if (interaction.mode === "drag") {
+      left = Math.min(Math.max(0, interaction.left + dx), Math.max(0, viewportWidth - width));
+      top = Math.min(Math.max(0, interaction.top + dy), Math.max(0, viewportHeight - height));
+    } else {
+      if (interaction.mode.includes("e")) {
+        width = Math.min(Math.max(minWidth, interaction.width + dx), viewportWidth - interaction.left);
+      }
+      if (interaction.mode.includes("s")) {
+        height = Math.min(Math.max(minHeight, interaction.height + dy), viewportHeight - interaction.top);
+      }
+      if (interaction.mode.includes("w")) {
+        const right = interaction.left + interaction.width;
+        left = Math.min(Math.max(0, interaction.left + dx), right - minWidth);
+        width = right - left;
+      }
+      if (interaction.mode.includes("n")) {
+        const bottom = interaction.top + interaction.height;
+        top = Math.min(Math.max(0, interaction.top + dy), bottom - minHeight);
+        height = bottom - top;
+      }
+    }
+
+    setDialogGeometry({
+      left: Math.round(left),
+      top: Math.round(top),
+      width: Math.round(width),
+      height: Math.round(height),
+    });
+  }
+
+  function stopDialogInteraction(event) {
+    if (dialogInteraction.current?.pointerId !== event.pointerId) return;
+    dialogInteraction.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  }
+
   function openCreate(id) {
     const row = rows.find((item) => item.id === id);
     if (!row) return;
@@ -241,6 +321,7 @@ export default function InspectionLinkPage({ user, onUnauthorized, onUnsavedChan
       setNotice("연결된 점검번호가 없어 일지를 열 수 없습니다.");
       return;
     }
+    setDialogGeometry(null);
     setSelected({
       ...row,
       eventTypeName: typeNames.get(row.eventTypeCd),
@@ -381,7 +462,7 @@ export default function InspectionLinkPage({ user, onUnauthorized, onUnsavedChan
         </div>
       </ContentTable>
 
-      <CrudModal open={Boolean(selected)} mode="create" titles={{ create: selected?.chkNo ? "안전점검일지 수정" : "안전점검일지 등록" }} formId="inspection-link-form" className="inspection-link-dialog cctv-detail-dialog" saving={saving} saveLabel={selected?.chkNo ? "수정" : "저장"} savingLabel={selected?.chkNo ? "수정 중..." : "저장 중..."} onClose={closeCreate} onSubmit={submitCheck}>
+      <CrudModal ref={detailDialog} open={Boolean(selected)} mode="create" titles={{ create: selected?.chkNo ? "안전점검일지 수정" : "안전점검일지 등록" }} formId="inspection-link-form" className="inspection-link-dialog cctv-detail-dialog" geometry={dialogGeometry} resizable saving={saving} saveLabel={selected?.chkNo ? "수정" : "저장"} savingLabel={selected?.chkNo ? "수정 중..." : "저장 중..."} onClose={closeCreate} onSubmit={submitCheck} onInteractionStart={startDialogInteraction} onInteractionMove={moveDialogInteraction} onInteractionEnd={stopDialogInteraction}>
         {selected && detailLoading && <div className="inspection-link-loading"><Loader label="점검일지 불러오는 중" /></div>}
         {selected && !detailLoading && !form && formError && <p className="inspection-link-error inspection-link-loading" role="alert">{formError}</p>}
         {selected && form && <div className="inspection-link-form-content">

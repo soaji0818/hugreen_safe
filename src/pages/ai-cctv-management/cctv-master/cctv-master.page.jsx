@@ -19,10 +19,10 @@ import { removeCamera, updateCamera } from "../../../services/cameraService";
 
 const EMPTY_ROWS = [];
 const columns = [
-  "카메라ID",
-  "카메라명",
   "공장",
   "설치 위치",
+  "카메라ID",
+  "카메라명",
   "대상 설비",
   "모델",
   "IP 주소",
@@ -778,10 +778,10 @@ export default {
     actions: { save: true, export: false, create: true, delete: true, createLabel: "추가" },
     filters: ["공장", "집중감시구역 여부", "사용 여부"],
     cols: [
-      "카메라ID",
-      "카메라명",
       "공장",
       "설치 위치",
+      "카메라ID",
+      "카메라명",
       "대상 설비",
       "사용 여부",
     ],
